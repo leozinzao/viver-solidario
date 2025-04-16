@@ -34,6 +34,9 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+    
+    --color-solidario-purple: 149 130 255;
+    --color-solidario-yellow: 255 213 0;
   }
 
   .dark {
@@ -64,6 +67,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
+    --color-solidario-purple: 149 130 255;
+    --color-solidario-yellow: 255 213 0;
   }
 }
 
