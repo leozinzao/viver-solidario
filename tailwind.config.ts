@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -55,7 +54,7 @@ export default {
         },
         viver: {
           yellow: "hsl(var(--color-viver-yellow))",
-          white: "hsl(var(--color-viver-white))",
+          orange: "hsl(var(--color-viver-orange))",
         },
       },
       fontFamily: {
