@@ -9,7 +9,7 @@ import ProgramsScreen from '@/screens/ProgramsScreen';
 import VolunteerScreen from '@/screens/VolunteerScreen';
 import EventsScreen from '@/screens/EventsScreen';
 import ImpactScreen from '@/screens/ImpactScreen';
-import { Home, Heart, User, Calendar, GraduationCap, Handshake, Impact } from '@/components/icons';
+import { Home, Heart, User, Plus, Calendar, GraduationCap, Handshake, Impact } from '@/components/icons';
 
 type ScreenType = 'welcome' | 'home' | 'donations' | 'profile' | 'programs' | 'volunteer' | 'events' | 'impact';
 
