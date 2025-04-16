@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,8 +54,9 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         viver: {
-          yellow: "hsl(var(--color-viver-yellow))",
-          orange: "hsl(var(--color-viver-orange))",
+          green: "rgb(var(--color-viver-green) / <alpha-value>)",
+          yellow: "rgb(var(--color-viver-yellow) / <alpha-value>)",
+          orange: "rgb(var(--color-viver-orange) / <alpha-value>)",
         },
       },
       fontFamily: {
