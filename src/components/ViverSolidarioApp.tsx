@@ -7,7 +7,7 @@ import DonationsScreen from '@/screens/DonationsScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import CampaignsScreen from '@/screens/CampaignsScreen';
 import EventsScreen from '@/screens/EventsScreen';
-import { Home, Heart, User, Calendar, Campaign, Plus } from 'lucide-react';
+import { Home, Heart, User, Calendar, Campaign, Plus } from '@/components/icons';
 
 type ScreenType = 'welcome' | 'home' | 'donations' | 'profile' | 'campaigns' | 'events';
 

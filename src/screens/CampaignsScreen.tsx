@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Campaign } from 'lucide-react';
+import { Campaign } from '@/components/icons';
 
 const CampaignsScreen: React.FC = () => {
   const campaigns = [
