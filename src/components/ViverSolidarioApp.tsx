@@ -5,11 +5,13 @@ import WelcomeScreen from '@/screens/WelcomeScreen';
 import DashboardScreen from '@/screens/DashboardScreen';
 import DonationsScreen from '@/screens/DonationsScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
-import CampaignsScreen from '@/screens/CampaignsScreen';
+import ProgramsScreen from '@/screens/ProgramsScreen';
+import VolunteerScreen from '@/screens/VolunteerScreen';
 import EventsScreen from '@/screens/EventsScreen';
-import { Home, Heart, User, Calendar, Campaign, Plus } from '@/components/icons';
+import ImpactScreen from '@/screens/ImpactScreen';
+import { Home, Heart, User, Calendar, GraduationCap, Handshake, Impact } from '@/components/icons';
 
-type ScreenType = 'welcome' | 'home' | 'donations' | 'profile' | 'campaigns' | 'events';
+type ScreenType = 'welcome' | 'home' | 'donations' | 'profile' | 'programs' | 'volunteer' | 'events' | 'impact';
 
 const ViverSolidarioApp: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('welcome');
@@ -28,13 +30,15 @@ const ViverSolidarioApp: React.FC = () => {
             {currentScreen === 'home' && <DashboardScreen />}
             {currentScreen === 'donations' && <DonationsScreen />}
             {currentScreen === 'profile' && <ProfileScreen />}
-            {currentScreen === 'campaigns' && <CampaignsScreen />}
+            {currentScreen === 'programs' && <ProgramsScreen />}
+            {currentScreen === 'volunteer' && <VolunteerScreen />}
             {currentScreen === 'events' && <EventsScreen />}
+            {currentScreen === 'impact' && <ImpactScreen />}
             
             {/* FAB for Donations screen */}
             {currentScreen === 'donations' && (
               <button 
-                className="absolute bottom-20 right-4 p-4 rounded-full bg-solidario-purple text-white shadow-lg hover:bg-solidario-purple/90 transition-colors"
+                className="absolute bottom-20 right-4 p-4 rounded-full bg-viver-green text-white shadow-lg hover:bg-viver-green/90 transition-colors"
                 aria-label="Add donation"
               >
                 <Plus className="h-6 w-6" />
@@ -43,7 +47,7 @@ const ViverSolidarioApp: React.FC = () => {
             
             <div className="flutter-bottom-nav">
               <button 
-                className={`nav-item ${currentScreen === 'home' ? 'text-solidario-purple' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'home' ? 'text-viver-green' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('home')}
               >
                 <Home className="h-6 w-6 mb-1" />
@@ -51,7 +55,15 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'donations' ? 'text-solidario-purple' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'programs' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                onClick={() => setCurrentScreen('programs')}
+              >
+                <GraduationCap className="h-6 w-6 mb-1" />
+                <span>Programas</span>
+              </button>
+              
+              <button 
+                className={`nav-item ${currentScreen === 'donations' ? 'text-viver-green' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('donations')}
               >
                 <Heart className="h-6 w-6 mb-1" />
@@ -59,27 +71,19 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'profile' ? 'text-solidario-purple' : 'text-muted-foreground'}`}
-                onClick={() => setCurrentScreen('profile')}
+                className={`nav-item ${currentScreen === 'volunteer' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                onClick={() => setCurrentScreen('volunteer')}
               >
-                <User className="h-6 w-6 mb-1" />
-                <span>Perfil</span>
+                <Handshake className="h-6 w-6 mb-1" />
+                <span>Voluntariado</span>
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'campaigns' ? 'text-solidario-purple' : 'text-muted-foreground'}`}
-                onClick={() => setCurrentScreen('campaigns')}
+                className={`nav-item ${currentScreen === 'impact' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                onClick={() => setCurrentScreen('impact')}
               >
-                <Campaign className="h-6 w-6 mb-1" />
-                <span>Campanhas</span>
-              </button>
-              
-              <button 
-                className={`nav-item ${currentScreen === 'events' ? 'text-solidario-purple' : 'text-muted-foreground'}`}
-                onClick={() => setCurrentScreen('events')}
-              >
-                <Calendar className="h-6 w-6 mb-1" />
-                <span>Eventos</span>
+                <Impact className="h-6 w-6 mb-1" />
+                <span>Impacto</span>
               </button>
             </div>
           </>

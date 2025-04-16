@@ -1,54 +1,111 @@
 
 import React from 'react';
-import { Campaign, Event, MonetizationOn } from '@/components/icons';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Event, MonetizationOn, GraduationCap, Handshake } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 
 const DashboardScreen: React.FC = () => {
   return (
     <div className="flutter-screen bg-background p-4">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">Início</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-viver-green">ONG Viver</h1>
+        <img 
+          src="https://placeholder.pics/svg/40x40/00A651/FFFFFF/LOGO" 
+          alt="Logo ONG Viver" 
+          className="h-10 w-10 rounded-full"
+        />
+      </div>
+      
+      <div className="rounded-xl overflow-hidden h-40 mb-6 relative">
+        <img 
+          src="https://placeholder.pics/svg/500x200/DEDEDE/555555/Banner%20ONG%20Viver" 
+          alt="Banner ONG Viver"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
+          <h2 className="text-white font-bold text-lg">Transformando vidas há mais de 20 anos</h2>
+          <p className="text-white/90 text-sm">Juntos fazemos a diferença</p>
+        </div>
+      </div>
+      
+      <h2 className="text-lg font-semibold mb-3">Destaques</h2>
       
       <div className="space-y-4">
-        <div className="flutter-card flex items-center">
-          <div className="mr-4 bg-solidario-purple/20 p-3 rounded-full">
-            <Event className="w-6 h-6 text-solidario-purple" />
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-green">
+          <div className="mr-4 bg-viver-green/20 p-3 rounded-full">
+            <GraduationCap className="w-6 h-6 text-viver-green" />
+          </div>
+          <div>
+            <h3 className="font-semibold">Novo Programa Educativo</h3>
+            <p className="text-sm text-muted-foreground">Inscrições abertas para o Projeto Viver Feliz</p>
+          </div>
+        </Card>
+        
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-orange">
+          <div className="mr-4 bg-viver-orange/20 p-3 rounded-full">
+            <Event className="w-6 h-6 text-viver-orange" />
           </div>
           <div>
             <h3 className="font-semibold">Próximo Evento</h3>
-            <p className="text-sm text-muted-foreground">Campanha de Inverno - 20/07</p>
+            <p className="text-sm text-muted-foreground">Festa Junina Solidária - 15/06</p>
           </div>
-        </div>
+        </Card>
         
-        <div className="flutter-card flex items-center">
-          <div className="mr-4 bg-solidario-orange/20 p-3 rounded-full">
-            <Campaign className="w-6 h-6 text-solidario-orange" />
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow">
+          <div className="mr-4 bg-viver-yellow/20 p-3 rounded-full">
+            <MonetizationOn className="w-6 h-6 text-viver-yellow" />
           </div>
           <div>
-            <h3 className="font-semibold">Campanhas em Andamento</h3>
-            <p className="text-sm text-muted-foreground">3 campanhas ativas</p>
+            <h3 className="font-semibold">Campanha Ativa</h3>
+            <p className="text-sm text-muted-foreground">Doação de Alimentos - 30% arrecadado</p>
           </div>
-        </div>
-        
-        <div className="flutter-card flex items-center">
-          <div className="mr-4 bg-solidario-teal/20 p-3 rounded-full">
-            <MonetizationOn className="w-6 h-6 text-solidario-teal" />
-          </div>
-          <div>
-            <h3 className="font-semibold">Total de Doações Realizadas</h3>
-            <p className="text-sm text-muted-foreground">R$ 15.230,00</p>
-          </div>
-        </div>
-        
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Últimas Atualizações</h2>
-          <div className="flutter-card">
-            <h3 className="font-medium">Obrigado por sua doação!</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Sua contribuição de roupas ajudou 5 famílias em situação de vulnerabilidade.
-            </p>
-            <p className="text-xs text-right mt-2 text-muted-foreground">há 2 dias</p>
-          </div>
-        </div>
+        </Card>
       </div>
+      
+      <h2 className="text-lg font-semibold my-4">Como Participar</h2>
+      
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <Card className="flutter-card">
+          <CardContent className="p-3 text-center">
+            <div className="mx-auto w-12 h-12 rounded-full bg-viver-green/10 flex items-center justify-center mb-2">
+              <Handshake className="h-6 w-6 text-viver-green" />
+            </div>
+            <h3 className="font-medium text-sm">Seja Voluntário</h3>
+          </CardContent>
+        </Card>
+        
+        <Card className="flutter-card">
+          <CardContent className="p-3 text-center">
+            <div className="mx-auto w-12 h-12 rounded-full bg-viver-yellow/10 flex items-center justify-center mb-2">
+              <MonetizationOn className="h-6 w-6 text-viver-yellow" />
+            </div>
+            <h3 className="font-medium text-sm">Faça uma Doação</h3>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Card className="flutter-card mb-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Notícias Recentes</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <h4 className="font-medium text-sm">Nova Parceria Firmada</h4>
+            <p className="text-xs text-muted-foreground">A ONG Viver firma parceria com empresa local para ampliar atendimentos.</p>
+            <p className="text-xs text-right mt-1 text-muted-foreground">há 3 dias</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-sm">Visita de Autoridades</h4>
+            <p className="text-xs text-muted-foreground">Secretaria de Assistência Social visita projetos da ONG Viver.</p>
+            <p className="text-xs text-right mt-1 text-muted-foreground">há 1 semana</p>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Button className="w-full bg-viver-green hover:bg-viver-green/90">
+        Conheça Nosso Trabalho
+      </Button>
     </div>
   );
 };

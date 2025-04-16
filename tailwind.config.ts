@@ -53,9 +53,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        solidario: {
-          purple: "rgb(var(--color-solidario-purple) / <alpha-value>)",
-          yellow: "rgb(var(--color-solidario-yellow) / <alpha-value>)",
+        viver: {
+          green: "rgb(var(--color-viver-green) / <alpha-value>)",
+          yellow: "rgb(var(--color-viver-yellow) / <alpha-value>)",
+          orange: "rgb(var(--color-viver-orange) / <alpha-value>)",
         },
       },
       fontFamily: {

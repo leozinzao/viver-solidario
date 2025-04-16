@@ -14,17 +14,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 255 45% 75%;
+    --primary: 153 100% 32%; /* Verde ONG Viver #00A651 */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 60 100% 50%; /* Amarelo ONG Viver #FFF200 */
     --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 29 92% 54%; /* Laranja ONG Viver #F7941D */
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -35,8 +35,9 @@
 
     --radius: 0.5rem;
     
-    --color-solidario-purple: 149 130 255;
-    --color-solidario-yellow: 255 213 0;
+    --color-viver-green: 153 100% 32%;
+    --color-viver-yellow: 60 100% 50%;
+    --color-viver-orange: 29 92% 54%;
   }
 
   .dark {
@@ -49,17 +50,17 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 255 45% 75%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 153 100% 32%; /* Verde ONG Viver */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 60 100% 50%; /* Amarelo ONG Viver */
+    --secondary-foreground: 0 0% 0%;
+
+    --accent: 29 92% 54%; /* Laranja ONG Viver */
+    --accent-foreground: 0 0% 0%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -68,8 +69,9 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
     
-    --color-solidario-purple: 149 130 255;
-    --color-solidario-yellow: 255 213 0;
+    --color-viver-green: 153 100% 32%;
+    --color-viver-yellow: 60 100% 50%;
+    --color-viver-orange: 29 92% 54%;
   }
 }
 
@@ -104,3 +106,4 @@
 .nav-item {
   @apply flex flex-col items-center justify-center text-xs;
 }
+

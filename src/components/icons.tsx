@@ -1,4 +1,5 @@
-import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar } from "lucide-react";
+
+import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar, Handshake, GraduationCap } from "lucide-react";
 
 // Custom icon for volunteer activism
 export const VolunteerActivism = (props: LucideProps) => (
@@ -109,4 +110,46 @@ export const Calendar = (props: LucideProps) => (
   </svg>
 );
 
-export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar };
+// Ícone para educação/projetos socioeducativos
+export const Education = (props: LucideProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12 10h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2v-4z"/>
+    <path d="M12 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6.414A2 2 0 0 0 21.414 5L17 .586A2 2 0 0 0 15.586 0H12a2 2 0 0 0-2 2z"/>
+    <path d="M11 15h1"/>
+    <path d="M16 15h1"/>
+  </svg>
+);
+
+// Ícone para impacto social
+export const Impact = (props: LucideProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M8 9h1v1H8z"/>
+    <path d="M15 9h1v1h-1z"/>
+    <path d="M12 16c1.95 0 3.57-1.4 3.92-3.27.1-.55-.33-1.05-.88-1.05H8.96c-.55 0-.98.5-.88 1.05C8.43 14.6 10.05 16 12 16z"/>
+    <circle cx="12" cy="12" r="10"/>
+  </svg>
+);
+
+export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap };
