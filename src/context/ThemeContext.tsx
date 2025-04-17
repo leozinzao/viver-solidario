@@ -12,14 +12,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check for user preference in localStorage or system preference
-    const savedTheme = localStorage.getItem('viverSolidarioTheme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
+    // Sempre iniciar no tema claro
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('viverSolidarioTheme', 'light');
   }, []);
 
   const toggleTheme = () => {
