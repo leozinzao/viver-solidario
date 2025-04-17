@@ -1,72 +1,94 @@
-
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, Calendar } from '@/components/icons';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Heart } from "@/components/icons";
 
 const VolunteerScreen: React.FC = () => {
-  const opportunities = [
+  const grupos = [
     {
-      id: 1,
-      title: 'Apoio Escolar',
-      description: 'Ajude crianças com dificuldades escolares através de reforço pedagógico.',
-      schedule: 'Seg, Qua - 14h às 17h',
-      commitment: 'Mínimo 4h semanais'
+      titulo: "Acolhida",
+      descricao:
+        "Acolhe crianças, adolescentes e famílias, oferecendo orientação, afeto e alento.",
     },
     {
-      id: 2,
-      title: 'Oficina de Artes',
-      description: 'Conduza oficinas de artes visuais para desenvolver habilidades criativas em crianças.',
-      schedule: 'Ter, Qui - 9h às 11h',
-      commitment: 'Mínimo 4h semanais'
+      titulo: "Artesanato",
+      descricao:
+        "Produz peças artesanais vendidas em eventos e no Brechó do Bem, gerando renda para a instituição.",
     },
     {
-      id: 3,
-      title: 'Mentoria Profissional',
-      description: 'Oriente jovens em início de carreira com mentoria profissional.',
-      schedule: 'Sáb - 9h às 12h',
-      commitment: 'Mínimo 3h semanais'
-    }
+      titulo: "Brechó do Bem",
+      descricao:
+        "Faz triagem, organização das doações e atendimento ao público no Brechó.",
+    },
+    {
+      titulo: "Cozinha",
+      descricao:
+        "Auxilia no preparo de alimentos e na rotina da cozinha semi‑industrial da Viver.",
+    },
+    {
+      titulo: "Estoque",
+      descricao:
+        "Organiza alimentos e monta cestas básicas para as famílias assistidas.",
+    },
+    {
+      titulo: "Eventos",
+      descricao:
+        "Atua na organização e execução de eventos da Viver ou de parceiros.",
+    },
+    {
+      titulo: "Nota do Bem",
+      descricao:
+        "Recolhe, organiza e lança cupons fiscais no Programa Nota Paraná.",
+    },
+    {
+      titulo: "Recreação",
+      descricao:
+        "Planeja e desenvolve atividades recreativas com as crianças e adolescentes.",
+    },
   ];
 
   return (
-    <div className="flutter-screen p-4 space-y-4">
-      <h1 className="text-2xl font-bold text-center mb-6 text-viver-yellow">Seja Voluntário</h1>
-      
-      <Card className="flutter-card bg-viver-yellow/10 border-l-4 border-l-viver-yellow mb-6">
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-viver-yellow mb-2">Por que ser voluntário?</h3>
-          <p className="text-sm">Ao voluntariar na ONG Viver, você contribui diretamente para o desenvolvimento de crianças e adolescentes, além de adquirir experiências transformadoras.</p>
-          <Button className="w-full mt-4 bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Cadastre-se como voluntário
-          </Button>
-        </CardContent>
-      </Card>
-      
-      <h2 className="text-xl font-semibold mb-3">Oportunidades Abertas</h2>
-      
-      {opportunities.map((opportunity) => (
-        <Card key={opportunity.id} className="flutter-card border-l-4 border-l-viver-yellow">
-          <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="p-2 rounded-full bg-viver-yellow/10 text-viver-yellow">
-              <Handshake size={24} />
-            </div>
-            <div>
-              <CardTitle className="text-lg">{opportunity.title}</CardTitle>
-              <CardDescription className="flex items-center">
-                <Calendar className="mr-1 h-3 w-3 text-viver-yellow" /> {opportunity.schedule}
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">{opportunity.description}</p>
-            <p className="text-xs font-medium">Compromisso: {opportunity.commitment}</p>
-            <Button variant="outline" className="w-full mt-4 border-viver-yellow text-viver-yellow hover:bg-viver-yellow/10">
-              Inscrever-se
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="flutter-screen bg-background p-4">
+      <h1 className="text-2xl font-bold text-viver-yellow text-center mb-6">
+        Seja um Voluntário
+      </h1>
+
+      {/* Trabalhe Conosco */}
+      <section className="mb-8">
+        <h2 className="flex items-center text-lg font-semibold mb-2">
+          <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
+          Trabalhe Conosco
+        </h2>
+        <p className="text-sm">
+          Se você tem interesse no terceiro setor e quer fazer parte do time de funcionários da Viver,
+          envie seu currículo para&nbsp;
+          <a
+            href="mailto:gestaodepessoas@ongviver.org.br"
+            className="underline"
+          >
+            gestaodepessoas@ongviver.org.br
+          </a>
+          . Ele será analisado e, quando tivermos uma oportunidade, entraremos em contato.
+        </p>
+        <p className="text-sm mt-2">
+          Dúvidas? Ligue para&nbsp;
+          <a href="tel:+554333150923" className="underline">
+            (43) 3315‑0923
+          </a>
+          .
+        </p>
+      </section>
+
+      {/* Lista de grupos */}
+      <ul className="space-y-4 mb-20">
+        {grupos.map((g) => (
+          <li key={g.titulo}>
+            <h3 className="flex items-center text-lg font-semibold">
+              <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
+              {g.titulo}
+            </h3>
+            <p className="text-sm ml-7">{g.descricao}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

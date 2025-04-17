@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Event, MonetizationOn, GraduationCap, Handshake } from '@/components/icons';
@@ -16,9 +15,12 @@ const DashboardScreen: React.FC = () => {
           />
           <h1 className="text-2xl font-bold text-viver-yellow">ONG Viver</h1>
         </div>
+        <Button className="bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+          Entrar
+        </Button>
       </div>
       
-      <div className="rounded-xl overflow-hidden h-40 mb-6 relative">
+      <div className="rounded-xl overflow-hidden h-40 mb-6 relative shadow-lg">
         <div className="w-full h-full bg-viver-yellow/20 flex items-center justify-center">
           <img 
             src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
@@ -35,7 +37,7 @@ const DashboardScreen: React.FC = () => {
       <h2 className="text-lg font-semibold mb-3">Destaques</h2>
       
       <div className="space-y-4">
-        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow">
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow hover:shadow-md transition-shadow">
           <div className="mr-4 bg-viver-yellow/20 p-3 rounded-full">
             <GraduationCap className="w-6 h-6 text-viver-yellow" />
           </div>
@@ -45,7 +47,7 @@ const DashboardScreen: React.FC = () => {
           </div>
         </Card>
         
-        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow-medium">
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow-medium hover:shadow-md transition-shadow">
           <div className="mr-4 bg-viver-yellow-medium/20 p-3 rounded-full">
             <Event className="w-6 h-6 text-viver-yellow-medium" />
           </div>
@@ -55,7 +57,7 @@ const DashboardScreen: React.FC = () => {
           </div>
         </Card>
         
-        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow">
+        <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow hover:shadow-md transition-shadow">
           <div className="mr-4 bg-viver-yellow/20 p-3 rounded-full">
             <MonetizationOn className="w-6 h-6 text-viver-yellow" />
           </div>
@@ -69,7 +71,7 @@ const DashboardScreen: React.FC = () => {
       <h2 className="text-lg font-semibold my-4">Como Participar</h2>
       
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <Card className="flutter-card">
+        <Card className="flutter-card hover:shadow-md transition-shadow">
           <CardContent className="p-3 text-center">
             <div className="mx-auto w-12 h-12 rounded-full bg-viver-yellow/10 flex items-center justify-center mb-2">
               <Handshake className="h-6 w-6 text-viver-yellow" />
@@ -78,7 +80,7 @@ const DashboardScreen: React.FC = () => {
           </CardContent>
         </Card>
         
-        <Card className="flutter-card">
+        <Card className="flutter-card hover:shadow-md transition-shadow">
           <CardContent className="p-3 text-center">
             <div className="mx-auto w-12 h-12 rounded-full bg-viver-yellow/10 flex items-center justify-center mb-2">
               <MonetizationOn className="h-6 w-6 text-viver-yellow" />
@@ -88,7 +90,7 @@ const DashboardScreen: React.FC = () => {
         </Card>
       </div>
       
-      <Card className="flutter-card mb-4">
+      <Card className="flutter-card mb-4 hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Notícias Recentes</CardTitle>
         </CardHeader>

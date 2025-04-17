@@ -1,65 +1,73 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/icons";
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Event } from '@/components/icons';
-import { Button } from '@/components/ui/button';
+const eventos = [
+  {
+    titulo: "Participe da Pizzada da Viver 2022",
+    resumo:
+      "Edição acontece em 12/03. Renda será destinada à compra de leite integral para as crianças assistidas.",
+    link: "https://www.ongviver.org.br/dia-a-dia/participe-da-pizzada-da-viver-2022",
+  },
+  {
+    titulo: "Dupla Manu e Gabriel realiza Live para a ONG Viver",
+    resumo:
+      "Ação arrecadou cestas básicas, doações em dinheiro e muita alegria.",
+    link: "https://www.ongviver.org.br/dia-a-dia/dupla-manu-e-gabriel-realiza-live",
+  },
+  {
+    titulo: "Pizzada da Viver 2.020",
+    resumo:
+      "Primeira edição do ano foi diferente, mas bateu recorde de vendas.",
+    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-2020",
+  },
+  {
+    titulo: "Pizzada da Viver – Arapongas",
+    resumo: "Edição especial da Pizzada da Viver em Arapongas.",
+    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-arapongas",
+  },
+  {
+    titulo: "Pizzada da Viver 2019",
+    resumo: "Confira o resultado da Pizzada Viver 2019.",
+    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-2019",
+  },
+  {
+    titulo: "Edital de Tomada de Preços 005/2024",
+    resumo: "Publicação oficial sobre contratação de serviços.",
+    link: "https://www.ongviver.org.br/dia-a-dia/edital-de-tomada-de-preco-005-2024",
+  },
+];
 
 const EventsScreen: React.FC = () => {
-  const events = [
-    {
-      id: 1,
-      title: 'Festival Beneficente',
-      location: 'Sede da ONG Viver',
-      date: '15 de Junho, 16h-22h',
-      description: 'Venha participar do nosso festival beneficente. Toda a renda será revertida para os projetos da ONG.'
-    },
-    {
-      id: 2,
-      title: 'Roda de Conversa',
-      location: 'Centro Comunitário',
-      date: '20 de Junho, 14h-17h',
-      description: 'Roda de conversa sobre enfrentamento do câncer infantojuvenil com profissionais da área da saúde.'
-    },
-    {
-      id: 3,
-      title: 'Bazar Beneficente',
-      location: 'Shopping Local',
-      date: '25 de Junho, 9h-18h',
-      description: 'Bazar com produtos novos e usados a preços acessíveis. Toda a renda será destinada aos nossos projetos.'
-    }
-  ];
-
   return (
-    <div className="flutter-screen p-4 space-y-4">
-      <h1 className="text-2xl font-bold text-center mb-6 text-viver-yellow">Eventos</h1>
-      
-      {events.map((event) => (
-        <Card key={event.id} className="flutter-card border-t-4 border-t-viver-yellow">
-          <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="p-2 rounded-full bg-viver-yellow/10 text-viver-yellow">
-              <Event size={24} />
-            </div>
-            <div>
-              <CardTitle className="text-lg">{event.title}</CardTitle>
-              <CardDescription className="flex items-center">
-                <Calendar className="mr-1 h-3 w-3" /> {event.date}
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="font-medium text-sm">Local: {event.location}</p>
-            <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
-            <div className="flex gap-2 mt-4">
-              <Button className="flex-1 bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-                Participar
-              </Button>
-              <Button variant="outline" className="flex-1">
-                Mais Detalhes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+    <div className="flutter-screen bg-background p-4">
+      <h1 className="text-2xl font-bold text-viver-yellow text-center mb-6">
+        Eventos
+      </h1>
+
+      <div className="space-y-6 mb-20">
+        {eventos.map((ev) => (
+          <Card key={ev.titulo} className="flutter-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center text-lg">
+                <Calendar className="mr-2 h-6 w-6 shrink-0 text-viver-yellow"/> 
+                {ev.titulo}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-sm">{ev.resumo}</p>
+              <a
+                href={ev.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold underline text-viver-yellow"
+              >
+                Saiba mais
+              </a>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
