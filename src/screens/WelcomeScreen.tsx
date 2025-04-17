@@ -1,59 +1,46 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 
 interface WelcomeScreenProps {
   onEnterApp: () => void;
+  onLogin: () => void;
 }
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onEnterApp }) => {
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onEnterApp, onLogin }) => {
   return (
-    <div className="flutter-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-viver-yellow/20 to-white dark:from-viver-yellow/10 dark:to-background">
-      <div className="mb-8 flex flex-col items-center">
-        <div className="w-40 h-40 mb-4">
-          <img 
-            src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
-            alt="Logo ONG Viver"
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <p className="text-center text-muted-foreground max-w-xs">APOIO À CRIANÇA E ADOLESCENTE COM CÂNCER</p>
+    <div className="flutter-screen p-4 bg-white flex flex-col justify-center items-center">
+      <div className="w-32 h-32 mb-6 rounded-full bg-viver-yellow/10 flex items-center justify-center">
+        <img 
+          src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
+          alt="ONG Viver"
+          className="w-24 h-24 object-contain"
+        />
       </div>
       
-      <div className="space-y-4 w-full max-w-xs">
-        <div className="bg-white p-4 rounded-lg shadow-md dark:bg-card">
-          <h2 className="font-semibold mb-2 text-center">Nosso Trabalho</h2>
-          <p className="text-sm text-center text-muted-foreground">
-            Atuamos na assistência social para crianças e adolescentes com câncer e suas famílias.
-          </p>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg shadow-md dark:bg-card">
-          <h2 className="font-semibold mb-2 text-center">Nossa Missão</h2>
-          <p className="text-sm text-center text-muted-foreground">
-            Proporcionar apoio e assistência às crianças e adolescentes com câncer, buscando melhorar sua qualidade de vida.
-          </p>
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold text-center text-viver-yellow mb-2">ONG Viver</h1>
+      <p className="text-center text-muted-foreground mb-8">Transformando vidas através da solidariedade</p>
       
-      <div className="mt-10 w-full max-w-xs space-y-4">
+      <div className="space-y-2 w-full max-w-xs">
         <Button 
-          onClick={onEnterApp} 
-          className="w-full py-6 text-lg bg-viver-yellow text-black hover:bg-viver-yellow/90"
+          className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+          onClick={onEnterApp}
         >
-          Entrar no App
+          Entrar como visitante
         </Button>
         
-        <div className="flex justify-center space-x-4">
-          <Button variant="outline" size="sm">Sobre Nós</Button>
-          <Button variant="outline" size="sm">Contato</Button>
-        </div>
+        <Button 
+          variant="outline" 
+          className="w-full border-viver-yellow text-viver-yellow hover:bg-viver-yellow/10"
+          onClick={onLogin}
+        >
+          Login
+        </Button>
       </div>
       
-      <footer className="mt-auto pt-6 text-xs text-center text-muted-foreground">
-        <p>ONG Viver © {new Date().getFullYear()}</p>
-        <p>Apoio à criança e adolescente com câncer</p>
-      </footer>
+      <p className="text-xs text-muted-foreground text-center mt-8">
+        Versão 1.0.0
+      </p>
     </div>
   );
 };
