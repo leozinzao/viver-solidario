@@ -31,6 +31,10 @@ const AppContent: React.FC = () => {
     setCurrentScreen('welcome');
   };
   
+  const handleLoginSuccess = () => {
+    setCurrentScreen('home'); // Vai direto para tela inicial após login
+  };
+  
   if (!isAuthenticated && currentScreen !== 'welcome' && currentScreen !== 'login') {
     setCurrentScreen('welcome');
   }
@@ -42,7 +46,10 @@ const AppContent: React.FC = () => {
       )}
       
       {currentScreen === 'login' && (
-        <LoginScreen onBackToWelcome={handleBackToWelcome} />
+        <LoginScreen 
+          onBackToWelcome={handleBackToWelcome} 
+          onLoginSuccess={handleLoginSuccess} 
+        />
       )}
       
       {isAuthenticated && (

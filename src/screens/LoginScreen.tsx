@@ -8,9 +8,10 @@ import { toast } from '@/components/ui/use-toast';
 
 interface LoginScreenProps {
   onBackToWelcome: () => void;
+  onLoginSuccess: () => void; // Nova prop adicionada
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +37,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome }) => {
         title: "Login realizado com sucesso",
         description: "Bem-vindo à ONG Viver!",
       });
+      onLoginSuccess(); // Chama a função de sucesso de login
     } catch (error) {
       toast({
         title: "Erro ao fazer login",
