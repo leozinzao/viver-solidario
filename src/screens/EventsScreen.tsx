@@ -8,35 +8,35 @@ const EventsScreen: React.FC = () => {
   const events = [
     {
       id: 1,
-      title: 'Festa Junina Solidária',
+      title: 'Festival Beneficente',
       location: 'Sede da ONG Viver',
       date: '15 de Junho, 16h-22h',
-      description: 'Venha participar da nossa festa junina beneficente. Toda a renda será revertida para os projetos da ONG.'
+      description: 'Venha participar do nosso festival beneficente. Toda a renda será revertida para os projetos da ONG.'
     },
     {
       id: 2,
-      title: 'Workshop de Empregabilidade',
+      title: 'Roda de Conversa',
       location: 'Centro Comunitário',
       date: '20 de Junho, 14h-17h',
-      description: 'Workshop gratuito para jovens sobre preparação para o mercado de trabalho e elaboração de currículo.'
+      description: 'Roda de conversa sobre enfrentamento do câncer infantojuvenil com profissionais da área da saúde.'
     },
     {
       id: 3,
       title: 'Bazar Beneficente',
       location: 'Shopping Local',
       date: '25 de Junho, 9h-18h',
-      description: 'Bazar com produtos novos e usados a preços acessíveis. Toda a renda será destinada aos nossos projetos sociais.'
+      description: 'Bazar com produtos novos e usados a preços acessíveis. Toda a renda será destinada aos nossos projetos.'
     }
   ];
 
   return (
     <div className="flutter-screen p-4 space-y-4">
-      <h1 className="text-2xl font-bold text-center mb-6 text-viver-green">Eventos</h1>
+      <h1 className="text-2xl font-bold text-center mb-6 text-viver-yellow">Eventos</h1>
       
       {events.map((event) => (
-        <Card key={event.id} className="flutter-card border-t-4 border-t-viver-orange">
+        <Card key={event.id} className="flutter-card border-t-4 border-t-viver-yellow">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="p-2 rounded-full bg-viver-orange/10 text-viver-orange">
+            <div className="p-2 rounded-full bg-viver-yellow/10 text-viver-yellow">
               <Event size={24} />
             </div>
             <div>
@@ -50,7 +50,7 @@ const EventsScreen: React.FC = () => {
             <p className="font-medium text-sm">Local: {event.location}</p>
             <p className="text-sm text-muted-foreground mt-1">{event.description}</p>
             <div className="flex gap-2 mt-4">
-              <Button className="flex-1 bg-viver-orange hover:bg-viver-orange/90">
+              <Button className="flex-1 bg-viver-yellow hover:bg-viver-yellow/90 text-black">
                 Participar
               </Button>
               <Button variant="outline" className="flex-1">

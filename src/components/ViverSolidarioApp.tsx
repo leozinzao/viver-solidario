@@ -38,7 +38,7 @@ const ViverSolidarioApp: React.FC = () => {
             {/* FAB for Donations screen */}
             {currentScreen === 'donations' && (
               <button 
-                className="absolute bottom-20 right-4 p-4 rounded-full bg-viver-green text-white shadow-lg hover:bg-viver-green/90 transition-colors"
+                className="absolute bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
                 aria-label="Add donation"
               >
                 <Plus className="h-6 w-6" />
@@ -47,7 +47,7 @@ const ViverSolidarioApp: React.FC = () => {
             
             <div className="flutter-bottom-nav">
               <button 
-                className={`nav-item ${currentScreen === 'home' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'home' ? 'text-viver-yellow' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('home')}
               >
                 <Home className="h-6 w-6 mb-1" />
@@ -55,7 +55,7 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'programs' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'programs' ? 'text-viver-yellow' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('programs')}
               >
                 <GraduationCap className="h-6 w-6 mb-1" />
@@ -63,7 +63,7 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'donations' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'donations' ? 'text-viver-yellow' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('donations')}
               >
                 <Heart className="h-6 w-6 mb-1" />
@@ -71,7 +71,7 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'volunteer' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'volunteer' ? 'text-viver-yellow' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('volunteer')}
               >
                 <Handshake className="h-6 w-6 mb-1" />
@@ -79,7 +79,7 @@ const ViverSolidarioApp: React.FC = () => {
               </button>
               
               <button 
-                className={`nav-item ${currentScreen === 'impact' ? 'text-viver-green' : 'text-muted-foreground'}`}
+                className={`nav-item ${currentScreen === 'impact' ? 'text-viver-yellow' : 'text-muted-foreground'}`}
                 onClick={() => setCurrentScreen('impact')}
               >
                 <Impact className="h-6 w-6 mb-1" />

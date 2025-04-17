@@ -8,22 +8,22 @@ const ProgramsScreen: React.FC = () => {
   const programs = [
     {
       id: 1,
-      title: 'Projeto Viver Feliz',
-      description: 'Atividades socioeducativas para crianças e adolescentes em contraturno escolar.',
+      title: 'Apoio ao Tratamento',
+      description: 'Acompanhamento durante o tratamento de câncer, com suporte emocional e material.',
       participants: '120 crianças',
-      location: 'Sede ONG Viver'
+      location: 'Hospitais parceiros'
     },
     {
       id: 2,
-      title: 'Projeto Vida Viver',
-      description: 'Oficinas profissionalizantes para jovens em situação de vulnerabilidade social.',
+      title: 'Atividades Recreativas',
+      description: 'Atividades lúdicas e culturais para crianças e adolescentes em tratamento.',
       participants: '45 jovens',
-      location: 'Centro Comunitário'
+      location: 'Sede ONG Viver e Hospitais'
     },
     {
       id: 3,
       title: 'Acompanhamento Familiar',
-      description: 'Suporte psicossocial para famílias em situação de vulnerabilidade.',
+      description: 'Suporte psicossocial para famílias de crianças em tratamento oncológico.',
       participants: '75 famílias',
       location: 'Diversos bairros'
     }
@@ -31,12 +31,12 @@ const ProgramsScreen: React.FC = () => {
 
   return (
     <div className="flutter-screen p-4 space-y-4">
-      <h1 className="text-2xl font-bold text-center mb-6 text-viver-green">Nossos Programas</h1>
+      <h1 className="text-2xl font-bold text-center mb-6 text-viver-yellow">Nossos Programas</h1>
       
       {programs.map((program) => (
-        <Card key={program.id} className="flutter-card border-l-4 border-l-viver-green">
+        <Card key={program.id} className="flutter-card border-l-4 border-l-viver-yellow">
           <CardHeader className="flex flex-row items-center gap-4 pb-2">
-            <div className="p-2 rounded-full bg-viver-green/10 text-viver-green">
+            <div className="p-2 rounded-full bg-viver-yellow/10 text-viver-yellow">
               <GraduationCap size={24} />
             </div>
             <div>
@@ -47,7 +47,7 @@ const ProgramsScreen: React.FC = () => {
           <CardContent>
             <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
             <p className="text-xs font-medium">Local: {program.location}</p>
-            <Button className="w-full mt-4 bg-viver-green hover:bg-viver-green/90">
+            <Button className="w-full mt-4 bg-viver-yellow hover:bg-viver-yellow/90 text-black">
               Saiba mais
             </Button>
           </CardContent>

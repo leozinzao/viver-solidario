@@ -54,9 +54,9 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         viver: {
-          green: "rgb(var(--color-viver-green) / <alpha-value>)",
-          yellow: "rgb(var(--color-viver-yellow) / <alpha-value>)",
-          orange: "rgb(var(--color-viver-orange) / <alpha-value>)",
+          yellow: "hsl(var(--color-viver-yellow))",
+          "yellow-light": "hsl(var(--color-viver-yellow-light))",
+          "yellow-medium": "hsl(var(--color-viver-yellow-medium))",
         },
       },
       fontFamily: {
