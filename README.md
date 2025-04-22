@@ -20,4 +20,14 @@ Aplicação web/mobile inspirada na ONG Viver — desenvolvida para divulgar eve
 
 ## 2. 📂 Estrutura de pastas
 
-``` src/ ├─ components/ │ └─ ui/ ├─ context/ ├─ pages/ │ └─ Index.tsx ├─ screens/ └─ assets/ ``` 
+```
+src/
+├─ components/            
+│   └─ ui/                
+├─ context/              
+├─ pages/               
+│   └─ Index.tsx          
+├─ screens/               
+└─ assets/                
+```
+
