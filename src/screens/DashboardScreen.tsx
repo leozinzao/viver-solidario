@@ -1,8 +1,16 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Event, MonetizationOn, GraduationCap, Handshake } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+
+// Import icons directly from lucide-react
+import { 
+  GraduationCap, 
+  Calendar as CalendarIcon, 
+  Heart, 
+  DollarSign, 
+  Handshake
+} from "lucide-react";
 
 const DashboardScreen: React.FC = () => {
   return (
@@ -54,7 +62,7 @@ const DashboardScreen: React.FC = () => {
         </Card>
         <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow-medium bg-white/60 animate-enter glass-morphism hover:scale-105 transition-transform cursor-pointer">
           <div className="mr-4 bg-viver-yellow-medium/30 p-3 rounded-full shadow-md">
-            <Event className="w-6 h-6 text-viver-yellow-medium" />
+            <CalendarIcon className="w-6 h-6 text-viver-yellow-medium" />
           </div>
           <div>
             <h3 className="font-semibold">Próximo Evento</h3>
@@ -63,7 +71,7 @@ const DashboardScreen: React.FC = () => {
         </Card>
         <Card className="flutter-card flex items-center border-l-4 border-l-viver-yellow bg-white/60 animate-enter glass-morphism hover:scale-105 transition-transform cursor-pointer">
           <div className="mr-4 bg-viver-yellow/30 p-3 rounded-full shadow-md">
-            <MonetizationOn className="w-6 h-6 text-viver-yellow" />
+            <DollarSign className="w-6 h-6 text-viver-yellow" />
           </div>
           <div>
             <h3 className="font-semibold">Campanha Ativa</h3>
@@ -86,7 +94,7 @@ const DashboardScreen: React.FC = () => {
         <Card className="flutter-card hover:shadow-xl transition-shadow bg-white/70 glass-morphism animate-scale-in hover:scale-105">
           <CardContent className="p-4 text-center flex flex-col items-center">
             <div className="w-12 h-12 rounded-full bg-viver-yellow/20 flex items-center justify-center mb-2">
-              <MonetizationOn className="h-7 w-7 text-viver-yellow" />
+              <Heart className="h-7 w-7 text-viver-yellow" />
             </div>
             <h3 className="font-medium text-sm">Faça uma Doação</h3>
           </CardContent>
