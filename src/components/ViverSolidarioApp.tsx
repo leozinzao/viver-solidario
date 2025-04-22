@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -46,6 +47,11 @@ const AppContent: React.FC = () => {
     setCurrentScreen("welcome");
   }
 
+  // Verifica se deve mostrar a navegação - apenas para telas pós-login/visitante
+  const shouldShowNavigation = isAuthenticated || 
+                              (currentScreen !== "welcome" && 
+                               currentScreen !== "login");
+
   return (
     <div className="flutter-app border border-border">
       {/* telas públicas -------------------------------------------------- */}
@@ -61,7 +67,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* telas internas -------------------------------------------------- */}
-      {isAuthenticated && (
+      {(isAuthenticated || currentScreen === "home") && (
         <>
           {currentScreen === "home"      && <DashboardScreen />}
           {currentScreen === "donations" && <DonationsScreen />}
@@ -80,63 +86,65 @@ const AppContent: React.FC = () => {
             </button>
           )}
 
-          {/* Bottom Navigation ----------------------------------------- */}
-          <div className="flutter-bottom-nav">
-            {/* Início */}
-            <button
-              className={`nav-item ${currentScreen === "home" ? "text-viver-yellow" : "text-muted-foreground"}`}
-              onClick={() => setCurrentScreen("home")}
-            >
-              <Home className="h-6 w-6 mb-1" />
-              <span>Início</span>
-            </button>
-
-            {/* Eventos (nova aba) */}
-            <button
-              className={`nav-item ${currentScreen === "events" ? "text-viver-yellow" : "text-muted-foreground"}`}
-              onClick={() => setCurrentScreen("events")}
-            >
-              <Calendar className="h-6 w-6 mb-1" />
-              <span>Eventos</span>
-            </button>
-
-            {/* Doações */}
-            <button
-              className={`nav-item ${currentScreen === "donations" ? "text-viver-yellow" : "text-muted-foreground"}`}
-              onClick={() => setCurrentScreen("donations")}
-            >
-              <Heart className="h-6 w-6 mb-1" />
-              <span>Doações</span>
-            </button>
-
-            {/* Voluntariado */}
-            <button
-              className={`nav-item ${currentScreen === "volunteer" ? "text-viver-yellow" : "text-muted-foreground"}`}
-              onClick={() => setCurrentScreen("volunteer")}
-            >
-              <Handshake className="h-6 w-6 mb-1" />
-              <span>Voluntariado</span>
-            </button>
-
-            {/* Impacto (somente usuários internos) ou Perfil */}
-            {hasPermission("internal") ? (
+          {/* Bottom Navigation - Agora só aparece quando appropriado */}
+          {shouldShowNavigation && currentScreen !== "welcome" && currentScreen !== "login" && (
+            <div className="flutter-bottom-nav">
+              {/* Início */}
               <button
-                className={`nav-item ${currentScreen === "impact" ? "text-viver-yellow" : "text-muted-foreground"}`}
-                onClick={() => setCurrentScreen("impact")}
+                className={`nav-item ${currentScreen === "home" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                onClick={() => setCurrentScreen("home")}
               >
-                <Impact className="h-6 w-6 mb-1" />
-                <span>Impacto</span>
+                <Home className="h-6 w-6 mb-1" />
+                <span>Início</span>
               </button>
-            ) : (
+
+              {/* Eventos (nova aba) */}
               <button
-                className={`nav-item ${currentScreen === "profile" ? "text-viver-yellow" : "text-muted-foreground"}`}
-                onClick={() => setCurrentScreen("profile")}
+                className={`nav-item ${currentScreen === "events" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                onClick={() => setCurrentScreen("events")}
               >
-                <User className="h-6 w-6 mb-1" />
-                <span>Perfil</span>
+                <Calendar className="h-6 w-6 mb-1" />
+                <span>Eventos</span>
               </button>
-            )}
-          </div>
+
+              {/* Doações */}
+              <button
+                className={`nav-item ${currentScreen === "donations" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                onClick={() => setCurrentScreen("donations")}
+              >
+                <Heart className="h-6 w-6 mb-1" />
+                <span>Doações</span>
+              </button>
+
+              {/* Voluntariado */}
+              <button
+                className={`nav-item ${currentScreen === "volunteer" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                onClick={() => setCurrentScreen("volunteer")}
+              >
+                <Handshake className="h-6 w-6 mb-1" />
+                <span>Voluntariado</span>
+              </button>
+
+              {/* Impacto (somente usuários internos) ou Perfil */}
+              {hasPermission("internal") ? (
+                <button
+                  className={`nav-item ${currentScreen === "impact" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                  onClick={() => setCurrentScreen("impact")}
+                >
+                  <Impact className="h-6 w-6 mb-1" />
+                  <span>Impacto</span>
+                </button>
+              ) : (
+                <button
+                  className={`nav-item ${currentScreen === "profile" ? "text-viver-yellow" : "text-muted-foreground"}`}
+                  onClick={() => setCurrentScreen("profile")}
+                >
+                  <User className="h-6 w-6 mb-1" />
+                  <span>Perfil</span>
+                </button>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
