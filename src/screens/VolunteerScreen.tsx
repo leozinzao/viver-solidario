@@ -71,7 +71,7 @@ const VolunteerScreen: React.FC = () => {
         <p className="text-sm mt-2">
           Dúvidas? Ligue para&nbsp;
           <a href="tel:+554333150923" className="underline">
-            (43) 3315‑0923
+            (43)3315‑0923
           </a>
           .
         </p>
