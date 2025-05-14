@@ -1,9 +1,22 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, MonetizationOn } from "@/components/icons";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "@/components/ui/use-toast";
 
 const DonationsScreen: React.FC = () => {
+  const { hasPermission } = useAuth();
+
+  const copyPixKey = () => {
+    navigator.clipboard.writeText("04.565.017/0001-47");
+    toast({
+      title: "Chave Pix copiada",
+      description: "A chave Pix foi copiada para sua área de transferência."
+    });
+  };
+
   return (
     <div className="flutter-screen bg-background p-4 relative">
       <h1 className="text-2xl font-bold mb-6 text-viver-yellow text-center">
@@ -19,9 +32,9 @@ const DonationsScreen: React.FC = () => {
           </h3>
           <p className="text-sm mb-4">
             O Pix é a forma mais rápida de apoiar a Viver em suas demandas
-            financeiras.
+            financeiras. Chave: <strong>04.565.017/0001-47</strong>
           </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black" onClick={copyPixKey}>
             Copiar Chave Pix
           </Button>
         </CardContent>
@@ -39,10 +52,16 @@ const DonationsScreen: React.FC = () => {
           <p className="text-sm">
             Clique em uma das opções abaixo e doe o valor que desejar.
           </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+          <Button 
+            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+            onClick={() => window.open("https://www.paypal.com/donate/?hosted_button_id=R3PPJ8XWS97KQ", "_blank")}
+          >
             Doe pelo PayPal
           </Button>
-          <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+          <Button 
+            className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black"
+            onClick={() => window.open("https://app.picpay.com/payment?type=store&hash=fFSm3I4XiFgTJQfU", "_blank")}
+          >
             Doe pelo PicPay
           </Button>
         </CardContent>
