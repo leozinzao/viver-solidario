@@ -1,11 +1,11 @@
 
 import bcrypt from "bcrypt";
-import * as User from "../models/userModel.js";
+import * as userService from "../services/userService.js";
 
 export const getProfile = async(req, res) => {
     try {
         const userId = req.user.sub;
-        const user = await User.findById(userId);
+        const user = await userService.findUserById(userId);
         
         if (!user) {
             return res.status(404).json({ msg: "Usuário não encontrado" });
@@ -31,7 +31,7 @@ export const updateProfile = async(req, res) => {
         const { nome, email, theme } = req.body;
         
         // Update only the fields that were provided
-        const updatedUser = await User.updateProfile(userId, { nome, email, theme });
+        const updatedUser = await userService.updateUserProfile(userId, { nome, email, theme });
         
         if (!updatedUser) {
             return res.status(404).json({ msg: "Usuário não encontrado" });
@@ -61,7 +61,7 @@ export const updatePassword = async(req, res) => {
         }
         
         // Get user to verify current password
-        const user = await User.findById(userId);
+        const user = await userService.findUserById(userId);
         if (!user) {
             return res.status(404).json({ msg: "Usuário não encontrado" });
         }
@@ -76,7 +76,7 @@ export const updatePassword = async(req, res) => {
         const hash = await bcrypt.hash(newPassword, 10);
         
         // Update password
-        await User.updatePassword(userId, hash);
+        await userService.updateUserPassword(userId, hash);
         
         res.json({ msg: "Senha atualizada com sucesso" });
     } catch (err) {

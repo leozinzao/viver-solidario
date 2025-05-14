@@ -1,8 +1,7 @@
 
-// backend/controllers/authController.js
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import * as User from "../models/userModel.js";
+import * as userService from "../services/userService.js";
 
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -11,11 +10,11 @@ export const register = async(req, res) => {
         const { nome, email, senha, role = "donor" } = req.body;
         if (!nome || !email || !senha) return res.status(400).json({ msg: "Campos obrigatórios" });
 
-        const exists = await User.findByEmail(email);
+        const exists = await userService.findUserByEmail(email);
         if (exists) return res.status(409).json({ msg: "Usuário já existe" });
 
         const hash = await bcrypt.hash(senha, 10);
-        const user = await User.create({ nome, email, hash, role });
+        const user = await userService.createUser({ nome, email, hash, role });
         res.status(201).json(user);
     } catch (err) {
         console.error(err);
@@ -26,7 +25,7 @@ export const register = async(req, res) => {
 export const login = async(req, res) => {
     try {
         const { email, senha } = req.body;
-        const user = await User.findByEmail(email);
+        const user = await userService.findUserByEmail(email);
         if (!user) return res.status(401).json({ msg: "Credenciais inválidas" });
 
         const ok = await bcrypt.compare(senha, user.senha_hash);

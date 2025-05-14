@@ -1,43 +1,74 @@
-import { pool } from "../config/db.js";
+
+import * as eventService from "../services/eventService.js";
 
 // Controlador para eventos
 export const listEvents = async(_req, res) => {
-    const { rows } = await pool.query(
-        "select * from api.eventos order by data_inicio desc"
-    );
-    res.json(rows);
+    try {
+        const events = await eventService.findAllEvents();
+        res.json(events);
+    } catch (error) {
+        console.error("Erro ao listar eventos:", error);
+        res.status(500).json({ msg: "Erro ao listar eventos" });
+    }
 };
 
 export const getEvent = async(req, res) => {
-    const { id } = req.params;
-    const { rows } = await pool.query(
-        "select * from api.eventos where id = $1", [id]
-    );
-    rows[0] ? res.json(rows[0]) : res.sendStatus(404);
+    try {
+        const { id } = req.params;
+        const event = await eventService.findEventById(id);
+        
+        if (!event) {
+            return res.status(404).json({ msg: "Evento não encontrado" });
+        }
+        
+        res.json(event);
+    } catch (error) {
+        console.error("Erro ao buscar evento:", error);
+        res.status(500).json({ msg: "Erro ao buscar evento" });
+    }
 };
 
 export const createEvent = async(req, res) => {
-    const { titulo, resumo, link, data_inicio, data_fim } = req.body;
-    const { rows } = await pool.query(
-        `insert into api.eventos (titulo, resumo, link, data_inicio, data_fim)
-     values ($1,$2,$3,$4,$5) returning *`, [titulo, resumo, link, data_inicio, data_fim]
-    );
-    res.status(201).json(rows[0]);
+    try {
+        const { titulo, resumo, link, data_inicio, data_fim } = req.body;
+        const newEvent = await eventService.insertEvent({ 
+            titulo, resumo, link, data_inicio, data_fim 
+        });
+        
+        res.status(201).json(newEvent);
+    } catch (error) {
+        console.error("Erro ao criar evento:", error);
+        res.status(500).json({ msg: "Erro ao criar evento" });
+    }
 };
 
 export const updateEvent = async(req, res) => {
-    const { id } = req.params;
-    const { titulo, resumo, link, data_inicio, data_fim } = req.body;
-    const { rows } = await pool.query(
-        `update api.eventos
-     set titulo=$2, resumo=$3, link=$4, data_inicio=$5, data_fim=$6
-     where id=$1 returning *`, [id, titulo, resumo, link, data_inicio, data_fim]
-    );
-    rows[0] ? res.json(rows[0]) : res.sendStatus(404);
+    try {
+        const { id } = req.params;
+        const { titulo, resumo, link, data_inicio, data_fim } = req.body;
+        
+        const updatedEvent = await eventService.modifyEvent(id, { 
+            titulo, resumo, link, data_inicio, data_fim 
+        });
+        
+        if (!updatedEvent) {
+            return res.status(404).json({ msg: "Evento não encontrado" });
+        }
+        
+        res.json(updatedEvent);
+    } catch (error) {
+        console.error("Erro ao atualizar evento:", error);
+        res.status(500).json({ msg: "Erro ao atualizar evento" });
+    }
 };
 
 export const deleteEvent = async(req, res) => {
-    const { id } = req.params;
-    await pool.query("delete from api.eventos where id=$1", [id]);
-    res.sendStatus(204);
+    try {
+        const { id } = req.params;
+        await eventService.removeEvent(id);
+        res.sendStatus(204);
+    } catch (error) {
+        console.error("Erro ao excluir evento:", error);
+        res.status(500).json({ msg: "Erro ao excluir evento" });
+    }
 };
