@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -152,11 +151,11 @@ const AppContent: React.FC = () => {
 };
 
 const ViverSolidarioApp: React.FC = () => (
-  <ThemeProvider>
-    <AuthProvider>
+  <AuthProvider>
+    <ThemeProvider>
       <AppContent />
-    </AuthProvider>
-  </ThemeProvider>
+    </ThemeProvider>
+  </AuthProvider>
 );
 
 export default ViverSolidarioApp;
