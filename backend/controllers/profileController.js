@@ -1,18 +1,20 @@
 
 import bcrypt from "bcrypt";
 import * as userService from "../services/userService.js";
+import { ApiResponse } from "../utils/responseHandler.js";
+import { ApiError } from "../utils/errorMiddleware.js";
 
-export const getProfile = async(req, res) => {
+export const getProfile = async(req, res, next) => {
     try {
         const userId = req.user.sub;
         const user = await userService.findUserById(userId);
         
         if (!user) {
-            return res.status(404).json({ msg: "Usuário não encontrado" });
+            throw ApiError.notFound("Usuário não encontrado");
         }
         
-        // Only return safe fields
-        res.json({
+        // Retorna apenas campos seguros
+        return ApiResponse.success(res, {
             id: user.id,
             nome: user.nome,
             email: user.email,
@@ -20,24 +22,23 @@ export const getProfile = async(req, res) => {
             theme: user.theme || "light"
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: "Erro no servidor" });
+        next(err);
     }
 };
 
-export const updateProfile = async(req, res) => {
+export const updateProfile = async(req, res, next) => {
     try {
         const userId = req.user.sub;
         const { nome, email, theme } = req.body;
         
-        // Update only the fields that were provided
+        // Atualiza apenas os campos fornecidos
         const updatedUser = await userService.updateUserProfile(userId, { nome, email, theme });
         
         if (!updatedUser) {
-            return res.status(404).json({ msg: "Usuário não encontrado" });
+            throw ApiError.notFound("Usuário não encontrado");
         }
         
-        res.json({
+        return ApiResponse.success(res, {
             id: updatedUser.id,
             nome: updatedUser.nome,
             email: updatedUser.email,
@@ -45,42 +46,55 @@ export const updateProfile = async(req, res) => {
             theme: updatedUser.theme
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: "Erro no servidor" });
+        next(err);
     }
 };
 
-export const updatePassword = async(req, res) => {
+export const updatePassword = async(req, res, next) => {
     try {
         const userId = req.user.sub;
         const { currentPassword, newPassword } = req.body;
         
-        // Validate required fields
+        // Valida campos obrigatórios
         if (!currentPassword || !newPassword) {
-            return res.status(400).json({ msg: "Senha atual e nova senha são obrigatórias" });
+            throw ApiError.badRequest("Senha atual e nova senha são obrigatórias");
         }
         
-        // Get user to verify current password
+        // Obtém usuário para verificar senha atual
         const user = await userService.findUserById(userId);
         if (!user) {
-            return res.status(404).json({ msg: "Usuário não encontrado" });
+            throw ApiError.notFound("Usuário não encontrado");
         }
         
-        // Verify current password
+        // Verifica senha atual
         const passwordMatch = await bcrypt.compare(currentPassword, user.senha_hash);
         if (!passwordMatch) {
-            return res.status(401).json({ msg: "Senha atual incorreta" });
+            throw ApiError.unauthorized("Senha atual incorreta");
         }
         
-        // Hash new password
+        // Hasheia nova senha
         const hash = await bcrypt.hash(newPassword, 10);
         
-        // Update password
+        // Atualiza a senha
         await userService.updateUserPassword(userId, hash);
         
-        res.json({ msg: "Senha atualizada com sucesso" });
+        return ApiResponse.success(res, { message: "Senha atualizada com sucesso" });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: "Erro no servidor" });
+        next(err);
+    }
+};
+
+export const getUserRole = async(req, res, next) => {
+    try {
+        const userId = req.user.sub;
+        const user = await userService.findUserById(userId);
+        
+        if (!user) {
+            throw ApiError.notFound("Usuário não encontrado");
+        }
+        
+        return ApiResponse.success(res, { role: user.role || "donor" });
+    } catch (err) {
+        next(err);
     }
 };

@@ -2,11 +2,17 @@
 import { pool } from "../config/db.js";
 
 // Serviços para usuários
-export const findAllVoluntarios = async () => {
+export const findAllVoluntarios = async (limit = 10, offset = 0) => {
     const { rows } = await pool.query(
-        "select id, nome, email, ativo from api.voluntarios order by nome"
+        "select id, nome, email, ativo, role, theme from api.voluntarios order by nome LIMIT $1 OFFSET $2", 
+        [limit, offset]
     );
     return rows;
+};
+
+export const countVoluntarios = async () => {
+    const { rows } = await pool.query('SELECT COUNT(*) FROM api.voluntarios');
+    return parseInt(rows[0].count);
 };
 
 export const findUserByEmail = async (email) => {
@@ -52,4 +58,30 @@ export const updateUserPassword = async (userId, hash) => {
         [userId, hash]
     );
     return rows[0];
+};
+
+export const updateUserRole = async (userId, role) => {
+    const { rows } = await pool.query(
+        `update api.voluntarios set role = $2 where id = $1 returning id, nome, email, role`, 
+        [userId, role]
+    );
+    return rows[0];
+};
+
+export const findUsersByRole = async (role, limit = 10, offset = 0) => {
+    const { rows } = await pool.query(
+        `select id, nome, email, ativo, role, theme from api.voluntarios 
+         where role = $1 
+         order by nome LIMIT $2 OFFSET $3`, 
+        [role, limit, offset]
+    );
+    return rows;
+};
+
+export const countUsersByRole = async (role) => {
+    const { rows } = await pool.query(
+        'SELECT COUNT(*) FROM api.voluntarios WHERE role = $1',
+        [role]
+    );
+    return parseInt(rows[0].count);
 };

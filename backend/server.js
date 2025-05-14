@@ -9,6 +9,7 @@ dotenv.config();
 import { authRouter } from "./routes/auth.js";
 import { userRouter } from "./routes/users.js";
 import { profileRouter } from "./routes/profile.js";
+import testimonialRouter from "./routes/testimonials.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -21,6 +22,7 @@ app.use("/api/auth", authRouter);
 app.use("/api", userRouter);
 app.use("/api", profileRouter);
 app.use("/api/events", eventRouter);
+app.use("/api/testimonials", testimonialRouter);
 
 app.get("/", (_req, res) => res.send("Viver Solidário API 🚀"));
 
