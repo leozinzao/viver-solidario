@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
@@ -17,7 +17,7 @@ import {
   Heart,
   User,
   Plus,
-  Calendar,      // ícone da nova aba
+  Calendar,
   Handshake,
   Impact,
 } from "@/components/icons";
@@ -34,13 +34,42 @@ type ScreenType =
 
 const AppContent: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>("welcome");
-  const { isAuthenticated, hasPermission } = useAuth();
+  const { isAuthenticated, hasPermission, logout } = useAuth();
+
+  // Sistema de navegação entre telas
+  useEffect(() => {
+    // Event listener para gerenciar navegação interna
+    const handleNavigate = (e: CustomEvent) => {
+      if (e.detail && e.detail.screen) {
+        setCurrentScreen(e.detail.screen as ScreenType);
+      }
+    };
+
+    // Registrar o evento personalizado
+    window.addEventListener('navigate' as any, handleNavigate);
+    
+    return () => {
+      window.removeEventListener('navigate' as any, handleNavigate);
+    };
+  }, []);
 
   // -------- handlers de navegação ----------
-  const handleEnterApp     = () => setCurrentScreen("home");
-  const handleGoToLogin    = () => setCurrentScreen("login");
-  const handleBackToWelcome= () => setCurrentScreen("welcome");
+  const handleEnterApp = () => setCurrentScreen("home");
+  const handleGoToLogin = () => setCurrentScreen("login");
+  const handleBackToWelcome = () => setCurrentScreen("welcome");
   const handleLoginSuccess = () => setCurrentScreen("home");
+
+  // Função para navegar entre telas que pode ser chamada de qualquer lugar
+  const navigateTo = (screen: ScreenType) => {
+    window.dispatchEvent(new CustomEvent('navigate', { 
+      detail: { screen } 
+    }));
+  };
+
+  // Expor função globalmente (para botões em outros componentes)
+  useEffect(() => {
+    (window as any).navigateTo = navigateTo;
+  }, []);
 
   // redireciona anônimos para Welcome
   if (!isAuthenticated && currentScreen !== "welcome" && currentScreen !== "login") {
@@ -69,12 +98,14 @@ const AppContent: React.FC = () => {
       {/* telas internas -------------------------------------------------- */}
       {(isAuthenticated || currentScreen === "home") && (
         <>
-          {currentScreen === "home"      && <DashboardScreen />}
+          {currentScreen === "home" && (
+            <DashboardScreen />
+          )}
           {currentScreen === "donations" && <DonationsScreen />}
-          {currentScreen === "events"    && <EventsScreen />}
+          {currentScreen === "events" && <EventsScreen />}
           {currentScreen === "volunteer" && <VolunteerScreen />}
-          {currentScreen === "impact"    && <ImpactScreen />}
-          {currentScreen === "profile"   && <ProfileScreen />}
+          {currentScreen === "impact" && <ImpactScreen />}
+          {currentScreen === "profile" && <ProfileScreen />}
 
           {/* FAB exclusivo da tela Doações */}
           {currentScreen === "donations" && hasPermission("internal") && (
@@ -152,11 +183,11 @@ const AppContent: React.FC = () => {
 };
 
 const ViverSolidarioApp: React.FC = () => (
-  <ThemeProvider>
-    <AuthProvider>
+  <AuthProvider>
+    <ThemeProvider>
       <AppContent />
-    </AuthProvider>
-  </ThemeProvider>
+    </ThemeProvider>
+  </AuthProvider>
 );
 
 export default ViverSolidarioApp;

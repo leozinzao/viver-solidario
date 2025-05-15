@@ -1,7 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/ui/use-toast';
 
 // Import icons directly from lucide-react
 import { 
@@ -9,10 +10,20 @@ import {
   Calendar as CalendarIcon, 
   Heart, 
   DollarSign, 
-  Handshake
+  Handshake,
+  LogIn
 } from "lucide-react";
 
 const DashboardScreen: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
+  const handleLoginClick = () => {
+    // Usar a função global para navegar
+    if (typeof window !== 'undefined' && (window as any).navigateTo) {
+      (window as any).navigateTo('login');
+    }
+  };
+
   return (
     <div className="flutter-screen bg-gradient-to-b from-viver-yellow/10 to-white dark:from-solidario-purple/10 dark:to-background p-4">
       {/* Header */}
@@ -27,9 +38,18 @@ const DashboardScreen: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-viver-yellow drop-shadow-md">ONG Viver</h1>
         </div>
-        <Button className="bg-viver-yellow hover:bg-viver-yellow/90 text-black shadow-md transition-transform hover:scale-105 animate-fade-in" size="lg">
-          Entrar
-        </Button>
+        
+        {/* Só mostrar botão de login se não estiver autenticado */}
+        {!isAuthenticated && (
+          <Button 
+            onClick={handleLoginClick}
+            className="bg-viver-yellow hover:bg-viver-yellow/90 text-black shadow-md transition-transform hover:scale-105 animate-fade-in flex items-center gap-2" 
+            size="lg"
+          >
+            <LogIn className="h-5 w-5" />
+            Entrar
+          </Button>
+        )}
       </div>
       
       {/* Hero Banner */}

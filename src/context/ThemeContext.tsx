@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 type ThemeContextType = {
   isDarkMode: boolean;
@@ -9,15 +10,21 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { user, updateUserProfile } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(user?.theme === 'dark');
 
   useEffect(() => {
-    // Sempre iniciar no tema claro
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('viverSolidarioTheme', 'light');
-  }, []);
+    // Initialize theme based on user preference
+    if (user?.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    }
+  }, [user?.theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
     setIsDarkMode((prev) => {
       const newTheme = !prev;
       
@@ -27,6 +34,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       } else {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('viverSolidarioTheme', 'light');
+      }
+      
+      // Update user preference in the backend if authenticated
+      if (user) {
+        updateUserProfile({ theme: newTheme ? 'dark' : 'light' }).catch(console.error);
       }
       
       return newTheme;
