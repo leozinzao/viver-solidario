@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { eventRouter } from "./routes/events.js";
+
 dotenv.config();
 
 import { authRouter } from "./routes/auth.js";
