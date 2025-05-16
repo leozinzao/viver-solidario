@@ -14,7 +14,7 @@ const SignUp = () => {
       if (typeof window !== 'undefined' && (window as any).navigateTo) {
         (window as any).navigateTo('signup');
       }
-    }, 100);
+    }, 200);
   }, [navigate]);
 
   return (

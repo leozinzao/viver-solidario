@@ -4,7 +4,8 @@ export const api = async(
     options = {}
 ) => {
     const token = localStorage.getItem("token"); // salvo no login
-    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+    // Use a public API service for testing or fallback to the deployed backend
+    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://api-viver-solidario.onrender.com';
     
     const res = await fetch(
         baseUrl + url, {

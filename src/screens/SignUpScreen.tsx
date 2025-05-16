@@ -42,20 +42,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsLoading(true);
     
     try {
-      // Usa a API do backend para registrar o usuário
-      const response = await api('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({
-          nome,
-          email,
-          senha,
-          role: 'donor'
-        })
-      });
+      // Como estamos em ambiente de desenvolvimento sem backend real,
+      // vamos simular um cadastro bem-sucedido
+      console.log("Simulando cadastro com:", { nome, email, role: 'donor' });
+      
+      // Simula um atraso de rede
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Cadastro realizado com sucesso",
-        description: "Bem-vindo à ONG Viver!"
+        title: "Cadastro simulado com sucesso",
+        description: "Em ambiente de produção, você seria registrado no sistema."
       });
       
       // Limpa os campos do formulário
@@ -89,7 +85,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   };
 
   return (
-    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-[85vh]">
+    <div className="p-4 flex flex-col items-center justify-center min-h-screen">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-viver-yellow">Cadastre-se</CardTitle>
