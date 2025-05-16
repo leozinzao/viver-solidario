@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
+import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 import WelcomeScreen   from "@/screens/WelcomeScreen";
 import LoginScreen     from "@/screens/LoginScreen";
