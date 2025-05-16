@@ -1,4 +1,3 @@
-
 import { createClient } from "@supabase/supabase-js";
 
 // Fornecer valores padrão para desenvolvimento, estes não funcionarão para chamadas reais da API
@@ -18,7 +17,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true
   },
   realtime: {
-    enabled: true,
+    // A propriedade 'enabled' não existe em RealtimeClientOptions
+    // Removemos essa opção para resolver o erro
   }
 });
 
