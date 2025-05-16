@@ -1,10 +1,13 @@
+
 export const api = async(
     url,
     options = {}
 ) => {
     const token = localStorage.getItem("token"); // salvo no login
+    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+    
     const res = await fetch(
-        import.meta.env.VITE_BACKEND_URL + url, {
+        baseUrl + url, {
             ...options,
             headers: {
                 "Content-Type": "application/json",
@@ -12,6 +15,15 @@ export const api = async(
                 ...options.headers,
             },
         });
-    if (!res.ok) throw await res.json();
+    if (!res.ok) {
+        const errorData = await res.text();
+        let parsedError;
+        try {
+            parsedError = JSON.parse(errorData);
+        } catch (e) {
+            throw new Error(errorData || res.statusText);
+        }
+        throw parsedError;
+    }
     return res.json();
 };

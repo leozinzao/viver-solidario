@@ -58,6 +58,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
         description: "Bem-vindo à ONG Viver!"
       });
       
+      // Limpa os campos do formulário
+      setNome('');
+      setEmail('');
+      setSenha('');
+      setConfirmaSenha('');
+      
       onSignUpSuccess();
     } catch (error: any) {
       console.error('Erro ao cadastrar:', error);
