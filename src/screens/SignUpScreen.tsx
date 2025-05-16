@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { supabaseAuth } from '@/lib/supabase';
+import { supabase, supabaseAuth } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 
 interface SignUpScreenProps {
