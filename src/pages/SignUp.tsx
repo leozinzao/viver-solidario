@@ -18,8 +18,11 @@ const SignUp = () => {
   }, [navigate]);
 
   return (
-    <div style={{ maxWidth: 400, margin: "auto", marginTop: 64 }}>
-      <h2>Redirecionando...</h2>
+    <div className="flex justify-center items-center min-h-screen p-4">
+      <div className="max-w-md w-full text-center">
+        <h2 className="text-xl font-semibold mb-2">Redirecionando...</h2>
+        <p>Você será direcionado para a página de cadastro.</p>
+      </div>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { supabase, supabaseAuth } from '@/lib/supabase';
+import { api } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
 
 interface SignUpScreenProps {
@@ -42,41 +42,30 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsLoading(true);
     
     try {
-      // Registra o usuário no Supabase Auth
-      const { data, error } = await supabaseAuth.signUp(email, senha);
+      // Usa a API do backend para registrar o usuário
+      const response = await api('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          nome,
+          email,
+          senha,
+          role: 'donor'
+        })
+      });
       
-      if (error) throw error;
+      toast({
+        title: "Cadastro realizado com sucesso",
+        description: "Bem-vindo à ONG Viver!"
+      });
       
-      if (data) {
-        // Após o registro bem-sucedido, podemos adicionar o nome do usuário à tabela de voluntários
-        const { error: profileError } = await supabase
-          .from('voluntarios')
-          .upsert([
-            { 
-              id: data.user.id,
-              nome: nome,
-              email: email,
-              role: 'donor',
-              theme: 'light'
-            }
-          ]);
-        
-        if (profileError) throw profileError;
-        
-        toast({
-          title: "Cadastro realizado com sucesso",
-          description: "Bem-vindo à ONG Viver!"
-        });
-        
-        onSignUpSuccess();
-      }
+      onSignUpSuccess();
     } catch (error: any) {
       console.error('Erro ao cadastrar:', error);
       
       let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
       
       if (error.message) {
-        if (error.message.includes("duplicate")) {
+        if (error.message.includes("duplicate") || error.message.includes("já está cadastrado")) {
           errorMessage = "Este e-mail já está cadastrado.";
         } else {
           errorMessage = error.message;
@@ -94,7 +83,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   };
 
   return (
-    <div className="flutter-screen p-4 flex flex-col items-center justify-center">
+    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-[85vh]">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-viver-yellow">Cadastre-se</CardTitle>
