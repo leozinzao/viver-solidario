@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 interface WelcomeScreenProps {
   onEnterApp: () => void;
   onLogin: () => void;
+  onSignUp: () => void; // Nova propriedade para o botão de cadastro
 }
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onEnterApp, onLogin }) => {
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onEnterApp, onLogin, onSignUp }) => {
   return (
     <div className="flutter-screen p-4 bg-white flex flex-col justify-center items-center">
       <div className="w-32 h-32 mb-6 rounded-full bg-viver-yellow/10 flex items-center justify-center">
@@ -35,6 +36,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onEnterApp, onLogin }) =>
           onClick={onLogin}
         >
           Login
+        </Button>
+
+        <Button 
+          variant="outline" 
+          className="w-full border-solidario-purple text-solidario-purple hover:bg-solidario-purple/10"
+          onClick={onSignUp}
+        >
+          Cadastrar-se
         </Button>
       </div>
       

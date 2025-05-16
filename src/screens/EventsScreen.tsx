@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,15 +76,17 @@ const EventsScreen: React.FC = () => {
         ))}
       </div>
 
-      {/* FAB para adicionar eventos (apenas para admin) */}
+      {/* FAB para adicionar eventos (apenas para admin/internal) */}
       {hasPermission("internal") && (
-        <button
-          onClick={() => setShowEventForm(true)}
-          className="absolute bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
-          aria-label="Adicionar evento"
-        >
-          <Plus className="h-6 w-6" />
-        </button>
+        <div className="fixed bottom-20 right-4">
+          <button
+            onClick={() => setShowEventForm(true)}
+            className="p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
+            aria-label="Adicionar evento"
+          >
+            <Plus className="h-6 w-6" />
+          </button>
+        </div>
       )}
       
       {/* Modal de cadastro de eventos */}

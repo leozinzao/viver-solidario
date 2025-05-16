@@ -5,12 +5,16 @@ import { ThemeProvider } from "@/context/ThemeContext";
 
 import WelcomeScreen   from "@/screens/WelcomeScreen";
 import LoginScreen     from "@/screens/LoginScreen";
+import SignUpScreen    from "@/screens/SignUpScreen"; // Nova tela de cadastro
 import DashboardScreen from "@/screens/DashboardScreen";
 import DonationsScreen from "@/screens/DonationsScreen";
 import ProfileScreen   from "@/screens/ProfileScreen";
 import VolunteerScreen from "@/screens/VolunteerScreen";
 import EventsScreen    from "@/screens/EventsScreen";
 import ImpactScreen    from "@/screens/ImpactScreen";
+
+import { Button } from "@/components/ui/button";
+import { LogIn } from "lucide-react";
 
 import {
   Home,
@@ -25,6 +29,7 @@ import {
 type ScreenType =
   | "welcome"
   | "login"
+  | "signup" // Nova tela de cadastro
   | "home"
   | "donations"
   | "profile"
@@ -56,6 +61,7 @@ const AppContent: React.FC = () => {
   // -------- handlers de navegação ----------
   const handleEnterApp = () => setCurrentScreen("home");
   const handleGoToLogin = () => setCurrentScreen("login");
+  const handleGoToSignUp = () => setCurrentScreen("signup"); // Novo handler
   const handleBackToWelcome = () => setCurrentScreen("welcome");
   const handleLoginSuccess = () => setCurrentScreen("home");
 
@@ -72,20 +78,25 @@ const AppContent: React.FC = () => {
   }, []);
 
   // redireciona anônimos para Welcome
-  if (!isAuthenticated && currentScreen !== "welcome" && currentScreen !== "login") {
+  if (!isAuthenticated && currentScreen !== "welcome" && currentScreen !== "login" && currentScreen !== "signup") {
     setCurrentScreen("welcome");
   }
 
   // Verifica se deve mostrar a navegação - apenas para telas pós-login/visitante
   const shouldShowNavigation = isAuthenticated || 
                               (currentScreen !== "welcome" && 
-                               currentScreen !== "login");
+                               currentScreen !== "login" &&
+                               currentScreen !== "signup");
 
   return (
     <div className="flutter-app border border-border">
       {/* telas públicas -------------------------------------------------- */}
       {currentScreen === "welcome" && (
-        <WelcomeScreen onEnterApp={handleEnterApp} onLogin={handleGoToLogin} />
+        <WelcomeScreen 
+          onEnterApp={handleEnterApp} 
+          onLogin={handleGoToLogin} 
+          onSignUp={handleGoToSignUp} // Nova prop
+        />
       )}
 
       {currentScreen === "login" && (
@@ -94,10 +105,32 @@ const AppContent: React.FC = () => {
           onLoginSuccess={handleLoginSuccess}
         />
       )}
+      
+      {currentScreen === "signup" && (
+        <SignUpScreen
+          onBackToWelcome={handleBackToWelcome}
+          onSignUpSuccess={handleLoginSuccess}
+        />
+      )}
 
       {/* telas internas -------------------------------------------------- */}
       {(isAuthenticated || currentScreen === "home") && (
         <>
+          {/* Barra superior com botão de login para visitantes */}
+          {!isAuthenticated && currentScreen === "home" && (
+            <div className="w-full h-14 bg-white dark:bg-background border-b flex items-center justify-end px-4">
+              <Button 
+                onClick={handleGoToLogin}
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1 text-viver-yellow border-viver-yellow hover:bg-viver-yellow/10"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Entrar</span>
+              </Button>
+            </div>
+          )}
+          
           {currentScreen === "home" && (
             <DashboardScreen />
           )}
@@ -107,18 +140,18 @@ const AppContent: React.FC = () => {
           {currentScreen === "impact" && <ImpactScreen />}
           {currentScreen === "profile" && <ProfileScreen />}
 
-          {/* FAB exclusivo da tela Doações */}
-          {currentScreen === "donations" && hasPermission("internal") && (
+          {/* FAB exclusivo para tela Eventos para usuários com permissão */}
+          {currentScreen === "events" && hasPermission("internal") && (
             <button
-              className="absolute bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
-              aria-label="Add donation"
+              className="fixed bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
+              aria-label="Adicionar evento"
             >
               <Plus className="h-6 w-6" />
             </button>
           )}
 
           {/* Bottom Navigation - Agora só aparece quando appropriado */}
-          {shouldShowNavigation && currentScreen !== "welcome" && currentScreen !== "login" && (
+          {shouldShowNavigation && currentScreen !== "welcome" && currentScreen !== "login" && currentScreen !== "signup" && (
             <div className="flutter-bottom-nav">
               {/* Início */}
               <button
