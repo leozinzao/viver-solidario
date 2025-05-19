@@ -1,25 +1,15 @@
+import express from "express";
+import { authenticateToken } from "../middleware/auth.js";
+import * as controller from "../controllers/testimonialController.js";
 
-import { Router } from "express";
-import { 
-    getTestimonials, 
-    getTestimonial, 
-    createTestimonial, 
-    updateTestimonial, 
-    deleteTestimonial,
-    togglePublishStatus
-} from "../controllers/testimonialController.js";
-import { verifyToken, hasRole, hasAdvancedPermissions } from "../utils/authMiddleware.js";
+const router = express.Router();
 
-export const testimonialRouter = Router();
+// Rota protegida: só acessa se estiver autenticado
+router.post("/", authenticateToken, controller.createTestimonial);
+router.put("/:id", authenticateToken, controller.updateTestimonial);
+router.delete("/:id", authenticateToken, controller.deleteTestimonial);
 
-// Rotas públicas
-testimonialRouter.get("/", getTestimonials);  // Lista todos os depoimentos (públicos)
-testimonialRouter.get("/:id", getTestimonial); // Obtém um depoimento específico
+// Rota pública
+router.get("/", controller.getAllTestimonials);
 
-// Rotas protegidas
-testimonialRouter.post("/", verifyToken, hasRole(['admin', 'internal', 'editor']), createTestimonial);
-testimonialRouter.put("/:id", verifyToken, hasRole(['admin', 'internal', 'editor']), updateTestimonial);
-testimonialRouter.delete("/:id", verifyToken, hasRole(['admin', 'internal']), deleteTestimonial);
-testimonialRouter.patch("/:id/publish", verifyToken, hasRole(['admin', 'internal', 'editor']), togglePublishStatus);
-
-export default testimonialRouter;
+export default router;

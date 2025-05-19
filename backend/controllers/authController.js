@@ -1,4 +1,3 @@
-
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as userService from "../services/userService.js";
@@ -10,7 +9,7 @@ const jwtSecret = process.env.JWT_SECRET;
 export const register = async(req, res, next) => {
     try {
         const { nome, email, senha, role = "donor" } = req.body;
-        
+
         if (!nome || !email || !senha) {
             throw ApiError.badRequest("Campos obrigatórios: nome, email, senha");
         }
@@ -22,7 +21,7 @@ export const register = async(req, res, next) => {
 
         // Validação de role (somente admin pode criar outros tipos)
         let userRole = 'donor'; // Padrão para novos usuários
-        
+
         // Se o usuário estiver autenticado e for admin/internal, pode especificar a role
         if (req.user && ['admin', 'internal'].includes(req.user.role)) {
             if (['admin', 'internal', 'editor', 'volunteer', 'donor'].includes(role)) {
@@ -32,7 +31,7 @@ export const register = async(req, res, next) => {
 
         const hash = await bcrypt.hash(senha, 10);
         const user = await userService.createUser({ nome, email, hash, role: userRole });
-        
+
         return ApiResponse.success(res, {
             id: user.id,
             nome: user.nome,
@@ -41,17 +40,18 @@ export const register = async(req, res, next) => {
         }, 201);
     } catch (err) {
         next(err);
+        if (req.user.role !== "admin") return res.status(403).json({ message: "Acesso negado" });
     }
 };
 
 export const login = async(req, res, next) => {
     try {
         const { email, senha } = req.body;
-        
+
         if (!email || !senha) {
             throw ApiError.badRequest("Email e senha são obrigatórios");
         }
-        
+
         const user = await userService.findUserByEmail(email);
         if (!user) {
             throw ApiError.unauthorized("Credenciais inválidas");
@@ -70,21 +70,21 @@ export const login = async(req, res, next) => {
             role = "volunteer";
         }
 
-        const token = jwt.sign({ 
-            sub: user.id, 
+        const token = jwt.sign({
+            sub: user.id,
             role: role,
             email: user.email
         }, jwtSecret, { expiresIn: "12h" });
 
-        return ApiResponse.success(res, { 
-            token, 
-            user: { 
-                id: user.id, 
-                nome: user.nome, 
+        return ApiResponse.success(res, {
+            token,
+            user: {
+                id: user.id,
+                nome: user.nome,
                 email: user.email,
                 role: role,
                 theme: user.theme || 'light'
-            } 
+            }
         });
     } catch (err) {
         next(err);
@@ -97,19 +97,19 @@ export const verifyCurrentToken = async(req, res, next) => {
         // Token já foi verificado no middleware verifyToken
         const userId = req.user.sub;
         const user = await userService.findUserById(userId);
-        
+
         if (!user) {
             throw ApiError.unauthorized("Usuário não encontrado");
         }
-        
-        return ApiResponse.success(res, { 
-            user: { 
-                id: user.id, 
-                nome: user.nome, 
+
+        return ApiResponse.success(res, {
+            user: {
+                id: user.id,
+                nome: user.nome,
                 email: user.email,
                 role: user.role || "donor",
                 theme: user.theme || 'light'
-            } 
+            }
         });
     } catch (err) {
         next(err);
