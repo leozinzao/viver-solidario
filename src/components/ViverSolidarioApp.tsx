@@ -214,14 +214,14 @@ const AppContent: React.FC = () => {
 
           {/* FAB exclusivo para tela Eventos para usuários com permissão */}
           {currentScreen === "events" && isAuthenticated && 
-           hasPermission(user?.role as any, Permission.CREATE_EVENT) && (
-            <button
-              className="fixed bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
-              aria-label="Adicionar evento"
-            >
-              <Plus className="h-6 w-6" />
-            </button>
-          )}
+            hasPermission(user?.role as any, Permission.CREATE_EVENT) && (
+              <button
+                className="fixed bottom-20 right-4 p-4 rounded-full bg-viver-yellow text-black shadow-lg hover:bg-viver-yellow/90 transition-colors"
+                aria-label="Adicionar evento"
+              >
+                <Plus className="h-6 w-6" />
+              </button>
+            )}
 
           {/* Bottom Navigation - Agora só aparece quando appropriado */}
           {shouldShowNavigation && (
