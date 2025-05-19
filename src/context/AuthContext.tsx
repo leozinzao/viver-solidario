@@ -1,11 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, supabaseAuth } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 import { Session, User } from '@supabase/supabase-js';
-
-type UserRole = 'visitor' | 'donor' | 'volunteer' | 'internal';
-type Theme = 'light' | 'dark';
+import { UserRole } from '@/lib/permissions';
+import { Theme } from '@/context/ThemeContext';
 
 interface UserInfo {
   id: string;
@@ -373,11 +371,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Função auxiliar para determinar o papel do usuário com base no email
   const determineRole = (email: string): UserRole => {
     if (email.includes('interno') || email.includes('admin')) {
-      return 'internal';
+      return UserRole.internal;
     } else if (email.includes('voluntario')) {
-      return 'volunteer';
+      return UserRole.volunteer;
     }
-    return 'donor';
+    return UserRole.donor;
   };
 
   if (loading) {
