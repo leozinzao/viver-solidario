@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase, supabaseAuth } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
@@ -64,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: userData.user?.id || '',
               name: profile.nome || userData.user?.user_metadata?.name || '',
               email: profile.email || userData.user?.email || '',
-              role: (profile.role as UserRole) || 'donor',
+              role: (profile.role as UserRole) || UserRole.donor,
               theme: (profile.theme as Theme) || 'light'
             };
             
@@ -121,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 id: session.user?.id || '',
                 name: profile.nome || session.user?.user_metadata?.name || '',
                 email: profile.email || session.user?.email || '',
-                role: (profile.role as UserRole) || 'donor',
+                role: (profile.role as UserRole) || UserRole.donor,
                 theme: (profile.theme as Theme) || 'light'
               };
               
@@ -176,7 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: data.user.id,
               name: profile.nome || data.user.user_metadata?.name || '',
               email: profile.email || data.user.email || '',
-              role: (profile.role as UserRole) || 'donor',
+              role: (profile.role as UserRole) || UserRole.donor,
               theme: (profile.theme as Theme) || 'light'
             };
             

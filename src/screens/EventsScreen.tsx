@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { Calendar, Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { UserRole } from "@/lib/permissions";
 
 const eventos = [
   {
@@ -77,7 +78,7 @@ const EventsScreen: React.FC = () => {
       </div>
 
       {/* FAB para adicionar eventos (apenas para admin/internal) */}
-      {hasPermission("internal") && (
+      {hasPermission(UserRole.internal) && (
         <div className="fixed bottom-20 right-4">
           <button
             onClick={() => setShowEventForm(true)}

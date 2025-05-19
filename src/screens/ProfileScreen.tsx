@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { DialogTitle, DialogDescription, DialogHeader, DialogFooter, DialogContent, Dialog } from "@/components/ui/dialog";
 import { History, User, LogOut, Moon, Edit, Settings, Shield, Lock, Save, X } from '@/components/icons';
 import { toast } from '@/components/ui/use-toast';
+import { UserRole } from '@/lib/permissions';
 
 const ProfileScreen: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -78,11 +78,11 @@ const ProfileScreen: React.FC = () => {
     if (!user) return null;
     
     switch (user.role) {
-      case 'internal':
+      case UserRole.internal:
         return <Badge className="bg-viver-yellow text-black">Acesso Interno</Badge>;
-      case 'volunteer':
+      case UserRole.volunteer:
         return <Badge className="bg-green-500">Voluntário</Badge>;
-      case 'donor':
+      case UserRole.donor:
         return <Badge className="bg-blue-500">Doador</Badge>;
       default:
         return <Badge className="bg-gray-500">Visitante</Badge>;
@@ -165,7 +165,7 @@ const ProfileScreen: React.FC = () => {
           </div>
         </div>
         
-        {hasPermission('internal') && (
+        {hasPermission(UserRole.internal) && (
           <div className="flutter-card border-l-4 border-l-viver-yellow">
             <div className="flex items-center">
               <div className="mr-3 p-2 bg-viver-yellow/10 rounded-full">
@@ -179,7 +179,7 @@ const ProfileScreen: React.FC = () => {
           </div>
         )}
         
-        {hasPermission(['internal', 'volunteer']) && (
+        {hasPermission([UserRole.internal, UserRole.volunteer]) && (
           <div className="flutter-card border-l-4 border-l-viver-yellow">
             <div className="flex items-center">
               <div className="mr-3 p-2 bg-viver-yellow/10 rounded-full">
@@ -193,7 +193,7 @@ const ProfileScreen: React.FC = () => {
           </div>
         )}
         
-        {hasPermission('internal') && (
+        {hasPermission(UserRole.internal) && (
           <div className="flutter-card">
             <div className="flex items-center">
               <div className="mr-3 p-2 bg-viver-yellow/10 rounded-full">
