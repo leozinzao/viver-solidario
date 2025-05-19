@@ -22,7 +22,7 @@ const AppContent: React.FC = () => {
     currentScreen !== "signup";
 
   // Verifica se o usuário é interno ou admin para mostrar botão de admin
-  const isAdminUser = user?.role === 'admin' || user?.role === 'internal';
+  const isAdminUser = user?.role === UserRole.admin || user?.role === UserRole.internal;
 
   return (
     <div className="flutter-app border border-border">

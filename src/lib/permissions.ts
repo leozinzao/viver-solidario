@@ -1,6 +1,13 @@
 
 // Define user roles
-export type UserRole = 'admin' | 'internal' | 'editor' | 'volunteer' | 'donor' | 'visitor';
+export enum UserRole {
+  admin = 'admin',
+  internal = 'internal',
+  editor = 'editor',
+  volunteer = 'volunteer',
+  donor = 'donor',
+  visitor = 'visitor'
+}
 
 // Define permissions for different features
 export enum Permission {
@@ -31,28 +38,28 @@ export enum Permission {
 
 // Define permission mappings by role
 const rolePermissions: Record<UserRole, Permission[]> = {
-  admin: Object.values(Permission),
-  internal: [
+  [UserRole.admin]: Object.values(Permission),
+  [UserRole.internal]: [
     Permission.CREATE_EVENT, Permission.EDIT_EVENT, Permission.DELETE_EVENT,
     Permission.CREATE_TESTIMONIAL, Permission.EDIT_TESTIMONIAL, Permission.DELETE_TESTIMONIAL, Permission.APPROVE_TESTIMONIAL,
     Permission.VIEW_USERS,
     Permission.ACCESS_ADMIN_PANEL, Permission.VIEW_ANALYTICS,
     Permission.DONATE, Permission.VOLUNTEER,
   ],
-  editor: [
+  [UserRole.editor]: [
     Permission.CREATE_EVENT, Permission.EDIT_EVENT,
     Permission.CREATE_TESTIMONIAL, Permission.EDIT_TESTIMONIAL, Permission.APPROVE_TESTIMONIAL,
     Permission.VIEW_ANALYTICS,
     Permission.DONATE, Permission.VOLUNTEER,
   ],
-  volunteer: [
+  [UserRole.volunteer]: [
     Permission.CREATE_TESTIMONIAL,
     Permission.DONATE, Permission.VOLUNTEER,
   ],
-  donor: [
+  [UserRole.donor]: [
     Permission.DONATE, Permission.VOLUNTEER,
   ],
-  visitor: []
+  [UserRole.visitor]: []
 };
 
 /**
