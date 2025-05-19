@@ -7,6 +7,7 @@ import HeaderBar from "@/components/navigation/HeaderBar";
 import NavigationBar from "@/components/navigation/NavigationBar";
 import ScreenRenderer from "@/components/screens/ScreenRenderer";
 import PermissionDialog from "@/components/permissions/PermissionDialog";
+import { UserRole } from "@/lib/permissions";
 
 const AppContent: React.FC = () => {
   const { currentScreen, navigateToScreen, handleEnterApp, handleGoToLogin, handleGoToSignUp, 
