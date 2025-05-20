@@ -7,7 +7,7 @@ import HeaderBar from "@/components/navigation/HeaderBar";
 import NavigationBar from "@/components/navigation/NavigationBar";
 import ScreenRenderer from "@/components/screens/ScreenRenderer";
 import PermissionDialog from "@/components/permissions/PermissionDialog";
-import { UserRole } from "@/lib/permissions";
+import { UserRole, Permission, hasPermission } from "@/lib/permissions";
 
 const AppContent: React.FC = () => {
   const { currentScreen, navigateToScreen, handleEnterApp, handleGoToLogin, handleGoToSignUp, 
@@ -21,8 +21,8 @@ const AppContent: React.FC = () => {
     currentScreen !== "login" &&
     currentScreen !== "signup";
 
-  // Verifica se o usuário é interno ou admin para mostrar botão de admin
-  const isAdminUser = user?.role === UserRole.admin || user?.role === UserRole.internal;
+  // Verifica se o usuário tem acesso ao painel admin
+  const hasAdminAccess = user && hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
 
   return (
     <div className="flutter-app border border-border">
@@ -33,7 +33,7 @@ const AppContent: React.FC = () => {
           {shouldShowNavigation && (
             <HeaderBar
               isAuthenticated={isAuthenticated}
-              isAdminUser={isAdminUser}
+              isAdminUser={hasAdminAccess}
               onLogin={handleGoToLogin}
               onAdminNavigate={() => navigateToScreen("admin")}
             />

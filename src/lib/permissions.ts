@@ -25,11 +25,13 @@ export enum Permission {
   VIEW_USERS = 'view:users',
   EDIT_USER = 'edit:user',
   DELETE_USER = 'delete:user',
+  MANAGE_USER_ROLES = 'manage:user-roles',
   
   // Admin features
   ACCESS_ADMIN_PANEL = 'access:admin-panel',
   VIEW_ANALYTICS = 'view:analytics',
   EDIT_SYSTEM_SETTINGS = 'edit:system-settings',
+  MANAGE_SYSTEM_CONFIG = 'manage:system-config',
   
   // General user permissions
   DONATE = 'donate',

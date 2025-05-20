@@ -36,7 +36,12 @@ export const hasRole = (requiredRoles) => {
         const userRole = req.user.role || 'donor';
         
         // Admin tem acesso total
-        if (userRole === 'admin' || userRole === 'internal') {
+        if (userRole === 'admin') {
+            return next();
+        }
+        
+        // Internal tem acesso avançado, mas não total
+        if (userRole === 'internal' && requiredRoles !== 'admin') {
             return next();
         }
 
@@ -57,6 +62,26 @@ export const hasRole = (requiredRoles) => {
 };
 
 /**
+ * Middleware para verificar se o usuário é administrador
+ */
+export const isAdmin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, error: { message: "Autenticação necessária", status: 401 } });
+    }
+
+    const userRole = req.user.role || 'donor';
+    
+    if (userRole === 'admin') {
+        return next();
+    }
+
+    return res.status(403).json({ 
+        success: false, 
+        error: { message: "Acesso negado: permissões de administrador necessárias", status: 403 } 
+    });
+};
+
+/**
  * Middleware para verificar se o usuário tem permissões avançadas (admin ou editor)
  */
 export const hasAdvancedPermissions = (req, res, next) => {
@@ -73,5 +98,25 @@ export const hasAdvancedPermissions = (req, res, next) => {
     return res.status(403).json({ 
         success: false, 
         error: { message: "Acesso negado: permissões insuficientes", status: 403 } 
+    });
+};
+
+/**
+ * Middleware para verificar se o usuário tem permissões de sistema
+ */
+export const hasSystemPermissions = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, error: { message: "Autenticação necessária", status: 401 } });
+    }
+
+    const userRole = req.user.role || 'donor';
+    
+    if (['admin', 'internal'].includes(userRole)) {
+        return next();
+    }
+
+    return res.status(403).json({ 
+        success: false, 
+        error: { message: "Acesso negado: permissões de sistema necessárias", status: 403 } 
     });
 };
