@@ -27,7 +27,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEditProfile }) =>
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 p-4">
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 p-4 border border-border rounded-lg bg-card/50">
       <div className="relative">
         <div className="w-24 h-24 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-md">
           <User className="w-12 h-12 text-viver-yellow" />
