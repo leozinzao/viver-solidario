@@ -32,8 +32,8 @@ const ProfileScreen: React.FC = () => {
   } = useProfileActions();
 
   return (
-    <div className="flutter-screen bg-background p-4">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">Perfil</h1>
+    <div className="flutter-screen bg-background p-5">
+      <h1 className="text-2xl font-bold mb-6 text-center sm:text-left">Perfil</h1>
       
       {/* Profile Header */}
       <ProfileHeader 
@@ -51,7 +51,7 @@ const ProfileScreen: React.FC = () => {
         onLogout={logout}
       />
       
-      <div className="mt-8 text-center">
+      <div className="mt-10 text-center">
         <p className="text-xs text-muted-foreground">Viver Solidário v1.0.0</p>
       </div>
       

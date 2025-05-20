@@ -23,7 +23,7 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
   onLogout
 }) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4 px-2">
       <ProfileOption
         icon={<History className="w-5 h-5 text-viver-yellow" />}
         title="Histórico de Ações"
