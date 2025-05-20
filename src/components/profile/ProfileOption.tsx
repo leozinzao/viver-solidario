@@ -20,23 +20,31 @@ const ProfileOption: React.FC<ProfileOptionProps> = ({
   highlight,
   danger
 }) => {
-  const baseClasses = "flutter-card" + 
-    (onClick ? " cursor-pointer" : "") + 
+  const baseClasses = "flutter-card w-full mb-3" + 
+    (onClick ? " cursor-pointer hover:shadow-md" : "") + 
     (highlight ? " border-l-4 border-l-viver-yellow" : "");
   
   return (
-    <div className={baseClasses} onClick={onClick}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className={`mr-3 p-2 ${danger ? 'bg-red-500/10' : 'bg-viver-yellow/10'} rounded-full`}>
+    <div 
+      className={baseClasses} 
+      onClick={onClick}
+      role={onClick ? "button" : "presentation"}
+    >
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-full ${danger ? 'bg-red-500/10 text-red-500' : 'bg-viver-yellow/10 text-viver-yellow'}`}>
             {icon}
           </div>
-          <div>
+          <div className="text-left">
             <h3 className={`font-medium ${danger ? 'text-red-500' : ''}`}>{title}</h3>
-            <p className={`text-xs ${danger ? 'opacity-70' : 'text-muted-foreground'}`}>{description}</p>
+            <p className={`text-xs ${danger ? 'text-red-400/70' : 'text-muted-foreground'}`}>{description}</p>
           </div>
         </div>
-        {rightElement}
+        {rightElement && (
+          <div className="ml-2">
+            {rightElement}
+          </div>
+        )}
       </div>
     </div>
   );
