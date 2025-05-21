@@ -20,20 +20,19 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
 }) => {
   return (
     <div className="w-full h-14 bg-white dark:bg-background border-b flex items-center justify-between px-4">
-      <div className="flex-1 flex items-center">
+      <div className="flex items-center">
+        {/* Logo da ONG Viver */}
         <div className="flex items-center">
-          {/* Logo da ONG Viver */}
-          <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/644dc858-b963-4312-a22e-38983c64e833.png" 
-              alt="ONG Viver" 
-              className="h-9 w-auto mr-2" 
-            />
-          </div>
+          <img 
+            src="/lovable-uploads/644dc858-b963-4312-a22e-38983c64e833.png" 
+            alt="ONG Viver" 
+            className="h-9 w-auto" 
+          />
+          <span className="ml-2 font-medium text-lg hidden sm:block">ONG Viver</span>
         </div>
       </div>
       
-      <div className="flex-1 flex justify-end">
+      <div className="flex justify-end">
         {!isAuthenticated && (
           <Button 
             onClick={onLogin}

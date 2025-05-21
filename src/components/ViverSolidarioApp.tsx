@@ -34,37 +34,32 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flutter-app border border-border">
-      {/* telas públicas e internas */}
-      {(isAuthenticated || currentScreen === "home") && (
-        <>
-          {/* Barra superior apenas para usuários com acesso admin */}
-          {shouldShowHeader && (
-            <HeaderBar
-              isAuthenticated={isAuthenticated}
-              isAdminUser={hasAdminAccess}
-              onLogin={handleGoToLogin}
-              onAdminNavigate={() => navigateToScreen("admin")}
-            />
-          )}
-          
-          {/* Renderizador de telas */}
-          <ScreenRenderer
-            currentScreen={currentScreen}
-            onEnterApp={handleEnterApp}
-            onGoToLogin={handleGoToLogin}
-            onGoToSignUp={handleGoToSignUp}
-            onBackToWelcome={handleBackToWelcome}
-            onLoginSuccess={handleLoginSuccess}
-          />
+      {/* Header bar para usuários admin */}
+      {shouldShowHeader && (
+        <HeaderBar
+          isAuthenticated={isAuthenticated}
+          isAdminUser={hasAdminAccess}
+          onLogin={handleGoToLogin}
+          onAdminNavigate={() => navigateToScreen("admin")}
+        />
+      )}
+      
+      {/* Renderizador de telas */}
+      <ScreenRenderer
+        currentScreen={currentScreen}
+        onEnterApp={handleEnterApp}
+        onGoToLogin={handleGoToLogin}
+        onGoToSignUp={handleGoToSignUp}
+        onBackToWelcome={handleBackToWelcome}
+        onLoginSuccess={handleLoginSuccess}
+      />
 
-          {/* Bottom Navigation - Agora só aparece quando appropriado */}
-          {shouldShowNavigation && (
-            <NavigationBar
-              currentScreen={currentScreen}
-              onNavigate={navigateToScreen}
-            />
-          )}
-        </>
+      {/* Bottom Navigation - Agora só aparece quando appropriado */}
+      {shouldShowNavigation && (
+        <NavigationBar
+          currentScreen={currentScreen}
+          onNavigate={navigateToScreen}
+        />
       )}
       
       {/* Diálogo de Permissão Negada */}
