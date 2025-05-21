@@ -1,8 +1,9 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn, Settings, Image } from "lucide-react";
+import { LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Permission, hasPermission } from "@/lib/permissions";
 
 interface HeaderBarProps {
   isAuthenticated: boolean;
@@ -21,8 +22,14 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
     <div className="w-full h-14 bg-white dark:bg-background border-b flex items-center justify-between px-4">
       <div className="flex-1 flex items-center">
         <div className="flex items-center">
-          <Image className="h-6 w-6 mr-2 text-viver-yellow" />
-          <h1 className="text-lg font-semibold text-viver-yellow">ONG Viver</h1>
+          {/* Logo da ONG Viver */}
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/644dc858-b963-4312-a22e-38983c64e833.png" 
+              alt="ONG Viver" 
+              className="h-9 w-auto mr-2" 
+            />
+          </div>
         </div>
       </div>
       

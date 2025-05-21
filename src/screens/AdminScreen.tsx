@@ -13,16 +13,6 @@ import {
   CalendarDays, 
   MessageSquare 
 } from 'lucide-react';
-import { 
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { cn } from "@/lib/utils";
 
 const AdminScreen: React.FC = () => {
   const { user } = useAuth();
