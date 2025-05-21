@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { LogIn, Settings } from "lucide-react";
+import { LogIn, Settings, Image } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface HeaderBarProps {
@@ -19,12 +19,11 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
 }) => {
   return (
     <div className="w-full h-14 bg-white dark:bg-background border-b flex items-center justify-between px-4">
-      {!isAuthenticated && (
-        <div className="flex-1"></div> /* Espaçador esquerdo */
-      )}
-      
-      <div className="flex-1 text-center">
-        <h1 className="text-lg font-semibold text-viver-yellow">ONG Viver</h1>
+      <div className="flex-1 flex items-center">
+        <div className="flex items-center">
+          <Image className="h-6 w-6 mr-2 text-viver-yellow" />
+          <h1 className="text-lg font-semibold text-viver-yellow">ONG Viver</h1>
+        </div>
       </div>
       
       <div className="flex-1 flex justify-end">
