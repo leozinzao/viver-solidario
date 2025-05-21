@@ -25,7 +25,12 @@ const AppContent: React.FC = () => {
   const hasAdminAccess = user && hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
   
   // Verifica se deve mostrar o header - SOMENTE para usuários autenticados com permissão de admin
-  const shouldShowHeader = isAuthenticated && hasAdminAccess;
+  // E também garantir que não seja exibido nas telas de login, cadastro e welcome
+  const shouldShowHeader = isAuthenticated && 
+                          hasAdminAccess && 
+                          currentScreen !== "welcome" && 
+                          currentScreen !== "login" &&
+                          currentScreen !== "signup";
 
   return (
     <div className="flutter-app border border-border">
