@@ -7,35 +7,43 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
 import { Eye, EyeOff } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface LoginScreenProps {
   onBackToWelcome: () => void;
   onLoginSuccess: () => void;
 }
 
+const loginSchema = z.object({
+  email: z.string()
+    .email({ message: "Email inválido" }),
+  password: z.string()
+    .min(1, { message: "A senha é obrigatória" })
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos.",
-        variant: "destructive"
-      });
-      return;
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
     }
-    
+  });
+
+  const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
     
     try {
-      await login(email, password);
+      await login(values.email, values.password);
       toast({
         title: "Login realizado com sucesso",
         description: "Bem-vindo à ONG Viver!",
@@ -50,10 +58,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
   };
 
   return (
@@ -76,48 +80,70 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
             <CardTitle className="text-2xl font-bold text-viver-yellow">Acesso ao Sistema</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
-                <Input
-                  id="email"
-                  placeholder="Seu email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Seu email"
+                          type="email"
+                          autoComplete="email"
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium">Senha</label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    placeholder="Sua senha"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            placeholder="Sua senha"
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
+                            disabled={isLoading}
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="pt-2">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium py-5"
+                    disabled={isLoading}
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                    {isLoading ? 'Entrando...' : 'Entrar'}
+                  </Button>
                 </div>
-              </div>
-              <div className="pt-2">
-                <Button 
-                  type="submit" 
-                  className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium py-5"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Entrando...' : 'Entrar'}
-                </Button>
-              </div>
-            </form>
+              </form>
+            </Form>
             
             <div className="mt-4 text-center">
               <Button 
