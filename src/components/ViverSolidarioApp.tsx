@@ -28,7 +28,6 @@ const AppContent: React.FC = () => {
   const hasAdminAccess = user && hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
   
   // Verifica se deve mostrar o header - SOMENTE para usuários autenticados com permissão de admin
-  // E também garantir que não seja exibido nas telas de login, cadastro e welcome
   const shouldShowHeader = isAuthenticated && 
                           hasAdminAccess && 
                           currentScreen !== "welcome" && 

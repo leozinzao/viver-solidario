@@ -10,11 +10,12 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate }) => {
-  const { user } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const hasAnalyticsPermission = hasPermission(user?.role as any, Permission.VIEW_ANALYTICS);
 
   return (
     <div className="flutter-bottom-nav">
-      {/* Início */}
+      {/* Main navigation items - available to all users */}
       <button
         className={`nav-item ${currentScreen === "home" ? "text-viver-yellow" : "text-muted-foreground"}`}
         onClick={() => onNavigate("home")}
@@ -23,7 +24,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
         <span>Início</span>
       </button>
 
-      {/* Eventos */}
       <button
         className={`nav-item ${currentScreen === "events" ? "text-viver-yellow" : "text-muted-foreground"}`}
         onClick={() => onNavigate("events")}
@@ -32,7 +32,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
         <span>Eventos</span>
       </button>
 
-      {/* Doações */}
       <button
         className={`nav-item ${currentScreen === "donations" ? "text-viver-yellow" : "text-muted-foreground"}`}
         onClick={() => onNavigate("donations")}
@@ -41,7 +40,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
         <span>Doações</span>
       </button>
 
-      {/* Voluntariado */}
       <button
         className={`nav-item ${currentScreen === "volunteer" ? "text-viver-yellow" : "text-muted-foreground"}`}
         onClick={() => onNavigate("volunteer")}
@@ -50,8 +48,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
         <span>Voluntariado</span>
       </button>
 
-      {/* Impacto (somente usuários internos) ou Perfil */}
-      {hasPermission(user?.role as any, Permission.VIEW_ANALYTICS) ? (
+      {/* Conditional Impact/Profile navigation based on permissions */}
+      {hasAnalyticsPermission ? (
         <button
           className={`nav-item ${currentScreen === "impact" ? "text-viver-yellow" : "text-muted-foreground"}`}
           onClick={() => onNavigate("impact")}

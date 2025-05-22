@@ -46,10 +46,21 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onLoginSuccess,
 }) => {
   const { isAuthenticated, user } = useAuth();
+  
+  // Screens that require authentication to be rendered
+  const authenticatedScreens: ScreenType[] = ["profile", "admin"];
+  
+  // Check if current screen should be rendered based on authentication
+  const shouldRenderScreen = (screen: ScreenType) => {
+    if (authenticatedScreens.includes(screen)) {
+      return isAuthenticated;
+    }
+    return true;
+  };
 
   return (
     <>
-      {/* telas públicas */}
+      {/* Public screens */}
       {currentScreen === "welcome" && (
         <WelcomeScreen 
           onEnterApp={onEnterApp} 
@@ -72,14 +83,16 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         />
       )}
 
-      {/* telas internas - agora todas são renderizadas independente de autenticação */}
+      {/* Public accessible screens */}
       {currentScreen === "home" && <DashboardScreen />}
       {currentScreen === "donations" && <DonationsScreen />}
       {currentScreen === "events" && <EventsScreen />}
       {currentScreen === "volunteer" && <VolunteerScreen />}
+      
+      {/* Authenticated screens - only render if user is authenticated */}
+      {currentScreen === "profile" && shouldRenderScreen("profile") && <ProfileScreen />}
       {currentScreen === "impact" && <ImpactScreen />}
-      {currentScreen === "profile" && <ProfileScreen />}
-      {currentScreen === "admin" && <AdminScreen />}
+      {currentScreen === "admin" && shouldRenderScreen("admin") && <AdminScreen />}
 
       {/* FAB exclusivo para tela Eventos para usuários com permissão */}
       {currentScreen === "events" && isAuthenticated && 

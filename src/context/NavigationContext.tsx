@@ -112,7 +112,17 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const handleGoToLogin = () => navigateToScreen("login");
   const handleGoToSignUp = () => navigateToScreen("signup");
   const handleBackToWelcome = () => navigateToScreen("welcome");
-  const handleLoginSuccess = () => navigateToScreen("home");
+  const handleLoginSuccess = () => {
+    // If user tried to access a specific screen before login, navigate there after login
+    if (attemptedScreen) {
+      const destination = attemptedScreen;
+      setAttemptedScreen(null);
+      navigateToScreen(destination);
+    } else {
+      // Default destination after login
+      navigateToScreen("home");
+    }
+  };
 
   // Expor função globalmente (para botões em outros componentes)
   useEffect(() => {
