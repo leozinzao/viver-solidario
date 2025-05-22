@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Home, Calendar, Heart, Handshake, User, Impact } from "@/components/icons";
+import { Home, Calendar, Heart, Handshake, User, Impact, Settings } from "@/components/icons";
 import { useAuth } from "@/context/AuthContext";
 import { Permission, hasPermission } from '@/lib/permissions';
 import { useNavigation } from "@/context/NavigationContext";
@@ -16,6 +16,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
   
   // Check if user has analytics permission
   const hasAnalyticsPermission = isAuthenticated && user && hasPermission(user.role as any, Permission.VIEW_ANALYTICS);
+  
+  // Check if user has admin permission
+  const hasAdminPermission = isAuthenticated && user && hasPermission(user.role as any, Permission.ACCESS_ADMIN_PANEL);
   
   // Handle navigation based on authentication state
   const handleNavigation = (screen: string, requiresAuth: boolean = false) => {
@@ -61,8 +64,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
         <span>Voluntariado</span>
       </button>
 
-      {/* Show either Impact button for users with analytics permission or Profile button */}
-      {hasAnalyticsPermission ? (
+      {/* Show either Impact button for users with analytics permission, Admin button for admin users, or Profile button */}
+      {hasAnalyticsPermission && (
         <button
           className={`nav-item ${currentScreen === "impact" ? "text-viver-yellow" : "text-muted-foreground"}`}
           onClick={() => handleNavigation("impact")}
@@ -70,7 +73,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
           <Impact className="h-6 w-6 mb-1" />
           <span>Impacto</span>
         </button>
-      ) : (
+      )}
+      
+      {!hasAnalyticsPermission && hasAdminPermission && (
+        <button
+          className={`nav-item ${currentScreen === "admin" ? "text-viver-yellow" : "text-muted-foreground"}`}
+          onClick={() => handleNavigation("admin", true)}
+        >
+          <Settings className="h-6 w-6 mb-1" />
+          <span>Admin</span>
+        </button>
+      )}
+      
+      {!hasAnalyticsPermission && !hasAdminPermission && (
         <button
           className={`nav-item ${currentScreen === "profile" ? "text-viver-yellow" : "text-muted-foreground"}`}
           onClick={() => handleNavigation("profile", true)}

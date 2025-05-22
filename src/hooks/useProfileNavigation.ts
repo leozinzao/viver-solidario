@@ -1,22 +1,22 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@/context/NavigationContext';
-import { Permission } from '@/lib/permissions';
+import { Permission, hasPermission } from '@/lib/permissions';
 
 export const useProfileNavigation = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { navigateToScreen } = useNavigation();
   
-  // Check if user has specific permissions - simplified logic
+  // Check if user has specific permissions
   const hasAnalyticsAccess = isAuthenticated && 
     user?.role && 
-    (user.role === 'internal' || user.role === 'admin');
+    hasPermission(user.role, Permission.VIEW_ANALYTICS);
   
   const hasAdminAccess = isAuthenticated && 
     user?.role && 
-    (user.role === 'internal' || user.role === 'admin');
+    hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
   
-  // Navigation handlers with simplified logic
+  // Navigation handlers
   const goToProfile = () => {
     if (isAuthenticated) {
       navigateToScreen('profile');
