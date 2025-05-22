@@ -133,7 +133,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     if (!isAuthenticated && 
         requiresAuthentication.includes(currentScreen)) {
-      setCurrentScreen("welcome");
+      setCurrentScreen("login");
     }
   }, [isAuthenticated, currentScreen]);
 

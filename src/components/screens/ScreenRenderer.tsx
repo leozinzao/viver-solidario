@@ -3,6 +3,7 @@ import React from "react";
 import { Plus } from "@/components/icons";
 import { Permission, hasPermission } from '@/lib/permissions';
 import { useAuth } from "@/context/AuthContext";
+import { useNavigation } from "@/context/NavigationContext";
 
 // Screens
 import WelcomeScreen from "@/screens/WelcomeScreen";
@@ -46,6 +47,15 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onLoginSuccess,
 }) => {
   const { isAuthenticated, user } = useAuth();
+  const { navigateToScreen } = useNavigation();
+  
+  // If user tries to access the profile screen but is not authenticated,
+  // redirect them to login
+  React.useEffect(() => {
+    if (currentScreen === "profile" && !isAuthenticated) {
+      navigateToScreen("login");
+    }
+  }, [currentScreen, isAuthenticated, navigateToScreen]);
   
   // Screens that require authentication to be rendered
   const authenticatedScreens: ScreenType[] = ["profile", "admin"];
