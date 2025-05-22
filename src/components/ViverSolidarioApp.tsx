@@ -14,29 +14,28 @@ const AppContent: React.FC = () => {
     handleBackToWelcome, handleLoginSuccess, showPermissionDenied, setShowPermissionDenied } = useNavigation();
   const { isAuthenticated, user } = useAuth();
   
-  // Lista de telas que usam navegação mesmo para visitantes não autenticados
+  // Public screens that show navigation even for unauthenticated users
   const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
   
-  // Verifica se deve mostrar a navegação - incluindo telas públicas com navegação
+  // Authentication screens that don't show navigation
+  const authScreens = ["welcome", "login", "signup"];
+  
+  // Determine whether to show navigation
   const shouldShowNavigation = 
     (isAuthenticated || publicScreensWithNavigation.includes(currentScreen)) && 
-    currentScreen !== "welcome" && 
-    currentScreen !== "login" &&
-    currentScreen !== "signup";
+    !authScreens.includes(currentScreen);
 
-  // Verifica se o usuário tem acesso ao painel admin
+  // Check if user has admin access
   const hasAdminAccess = user && hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
   
-  // Verifica se deve mostrar o header - SOMENTE para usuários autenticados com permissão de admin
+  // Show header only for authenticated admin users outside of auth screens
   const shouldShowHeader = isAuthenticated && 
                           hasAdminAccess && 
-                          currentScreen !== "welcome" && 
-                          currentScreen !== "login" &&
-                          currentScreen !== "signup";
+                          !authScreens.includes(currentScreen);
 
   return (
     <div className="flutter-app border border-border">
-      {/* Header bar para usuários admin */}
+      {/* Header bar for admin users */}
       {shouldShowHeader && (
         <HeaderBar
           isAuthenticated={isAuthenticated}
@@ -46,17 +45,19 @@ const AppContent: React.FC = () => {
         />
       )}
       
-      {/* Renderizador de telas */}
-      <ScreenRenderer
-        currentScreen={currentScreen}
-        onEnterApp={handleEnterApp}
-        onGoToLogin={handleGoToLogin}
-        onGoToSignUp={handleGoToSignUp}
-        onBackToWelcome={handleBackToWelcome}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      {/* Screen content */}
+      <div className={`flutter-screen ${shouldShowNavigation ? 'pb-14' : ''}`}>
+        <ScreenRenderer
+          currentScreen={currentScreen}
+          onEnterApp={handleEnterApp}
+          onGoToLogin={handleGoToLogin}
+          onGoToSignUp={handleGoToSignUp}
+          onBackToWelcome={handleBackToWelcome}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      </div>
 
-      {/* Bottom Navigation - Exibida para visitantes nas telas públicas e para usuários autenticados */}
+      {/* Bottom Navigation */}
       {shouldShowNavigation && (
         <NavigationBar
           currentScreen={currentScreen}
@@ -64,7 +65,7 @@ const AppContent: React.FC = () => {
         />
       )}
       
-      {/* Diálogo de Permissão Negada */}
+      {/* Permission Denied Dialog */}
       <PermissionDialog
         open={showPermissionDenied}
         onOpenChange={setShowPermissionDenied}

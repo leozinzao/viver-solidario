@@ -43,96 +43,99 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [attemptedScreen, setAttemptedScreen] = useState<ScreenType | null>(null);
   const { isAuthenticated, user } = useAuth();
 
-  // Cria mapeamento de telas para permissões necessárias
+  // Screen permission configuration
   const screenPermissions: Partial<Record<ScreenType, Permission>> = {
     admin: Permission.ACCESS_ADMIN_PANEL,
     impact: Permission.VIEW_ANALYTICS
   };
 
-  // Define which screens require authentication
+  // Screens that require authentication
   const requiresAuthentication: ScreenType[] = [
     "profile",
     "admin"
   ];
   
-  // Sistema de navegação entre telas
+  // Public screens that show navigation even for unauthenticated users
+  const publicScreensWithNavigation: ScreenType[] = [
+    "home",
+    "events",
+    "donations",
+    "volunteer"
+  ];
+  
+  // Navigation event listener
   useEffect(() => {
-    // Event listener para gerenciar navegação interna
     const handleNavigate = (e: CustomEvent) => {
       if (e.detail && e.detail.screen) {
         navigateToScreen(e.detail.screen as ScreenType);
       }
     };
 
-    // Registrar o evento personalizado
     window.addEventListener('navigate' as any, handleNavigate);
     
     return () => {
       window.removeEventListener('navigate' as any, handleNavigate);
     };
-  }, [isAuthenticated, user]); // Re-attach quando autenticação ou usuário mudar
+  }, [isAuthenticated, user]);
 
-  // Função segura para navegação com verificação de permissões
+  // Safe navigation with permission checking
   const navigateToScreen = (screen: ScreenType) => {
-    // Verifica se a tela requer autenticação e o usuário não está autenticado
+    // Check if screen requires authentication
     if (requiresAuthentication.includes(screen) && !isAuthenticated) {
       setAttemptedScreen(screen);
       setCurrentScreen("login");
       return;
     }
     
-    // Verifica se a tela requer permissão específica
+    // Check for required permissions
     const requiredPermission = screenPermissions[screen];
     
     if (requiredPermission && user?.role) {
-      // Verifica se o usuário tem a permissão para acessar essa tela
       const userCanAccess = hasPermission(user.role as any, requiredPermission);
       
       if (!userCanAccess) {
-        // Se não tem permissão, salva a tela tentada e mostra diálogo
         setAttemptedScreen(screen);
         setShowPermissionDenied(true);
         return;
       }
     }
     
-    // Se não precisa de permissão ou tem permissão, navega normalmente
+    // Navigate to screen if all checks passed
     setCurrentScreen(screen);
   };
 
-  // Função para navegar entre telas que pode ser chamada de qualquer lugar
+  // Global navigation function
   const navigateTo = (screen: ScreenType) => {
     window.dispatchEvent(new CustomEvent('navigate', { 
       detail: { screen } 
     }));
   };
 
-  // -------- handlers de navegação ----------
+  // Navigation handlers
   const handleEnterApp = () => navigateToScreen("home");
   const handleGoToLogin = () => navigateToScreen("login");
   const handleGoToSignUp = () => navigateToScreen("signup");
   const handleBackToWelcome = () => navigateToScreen("welcome");
+  
+  // Handle post-login navigation
   const handleLoginSuccess = () => {
-    // If user tried to access a specific screen before login, navigate there after login
     if (attemptedScreen) {
       const destination = attemptedScreen;
       setAttemptedScreen(null);
       navigateToScreen(destination);
     } else {
-      // Default destination after login
       navigateToScreen("home");
     }
   };
 
-  // Expor função globalmente (para botões em outros componentes)
+  // Expose navigation globally
   useEffect(() => {
     (window as any).navigateTo = navigateTo;
   }, []);
 
-  // redireciona anônimos para Welcome apenas para algumas telas específicas
+  // Redirect unauthenticated users from restricted screens
   useEffect(() => {
-    if (!isAuthenticated && 
-        requiresAuthentication.includes(currentScreen)) {
+    if (!isAuthenticated && requiresAuthentication.includes(currentScreen)) {
       setCurrentScreen("login");
     }
   }, [isAuthenticated, currentScreen]);

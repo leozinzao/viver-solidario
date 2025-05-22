@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Plus } from "@/components/icons";
 import { Permission, hasPermission } from '@/lib/permissions';
 import { useAuth } from "@/context/AuthContext";
@@ -49,22 +49,65 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   const { isAuthenticated, user } = useAuth();
   const { navigateToScreen } = useNavigation();
   
-  // If user tries to access the profile screen but is not authenticated,
-  // redirect them to login
-  React.useEffect(() => {
-    if (currentScreen === "profile" && !isAuthenticated) {
+  // Screens that require authentication
+  const authenticatedScreens: ScreenType[] = ["profile", "admin", "impact"];
+  
+  // Screens that require specific permissions
+  const permissionRequiredScreens: Record<ScreenType, Permission | null> = {
+    admin: Permission.ACCESS_ADMIN_PANEL,
+    impact: Permission.VIEW_ANALYTICS,
+    profile: null,
+    welcome: null,
+    login: null,
+    signup: null,
+    home: null,
+    donations: null,
+    volunteer: null,
+    events: null
+  };
+  
+  // Redirect unauthenticated users or users without proper permissions
+  useEffect(() => {
+    // Skip redirect for auth-related screens
+    if (["welcome", "login", "signup"].includes(currentScreen)) {
+      return;
+    }
+    
+    // Redirect unauthenticated users for protected screens
+    if (authenticatedScreens.includes(currentScreen as ScreenType) && !isAuthenticated) {
       navigateToScreen("login");
+      return;
     }
-  }, [currentScreen, isAuthenticated, navigateToScreen]);
-  
-  // Screens that require authentication to be rendered
-  const authenticatedScreens: ScreenType[] = ["profile", "admin"];
-  
-  // Check if current screen should be rendered based on authentication
-  const shouldRenderScreen = (screen: ScreenType) => {
-    if (authenticatedScreens.includes(screen)) {
-      return isAuthenticated;
+    
+    // Redirect users without required permissions
+    const requiredPermission = permissionRequiredScreens[currentScreen as ScreenType];
+    if (
+      requiredPermission && 
+      isAuthenticated && 
+      user && 
+      !hasPermission(user.role as any, requiredPermission)
+    ) {
+      navigateToScreen("home");
+      return;
     }
+  }, [currentScreen, isAuthenticated, user, navigateToScreen]);
+  
+  // Check if current screen should be rendered based on authentication and permissions
+  const shouldRenderScreen = (screen: ScreenType): boolean => {
+    if (authenticatedScreens.includes(screen) && !isAuthenticated) {
+      return false;
+    }
+    
+    const requiredPermission = permissionRequiredScreens[screen];
+    if (
+      requiredPermission && 
+      isAuthenticated && 
+      user && 
+      !hasPermission(user.role as any, requiredPermission)
+    ) {
+      return false;
+    }
+    
     return true;
   };
 
@@ -99,12 +142,12 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       {currentScreen === "events" && <EventsScreen />}
       {currentScreen === "volunteer" && <VolunteerScreen />}
       
-      {/* Authenticated screens - only render if user is authenticated */}
+      {/* Authenticated screens - only render if user is authenticated and has right permissions */}
       {currentScreen === "profile" && shouldRenderScreen("profile") && <ProfileScreen />}
-      {currentScreen === "impact" && <ImpactScreen />}
+      {currentScreen === "impact" && shouldRenderScreen("impact") && <ImpactScreen />}
       {currentScreen === "admin" && shouldRenderScreen("admin") && <AdminScreen />}
 
-      {/* FAB exclusivo para tela Eventos para usuários com permissão */}
+      {/* FAB exclusive for Events screen for users with event creation permission */}
       {currentScreen === "events" && isAuthenticated && 
         hasPermission(user?.role as any, Permission.CREATE_EVENT) && (
           <button
