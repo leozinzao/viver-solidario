@@ -7,20 +7,16 @@ export const useProfileNavigation = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { navigateToScreen } = useNavigation();
   
-  // Check if user has specific permissions
+  // Check if user has specific permissions - simplified logic
   const hasAnalyticsAccess = isAuthenticated && 
-    user && 
-    user.role && 
-    Permission.VIEW_ANALYTICS !== undefined &&
+    user?.role && 
     (user.role === 'internal' || user.role === 'admin');
   
   const hasAdminAccess = isAuthenticated && 
-    user && 
-    user.role && 
-    Permission.ACCESS_ADMIN_PANEL !== undefined &&
+    user?.role && 
     (user.role === 'internal' || user.role === 'admin');
   
-  // Navigation handlers
+  // Navigation handlers with simplified logic
   const goToProfile = () => {
     if (isAuthenticated) {
       navigateToScreen('profile');
