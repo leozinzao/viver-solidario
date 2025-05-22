@@ -14,9 +14,12 @@ const AppContent: React.FC = () => {
     handleBackToWelcome, handleLoginSuccess, showPermissionDenied, setShowPermissionDenied } = useNavigation();
   const { isAuthenticated, user } = useAuth();
   
-  // Verifica se deve mostrar a navegação - apenas para telas pós-login/visitante
+  // Lista de telas que usam navegação mesmo para visitantes não autenticados
+  const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
+  
+  // Verifica se deve mostrar a navegação - incluindo telas públicas com navegação
   const shouldShowNavigation = 
-    (isAuthenticated || currentScreen === "home") && 
+    (isAuthenticated || publicScreensWithNavigation.includes(currentScreen)) && 
     currentScreen !== "welcome" && 
     currentScreen !== "login" &&
     currentScreen !== "signup";
@@ -54,7 +57,7 @@ const AppContent: React.FC = () => {
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Bottom Navigation - Agora só aparece quando appropriado */}
+      {/* Bottom Navigation - Exibida para visitantes nas telas públicas e para usuários autenticados */}
       {shouldShowNavigation && (
         <NavigationBar
           currentScreen={currentScreen}

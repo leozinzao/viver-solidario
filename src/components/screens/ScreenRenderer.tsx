@@ -72,7 +72,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         />
       )}
 
-      {/* telas internas */}
+      {/* telas internas - agora todas são renderizadas independente de autenticação */}
       {currentScreen === "home" && <DashboardScreen />}
       {currentScreen === "donations" && <DonationsScreen />}
       {currentScreen === "events" && <EventsScreen />}

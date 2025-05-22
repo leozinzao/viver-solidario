@@ -49,6 +49,12 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     impact: Permission.VIEW_ANALYTICS
   };
 
+  // Define which screens require authentication
+  const requiresAuthentication: ScreenType[] = [
+    "profile",
+    "admin"
+  ];
+  
   // Sistema de navegação entre telas
   useEffect(() => {
     // Event listener para gerenciar navegação interna
@@ -68,6 +74,13 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Função segura para navegação com verificação de permissões
   const navigateToScreen = (screen: ScreenType) => {
+    // Verifica se a tela requer autenticação e o usuário não está autenticado
+    if (requiresAuthentication.includes(screen) && !isAuthenticated) {
+      setAttemptedScreen(screen);
+      setCurrentScreen("login");
+      return;
+    }
+    
     // Verifica se a tela requer permissão específica
     const requiredPermission = screenPermissions[screen];
     
@@ -106,13 +119,10 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     (window as any).navigateTo = navigateTo;
   }, []);
 
-  // redireciona anônimos para Welcome
+  // redireciona anônimos para Welcome apenas para algumas telas específicas
   useEffect(() => {
     if (!isAuthenticated && 
-        currentScreen !== "welcome" && 
-        currentScreen !== "login" && 
-        currentScreen !== "signup" &&
-        currentScreen !== "home") {
+        requiresAuthentication.includes(currentScreen)) {
       setCurrentScreen("welcome");
     }
   }, [isAuthenticated, currentScreen]);
