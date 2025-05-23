@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,10 +55,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsLoading(true);
     
     try {
-      // Simulação de cadastro bem-sucedido
-      console.log("Simulando cadastro com:", { nome: values.nome, email: values.email, role: 'donor' });
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Enviar dados para a API de cadastro
+      await api.post('/register', {
+        nome: values.nome,
+        email: values.email,
+        senha: values.senha
+      });
+
       toast({
         title: "Cadastro realizado com sucesso",
         description: "Sua conta foi criada! Agora você pode fazer login."
@@ -74,12 +76,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
       
       let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
       
-      if (error.message) {
-        if (error.message.includes("duplicate") || error.message.includes("já está cadastrado")) {
-          errorMessage = "Este e-mail já está cadastrado.";
-        } else {
-          errorMessage = error.message;
-        }
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message.includes("duplicate")) {
+        errorMessage = "Este e-mail já está cadastrado.";
       }
       
       toast({
@@ -114,6 +114,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
+                {/* Campo Nome */}
                 <FormField
                   control={form.control}
                   name="nome"
@@ -133,6 +134,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   )}
                 />
                 
+                {/* Campo Email */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -153,6 +155,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   )}
                 />
                 
+                {/* Campo Senha */}
                 <FormField
                   control={form.control}
                   name="senha"
@@ -184,6 +187,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   )}
                 />
                 
+                {/* Campo Confirmar Senha */}
                 <FormField
                   control={form.control}
                   name="confirmaSenha"

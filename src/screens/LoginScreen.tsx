@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,6 +81,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+                {/* Campo de Email */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -102,6 +102,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                   )}
                 />
 
+                {/* Campo de Senha */}
                 <FormField
                   control={form.control}
                   name="password"
@@ -133,6 +134,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                   )}
                 />
 
+                {/* Botão de Login */}
                 <div className="pt-2">
                   <Button 
                     type="submit" 
@@ -145,6 +147,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
               </form>
             </Form>
             
+            {/* Botão para Voltar */}
             <div className="mt-4 text-center">
               <Button 
                 variant="link" 
@@ -155,6 +158,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
               </Button>
             </div>
             
+            {/* Acessos para Teste */}
             <div className="mt-6 text-xs text-muted-foreground text-center px-4 py-3 bg-muted/30 rounded-md">
               <p className="mb-1 font-medium">Acessos para teste:</p>
               <p>interno@viver.org (acesso interno)</p>

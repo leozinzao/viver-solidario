@@ -3,7 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "./utils/errorMiddleware.js";
 import { eventRouter } from "./routes/events.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 dotenv.config();
 
 import { authRouter } from "./routes/auth.js";

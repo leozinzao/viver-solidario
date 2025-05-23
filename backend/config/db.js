@@ -1,7 +1,17 @@
-import postgres from 'postgres'
+import postgres from 'postgres';
 
-const connectionString = process.env.DATABASE_URL
-    // Conecta ao banco de dados utilizando a connection string definida no seu .env (schema configurado, conforme o projeto Viver Solidário)
-const sql = postgres(connectionString)
+// Carrega a string de conexão do arquivo .env
+const connectionString = process.env.DATABASE_URL;
 
-export default sql
+// Verifica se a variável DATABASE_URL está definida
+if (!connectionString) {
+    throw new Error('A variável de ambiente DATABASE_URL não está definida no arquivo .env');
+}
+
+// Inicializa a conexão com o banco de dados
+const sql = postgres(connectionString, {
+    ssl: { rejectUnauthorized: false }, // Configuração SSL necessária para Supabase
+});
+
+// Exporta a conexão
+export default sql;
