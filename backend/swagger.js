@@ -1,4 +1,3 @@
-// backend/swagger.js
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
@@ -10,15 +9,11 @@ const options = {
             version: "1.0.0",
         },
     },
-    apis: ["./routes/*.js"], // Documente suas rotas com JSDoc!
+    apis: ["./routes/*.js"], // Caminho para as rotas
 };
 
-export const swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = swaggerJSDoc(options);
 
-// No seu server.js:
-import express from "express";
-import { swaggerSpec } from "./swagger.js";
-import swaggerUi from "swagger-ui-express";
-
-const app = express();
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+export function setupSwagger(app) {
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}

@@ -1,12 +1,10 @@
+import supabase from '../config/supabase.js';
 
-import * as userService from "../services/userService.js";
+export const getUsers = async(req, res) => {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*');
 
-export const listVoluntarios = async(_req, res) => {
-    try {
-        const voluntarios = await userService.findAllVoluntarios();
-        res.json(voluntarios);
-    } catch (error) {
-        console.error("Erro ao listar voluntários:", error);
-        res.status(500).json({ msg: "Erro ao listar voluntários" });
-    }
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
 };

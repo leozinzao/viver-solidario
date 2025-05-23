@@ -5,7 +5,9 @@
     "main": "server.js",
     "scripts": {
         "dev": "nodemon server.js",
-        "start": "node server.js"
+        "start": "node server.js",
+        "lint": "eslint . --ext .js,.ts",
+        "build": "tsc"
     },
     "dependencies": {
         "bcrypt": "^5.1.1",

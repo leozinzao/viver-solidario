@@ -1,10 +1,7 @@
-import pkg from "pg";
-import dotenv from "dotenv";
-dotenv.config();
+import postgres from 'postgres'
 
-const { Pool } = pkg;
+const connectionString = process.env.DATABASE_URL
+    // Conecta ao banco de dados utilizando a connection string definida no seu .env (schema configurado, conforme o projeto Viver Solidário)
+const sql = postgres(connectionString)
 
-export const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-});
+export default sql
