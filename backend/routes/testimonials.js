@@ -1,15 +1,15 @@
 import express from "express";
-import { verifyToken } from "../utils/authMiddleware.js"; // padronize o nome
+import { verifyToken } from "../utils/authMiddleware.js";
 import * as controller from "../controllers/testimonialController.js";
 
-const router = express.Router();
+const testimonialRouter = express.Router();
 
 // Rotas protegidas
-router.post("/", verifyToken, controller.createTestimonial);
-router.put("/:id", verifyToken, controller.updateTestimonial);
-router.delete("/:id", verifyToken, controller.deleteTestimonial);
+testimonialRouter.post("/", verifyToken, controller.createTestimonial);
+testimonialRouter.put("/:id", verifyToken, controller.updateTestimonial);
+testimonialRouter.delete("/:id", verifyToken, controller.deleteTestimonial);
 
 // Rota pública
-router.get("/", controller.getAllTestimonials);
+testimonialRouter.get("/", controller.getAllTestimonials);
 
-export default router;
+export default testimonialRouter;

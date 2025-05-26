@@ -52,45 +52,48 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   });
 
   const handleSignUp = async (values: SignUpFormValues) => {
-    setIsLoading(true);
-    
-    try {
-      // Enviar dados para a API de cadastro
-      await api.post('/register', {
+  setIsLoading(true);
+
+  try {
+    await api('/auth/register', { // <-- ajuste aqui
+      method: 'POST',
+      body: JSON.stringify({
         nome: values.nome,
         email: values.email,
         senha: values.senha
-      });
+      })
+    });
 
-      toast({
-        title: "Cadastro realizado com sucesso",
-        description: "Sua conta foi criada! Agora você pode fazer login."
-      });
-      
-      // Resetar o formulário
-      form.reset();
-      
-      onSignUpSuccess();
-    } catch (error: any) {
-      console.error('Erro ao cadastrar:', error);
-      
-      let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message.includes("duplicate")) {
-        errorMessage = "Este e-mail já está cadastrado.";
-      }
-      
-      toast({
-        title: "Erro no cadastro",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+    toast({
+      title: "Cadastro realizado com sucesso",
+      description: "Sua conta foi criada! Agora você pode fazer login."
+    });
+
+    form.reset();
+    onSignUpSuccess();
+  } catch (error: any) {
+    console.error('Erro ao cadastrar:', error);
+
+    let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
+
+    // O tratamento abaixo depende do formato do erro retornado pelo backend!
+    if (error.message && typeof error.message === "string") {
+      errorMessage = error.message;
+    } else if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (String(error).includes("duplicate")) {
+      errorMessage = "Este e-mail já está cadastrado.";
     }
-  };
+
+    toast({
+      title: "Erro no cadastro",
+      description: errorMessage,
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-solidario-purple/5">

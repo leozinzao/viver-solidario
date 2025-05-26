@@ -1,117 +1,89 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import * as userService from "../services/userService.js";
-import { ApiResponse } from "../utils/responseHandler.js";
-import { ApiError } from "../utils/errorMiddleware.js";
+import sql from "../config/db.js";
 
-const jwtSecret = process.env.JWT_SECRET;
-
-export const register = async(req, res, next) => {
+// Função de registro de usuário
+export const register = async(req, res) => {
     try {
-        const { nome, email, senha, role = "donor" } = req.body;
+        const { nome, email, senha, perfil } = req.body;
 
-        if (!nome || !email || !senha) {
-            throw ApiError.badRequest("Campos obrigatórios: nome, email, senha");
+        // Validação básica
+        if (!nome || !email || !senha || !perfil) {
+            return res.status(400).json({ message: "Todos os campos são obrigatórios." });
         }
 
-        const exists = await userService.findUserByEmail(email);
-        if (exists) {
-            throw ApiError.conflict("Este email já está cadastrado");
+        // Verifica se o e-mail já está cadastrado
+        const [existingUser] = await sql `SELECT id FROM users WHERE email = ${email}`;
+        if (existingUser) {
+            return res.status(409).json({ message: "Este e-mail já está cadastrado." });
         }
 
-        // Validação de role (somente admin pode criar outros tipos)
-        let userRole = 'donor'; // Padrão para novos usuários
+        // Hash da senha
+        const senhaHash = await bcrypt.hash(senha, 10);
 
-        // Se o usuário estiver autenticado e for admin/internal, pode especificar a role
-        if (req.user && ['admin', 'internal'].includes(req.user.role)) {
-            if (['admin', 'internal', 'editor', 'volunteer', 'donor'].includes(role)) {
-                userRole = role;
-            }
-        }
+        // Define aprovação com base no perfil
+        const aprovado = perfil === "volunteer" ? false : true;
 
-        const hash = await bcrypt.hash(senha, 10);
-        const user = await userService.createUser({ nome, email, hash, role: userRole });
+        // Insere o usuário
+        await sql `
+            INSERT INTO users (nome, email, senha, perfil, aprovado)
+            VALUES (${nome}, ${email}, ${senhaHash}, ${perfil}, ${aprovado})
+        `;
 
-        return ApiResponse.success(res, {
-            id: user.id,
-            nome: user.nome,
-            email: user.email,
-            role: user.role
-        }, 201);
-    } catch (err) {
-        next(err);
-        if (req.user.role !== "admin") return res.status(403).json({ message: "Acesso negado" });
+        return res.status(201).json({ message: "Usuário cadastrado com sucesso!" });
+    } catch (error) {
+        console.error("Erro no cadastro:", error);
+        return res.status(500).json({ message: "Erro ao cadastrar usuário." });
     }
 };
 
-export const login = async(req, res, next) => {
+// Função de login de usuário
+export const login = async(req, res) => {
     try {
         const { email, senha } = req.body;
 
         if (!email || !senha) {
-            throw ApiError.badRequest("Email e senha são obrigatórios");
+            return res.status(400).json({ message: "Email e senha são obrigatórios." });
         }
 
-        const user = await userService.findUserByEmail(email);
+        const [user] = await sql `SELECT * FROM users WHERE email = ${email}`;
         if (!user) {
-            throw ApiError.unauthorized("Credenciais inválidas");
+            return res.status(401).json({ message: "Usuário ou senha inválidos." });
         }
 
-        const ok = await bcrypt.compare(senha, user.senha_hash);
-        if (!ok) {
-            throw ApiError.unauthorized("Credenciais inválidas");
+        // Se voluntário não aprovado, bloqueia acesso
+        if (user.perfil === "volunteer" && !user.aprovado) {
+            return res.status(403).json({ message: "Seu cadastro de voluntário aguarda aprovação de um administrador." });
         }
 
-        // Determina o papel do usuário com base no banco de dados ou padrão de email
-        let role = user.role || "donor";
-        if (email.includes('interno') || email.includes('admin')) {
-            role = "internal";
-        } else if (email.includes('voluntario')) {
-            role = "volunteer";
+        const senhaCorreta = await bcrypt.compare(senha, user.senha);
+        if (!senhaCorreta) {
+            return res.status(401).json({ message: "Usuário ou senha inválidos." });
         }
 
-        const token = jwt.sign({
-            sub: user.id,
-            role: role,
-            email: user.email
-        }, jwtSecret, { expiresIn: "12h" });
+        // Gera token JWT
+        const token = jwt.sign({ id: user.id, email: user.email, perfil: user.perfil },
+            process.env.JWT_SECRET, { expiresIn: "2h" }
+        );
 
-        return ApiResponse.success(res, {
+        return res.json({
             token,
             user: {
                 id: user.id,
                 nome: user.nome,
                 email: user.email,
-                role: role,
-                theme: user.theme || 'light'
+                perfil: user.perfil,
+                aprovado: user.aprovado // importante para UI!
             }
         });
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        console.error("Erro no login:", error);
+        return res.status(500).json({ message: "Erro ao realizar login." });
     }
 };
 
-// Nova função para verificar o token atual
-export const verifyCurrentToken = async(req, res, next) => {
-    try {
-        // Token já foi verificado no middleware verifyToken
-        const userId = req.user.sub;
-        const user = await userService.findUserById(userId);
-
-        if (!user) {
-            throw ApiError.unauthorized("Usuário não encontrado");
-        }
-
-        return ApiResponse.success(res, {
-            user: {
-                id: user.id,
-                nome: user.nome,
-                email: user.email,
-                role: user.role || "donor",
-                theme: user.theme || 'light'
-            }
-        });
-    } catch (err) {
-        next(err);
-    }
+// Verifica o token atual (usada para autenticação persistente)
+export const verifyCurrentToken = async(req, res) => {
+    // Se chegou aqui, o token já foi validado pelo middleware
+    res.status(200).json({ message: "Token válido!", user: req.user });
 };
