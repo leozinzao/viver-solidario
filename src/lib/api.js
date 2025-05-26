@@ -1,14 +1,15 @@
-
 export const api = async(
     url,
     options = {}
 ) => {
-    const token = localStorage.getItem("token"); // salvo no login
-    // Use a public API service for testing or fallback to the deployed backend
-    const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://api-viver-solidario.onrender.com';
-    
-    const res = await fetch(
-        baseUrl + url, {
+    const token = localStorage.getItem("token"); // token salvo após login
+
+    // Define a URL base a partir do .env ou usa uma URL padrão
+    const baseUrl =
+        import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+    try {
+        const response = await fetch(`${baseUrl}${url}`, {
             ...options,
             headers: {
                 "Content-Type": "application/json",
@@ -16,15 +17,21 @@ export const api = async(
                 ...options.headers,
             },
         });
-    if (!res.ok) {
-        const errorData = await res.text();
-        let parsedError;
-        try {
-            parsedError = JSON.parse(errorData);
-        } catch (e) {
-            throw new Error(errorData || res.statusText);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch {
+                throw new Error(errorText || response.statusText);
+            }
+            throw errorData;
         }
-        throw parsedError;
+
+        return await response.json();
+    } catch (error) {
+        console.error("Erro na API:", error);
+        throw error;
     }
-    return res.json();
 };

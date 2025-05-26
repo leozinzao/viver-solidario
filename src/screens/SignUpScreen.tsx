@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/input';
 import { api } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
@@ -16,7 +16,7 @@ interface SignUpScreenProps {
   onSignUpSuccess: () => void;
 }
 
-// Define schema for form validation
+// Atualize o schema para incluir o campo perfil
 const signUpSchema = z.object({
   nome: z.string()
     .min(3, { message: "O nome deve ter pelo menos 3 caracteres" })
@@ -26,7 +26,8 @@ const signUpSchema = z.object({
   senha: z.string()
     .min(6, { message: "A senha deve ter pelo menos 6 caracteres" })
     .max(100, { message: "A senha não pode ter mais de 100 caracteres" }),
-  confirmaSenha: z.string()
+  confirmaSenha: z.string(),
+  perfil: z.enum(["donor", "volunteer"], { required_error: "Selecione um perfil" }),
 }).refine((data) => data.senha === data.confirmaSenha, {
   message: "As senhas não coincidem",
   path: ["confirmaSenha"],
@@ -40,60 +41,60 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Initialize form with zod resolver
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       nome: "",
       email: "",
       senha: "",
-      confirmaSenha: ""
+      confirmaSenha: "",
+      perfil: "donor"
     }
   });
 
   const handleSignUp = async (values: SignUpFormValues) => {
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    await api('/auth/register', { // <-- ajuste aqui
-      method: 'POST',
-      body: JSON.stringify({
-        nome: values.nome,
-        email: values.email,
-        senha: values.senha
-      })
-    });
+    try {
+      await api('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          nome: values.nome,
+          email: values.email,
+          senha: values.senha,
+          perfil: values.perfil
+        })
+      });
 
-    toast({
-      title: "Cadastro realizado com sucesso",
-      description: "Sua conta foi criada! Agora você pode fazer login."
-    });
+      toast({
+        title: "Cadastro realizado com sucesso",
+        description: "Sua conta foi criada! Agora você pode fazer login."
+      });
 
-    form.reset();
-    onSignUpSuccess();
-  } catch (error: any) {
-    console.error('Erro ao cadastrar:', error);
+      form.reset();
+      onSignUpSuccess();
+    } catch (error: any) {
+      console.error('Erro ao cadastrar:', error);
 
-    let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
+      let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
 
-    // O tratamento abaixo depende do formato do erro retornado pelo backend!
-    if (error.message && typeof error.message === "string") {
-      errorMessage = error.message;
-    } else if (error.response?.data?.message) {
-      errorMessage = error.response.data.message;
-    } else if (String(error).includes("duplicate")) {
-      errorMessage = "Este e-mail já está cadastrado.";
+      if (error.message && typeof error.message === "string") {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (String(error).includes("duplicate")) {
+        errorMessage = "Este e-mail já está cadastrado.";
+      }
+
+      toast({
+        title: "Erro no cadastro",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    toast({
-      title: "Erro no cadastro",
-      description: errorMessage,
-      variant: "destructive"
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-solidario-purple/5">
@@ -221,7 +222,29 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                     </FormItem>
                   )}
                 />
-                
+
+                {/* Campo Perfil */}
+                <FormField
+                  control={form.control}
+                  name="perfil"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Perfil</FormLabel>
+                      <FormControl>
+                        <select
+                          {...field}
+                          disabled={isLoading}
+                          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-solidario-purple"
+                        >
+                          <option value="donor">Doador</option>
+                          <option value="volunteer">Voluntário</option>
+                        </select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="pt-2">
                   <Button 
                     type="submit" 

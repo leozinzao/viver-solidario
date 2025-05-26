@@ -14,7 +14,27 @@ console.log("DATABASE_URL:", process.env.DATABASE_URL);
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+// Configure CORS com todas as origens permitidas
+const allowedOrigins = [
+    "http://localhost:8080",
+    "http://192.168.40.42:8080",
+    "https://viver-solidario.vercel.app",
+    "https://www.viver-solidario.vercel.app"
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+}));
+
 app.use(express.json());
 
 // Rotas da API
