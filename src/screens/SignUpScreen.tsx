@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/input';
-import { api } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -10,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { supabase } from "@/lib/supabase"; // ajuste o caminho conforme seu projeto
 
 interface SignUpScreenProps {
   onBackToWelcome: () => void;
@@ -56,39 +56,32 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsLoading(true);
 
     try {
-      await api('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({
-          nome: values.nome,
-          email: values.email,
-          senha: values.senha,
-          perfil: values.perfil
-        })
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.senha,
+        options: {
+          data: {
+            nome: values.nome,
+            perfil: values.perfil
+          }
+        }
       });
+
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Cadastro realizado com sucesso",
-        description: "Sua conta foi criada! Agora você pode fazer login."
+        description: "Verifique seu e-mail para confirmar o cadastro."
       });
 
       form.reset();
       onSignUpSuccess();
     } catch (error: any) {
-      console.error('Erro ao cadastrar:', error);
-
-      let errorMessage = "Ocorreu um erro ao realizar o cadastro.";
-
-      if (error.message && typeof error.message === "string") {
-        errorMessage = error.message;
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (String(error).includes("duplicate")) {
-        errorMessage = "Este e-mail já está cadastrado.";
-      }
-
       toast({
         title: "Erro no cadastro",
-        description: errorMessage,
+        description: error.message || "Ocorreu um erro ao realizar o cadastro.",
         variant: "destructive"
       });
     } finally {
