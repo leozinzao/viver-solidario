@@ -21,17 +21,12 @@ const allowedOrigins = [
     "https://www.viver-solidario.vercel.app"
 ];
 
+
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
+    origin: "http://localhost:8080", // ou '*', para permitir todos (apenas em dev)
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());

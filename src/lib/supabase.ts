@@ -9,13 +9,11 @@ console.log("Supabase URL:", supabaseUrl);
 console.log("Supabase Anon Key exists:", !!supabaseAnonKey);
 
 // Criação do cliente Supabase
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
+
+export const supabase = createClient(
+  supabaseUrl!,
+  supabaseAnonKey!
+);
 
 // Funções auxiliares para operações comuns do Supabase
 export const supabaseAuth = {
