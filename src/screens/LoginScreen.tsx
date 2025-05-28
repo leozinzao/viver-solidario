@@ -33,6 +33,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
   const [showPassword, setShowPassword] = useState(false);
   const [showEmailConfirmationAlert, setShowEmailConfirmationAlert] = useState(false);
   const [isResendingEmail, setIsResendingEmail] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { login } = useAuth();
 
   const form = useForm<LoginFormValues>({
@@ -120,29 +121,41 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
   };
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log('Iniciando login com Google...');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no Google OAuth:', error);
+        throw error;
+      }
+      
+      console.log('Redirecionamento do Google iniciado:', data);
       
       toast({
         title: "Redirecionando...",
         description: "Você será redirecionado para fazer login com o Google.",
       });
     } catch (error: any) {
+      console.error('Erro completo do Google login:', error);
       toast({
         title: "Erro ao fazer login com Google",
-        description: error.message || "Tente novamente.",
+        description: error.message || "Verifique se o Google OAuth está configurado corretamente no Supabase.",
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsGoogleLoading(false);
     }
   };
 
@@ -201,6 +214,30 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
               </Alert>
             )}
 
+            {/* Botão Google - movido para o topo */}
+            <Button 
+              onClick={handleGoogleLogin}
+              variant="outline"
+              className="w-full h-12 border-2 border-gray-200 hover:bg-gray-50 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+              disabled={isGoogleLoading || isLoading}
+            >
+              <div className="flex items-center justify-center">
+                <img 
+                  src="https://developers.google.com/identity/images/g-logo.png" 
+                  alt="Google"
+                  className="w-5 h-5 mr-3"
+                />
+                {isGoogleLoading ? 'Conectando...' : 'Entrar com Google'}
+              </div>
+            </Button>
+
+            {/* Divisor */}
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-400">ou continue com email</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
                 {/* Campo de Email */}
@@ -216,7 +253,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                           placeholder="seu@email.com"
                           type="email"
                           autoComplete="email"
-                          disabled={isLoading}
+                          disabled={isLoading || isGoogleLoading}
                           className="h-12"
                         />
                       </FormControl>
@@ -239,7 +276,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                             placeholder="Sua senha"
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                             className="h-12 pr-12"
                           />
                           <button
@@ -261,34 +298,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                 <Button 
                   type="submit" 
                   className="w-full bg-gradient-to-r from-viver-yellow to-yellow-400 hover:from-viver-yellow/90 hover:to-yellow-400/90 text-black font-semibold h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={isLoading}
+                  disabled={isLoading || isGoogleLoading}
                 >
-                  {isLoading ? 'Entrando...' : 'Entrar'}
+                  {isLoading ? 'Entrando...' : 'Entrar com Email'}
                 </Button>
               </form>
             </Form>
-
-            {/* Divisor */}
-            <div className="flex items-center">
-              <div className="flex-1 border-t border-gray-200"></div>
-              <span className="px-3 text-sm text-gray-400">ou</span>
-              <div className="flex-1 border-t border-gray-200"></div>
-            </div>
-
-            {/* Botão Google */}
-            <Button 
-              onClick={handleGoogleLogin}
-              variant="outline"
-              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl"
-              disabled={isLoading}
-            >
-              <img 
-                src="https://developers.google.com/identity/images/g-logo.png" 
-                alt="Google"
-                className="w-5 h-5 mr-2"
-              />
-              Entrar com Google
-            </Button>
           </CardContent>
         </Card>
       </motion.div>

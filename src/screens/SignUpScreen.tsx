@@ -41,6 +41,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -58,6 +59,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsLoading(true);
 
     try {
+      console.log('Iniciando cadastro com email...');
+      
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.senha,
@@ -66,22 +69,27 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
             nome: values.nome,
             perfil: values.perfil,
             telefone: values.telefone
-          }
+          },
+          emailRedirectTo: `${window.location.origin}`
         }
       });
 
       if (error) {
+        console.error('Erro no cadastro:', error);
         throw error;
       }
 
+      console.log('Cadastro realizado:', data);
+
       toast({
-        title: "Cadastro realizado com sucesso",
-        description: "Verifique seu e-mail para confirmar o cadastro."
+        title: "Cadastro realizado com sucesso!",
+        description: "Verifique seu e-mail para confirmar o cadastro antes de fazer login.",
       });
 
       form.reset();
       onSignUpSuccess();
     } catch (error: any) {
+      console.error('Erro completo no cadastro:', error);
       toast({
         title: "Erro no cadastro",
         description: error.message || "Ocorreu um erro ao realizar o cadastro.",
@@ -93,56 +101,99 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   };
 
   const handleGoogleSignUp = async () => {
-    setIsLoading(true);
+    setIsGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log('Iniciando cadastro com Google...');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
+            prompt: 'select_account',
           },
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no Google OAuth:', error);
+        throw error;
+      }
+      
+      console.log('Redirecionamento do Google iniciado:', data);
       
       toast({
         title: "Redirecionando...",
         description: "Você será redirecionado para se cadastrar com o Google.",
       });
     } catch (error: any) {
+      console.error('Erro completo do Google signup:', error);
       toast({
         title: "Erro ao cadastrar com Google",
-        description: error.message || "Tente novamente.",
+        description: error.message || "Verifique se o Google OAuth está configurado corretamente no Supabase.",
         variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setIsGoogleLoading(false);
     }
   };
 
   return (
-    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-viver-yellow/5">
+    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-viver-yellow/10 via-white to-solidario-purple/10">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="border-none shadow-lg">
+        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-viver-yellow/10 flex items-center justify-center">
+            <Button
+              variant="ghost"
+              onClick={onBackToWelcome}
+              className="absolute top-4 left-4 p-2 hover:bg-gray-100 rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Button>
+            
+            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-gradient-to-br from-viver-yellow/20 to-viver-yellow/10 flex items-center justify-center shadow-lg">
               <img 
                 src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
                 alt="ONG Viver"
                 className="w-14 h-14 object-contain"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-viver-yellow">Cadastrar-se</CardTitle>
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-viver-yellow to-solidario-purple bg-clip-text text-transparent">
+              Cadastre-se
+            </CardTitle>
+            <p className="text-gray-500 text-sm mt-2">Junte-se à nossa comunidade solidária</p>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
+            {/* Botão Google - movido para o topo */}
+            <Button 
+              onClick={handleGoogleSignUp}
+              variant="outline"
+              className="w-full h-12 border-2 border-gray-200 hover:bg-gray-50 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+              disabled={isGoogleLoading || isLoading}
+            >
+              <div className="flex items-center justify-center">
+                <img 
+                  src="https://developers.google.com/identity/images/g-logo.png" 
+                  alt="Google"
+                  className="w-5 h-5 mr-3"
+                />
+                {isGoogleLoading ? 'Conectando...' : 'Cadastrar com Google'}
+              </div>
+            </Button>
+
+            {/* Divisor */}
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-400">ou cadastre-se com email</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
                 {/* Campo Nome */}
@@ -157,7 +208,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                           {...field}
                           placeholder="Seu nome completo"
                           autoComplete="name"
-                          disabled={isLoading}
+                          disabled={isLoading || isGoogleLoading}
+                          className="h-11"
                         />
                       </FormControl>
                       <FormMessage />
@@ -175,10 +227,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Seu email"
+                          placeholder="seu@email.com"
                           type="email"
                           autoComplete="email"
-                          disabled={isLoading}
+                          disabled={isLoading || isGoogleLoading}
+                          className="h-11"
                         />
                       </FormControl>
                       <FormMessage />
@@ -196,9 +249,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Seu telefone"
+                          placeholder="(11) 99999-9999"
                           type="tel"
-                          disabled={isLoading}
+                          disabled={isLoading || isGoogleLoading}
+                          className="h-11"
                         />
                       </FormControl>
                       <FormMessage />
@@ -212,15 +266,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   name="perfil"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo de Perfil</FormLabel>
+                      <FormLabel>Como você quer contribuir?</FormLabel>
                       <FormControl>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um perfil" />
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading || isGoogleLoading}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="Selecione uma opção" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="donor">Doador</SelectItem>
-                            <SelectItem value="volunteer">Voluntário</SelectItem>
+                            <SelectItem value="donor">Doador - Quero fazer doações</SelectItem>
+                            <SelectItem value="volunteer">Voluntário - Quero ajudar com meu tempo</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -240,16 +294,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                         <div className="relative">
                           <Input
                             {...field}
-                            placeholder="Sua senha"
+                            placeholder="Mínimo 6 caracteres"
                             type={showPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            disabled={isLoading}
-                            className="pr-10"
+                            disabled={isLoading || isGoogleLoading}
+                            className="h-11 pr-12"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-gray-700 transition-colors"
                             tabIndex={-1}
                           >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -272,16 +326,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                         <div className="relative">
                           <Input
                             {...field}
-                            placeholder="Confirme sua senha"
+                            placeholder="Digite a senha novamente"
                             type={showConfirmPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            disabled={isLoading}
-                            className="pr-10"
+                            disabled={isLoading || isGoogleLoading}
+                            className="h-11 pr-12"
                           />
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-gray-700 transition-colors"
                             tabIndex={-1}
                           >
                             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -296,47 +350,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                 <div className="pt-2">
                   <Button 
                     type="submit" 
-                    className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium py-5"
-                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-viver-yellow to-yellow-400 hover:from-viver-yellow/90 hover:to-yellow-400/90 text-black font-semibold h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isLoading || isGoogleLoading}
                   >
-                    {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+                    {isLoading ? 'Cadastrando...' : 'Criar conta'}
                   </Button>
                 </div>
               </form>
             </Form>
-
-            {/* Divisor */}
-            <div className="flex items-center my-4">
-              <div className="flex-1 border-t border-gray-300"></div>
-              <span className="px-3 text-sm text-gray-500">ou</span>
-              <div className="flex-1 border-t border-gray-300"></div>
-            </div>
-
-            {/* Botão Google */}
-            <Button 
-              onClick={handleGoogleSignUp}
-              variant="outline"
-              className="w-full py-5 border-gray-300 hover:bg-gray-50"
-              disabled={isLoading}
-            >
-              <img 
-                src="https://developers.google.com/identity/images/g-logo.png" 
-                alt="Google"
-                className="w-5 h-5 mr-2"
-              />
-              Cadastrar com Google
-            </Button>
-            
-            <div className="mt-4 flex justify-center">
-              <Button 
-                variant="ghost" 
-                onClick={onBackToWelcome}
-                className="text-viver-yellow flex items-center gap-1"
-              >
-                <ArrowLeft size={16} />
-                <span>Voltar para a tela inicial</span>
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </motion.div>

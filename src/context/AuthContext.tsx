@@ -36,17 +36,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSupabaseUser(session?.user || null);
         
         if (event === 'SIGNED_IN' && session?.user) {
+          console.log('Usuário logado, buscando perfil...');
           const profile = await fetchUserProfile(session.user);
           
           if (profile) {
             setUser(profile);
             setIsAuthenticated(true);
             localStorage.setItem('viverUser', JSON.stringify(profile));
+            console.log('Perfil do usuário carregado:', profile);
           }
         } else if (event === 'SIGNED_OUT') {
+          console.log('Usuário deslogado');
           setUser(null);
           setIsAuthenticated(false);
           localStorage.removeItem('viverUser');
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed');
         }
         
         setLoading(false);
@@ -55,9 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     const loadInitialState = async () => {
+      console.log('Verificando sessão existente...');
       const { data: sessionData } = await supabase.auth.getSession();
       
       if (sessionData?.session) {
+        console.log('Sessão existente encontrada');
         const profile = await fetchUserProfile(sessionData.session.user);
         
         if (profile) {
@@ -79,6 +86,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (supabaseUser: User): Promise<UserInfo | null> => {
     try {
+      console.log('Buscando perfil para usuário:', supabaseUser.id);
+      
       // Primeiro tenta buscar na tabela voluntarios
       const { data: voluntarioData } = await supabase
         .from('voluntarios')
@@ -87,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (voluntarioData) {
+        console.log('Usuário encontrado na tabela voluntarios:', voluntarioData);
         return {
           id: supabaseUser.id,
           name: voluntarioData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
@@ -104,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
       
       if (doadorData) {
+        console.log('Usuário encontrado na tabela doadores:', doadorData);
         return {
           id: supabaseUser.id,
           name: doadorData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
@@ -113,12 +124,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
       
-      // Fallback caso não encontre em nenhuma tabela
+      // Fallback para usuários do Google que ainda não foram inseridos nas tabelas
+      console.log('Usuário não encontrado nas tabelas, criando perfil básico...');
+      const role = determineRole(supabaseUser.email || '');
+      
+      // Para usuários do Google, vamos criar automaticamente na tabela apropriada
+      if (supabaseUser.app_metadata?.provider === 'google') {
+        console.log('Usuário do Google, criando entrada na tabela...');
+        const tableName = role === UserRole.volunteer ? 'voluntarios' : 'doadores';
+        
+        const { error: insertError } = await supabase
+          .from(tableName)
+          .insert({
+            id: supabaseUser.id,
+            nome: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+            email: supabaseUser.email || '',
+            telefone: ''
+          });
+        
+        if (insertError) {
+          console.error('Erro ao criar entrada na tabela:', insertError);
+        } else {
+          console.log('Entrada criada com sucesso na tabela:', tableName);
+        }
+      }
+      
       return {
         id: supabaseUser.id,
-        name: supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
         email: supabaseUser.email || '',
-        role: determineRole(supabaseUser.email || ''),
+        role: role,
         theme: 'light'
       };
     } catch (error) {
@@ -127,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fallback para dados do Supabase Auth
       return {
         id: supabaseUser.id,
-        name: supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
         email: supabaseUser.email || '',
         role: determineRole(supabaseUser.email || ''),
         theme: 'light'
