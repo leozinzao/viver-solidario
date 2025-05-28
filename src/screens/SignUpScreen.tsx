@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -224,14 +225,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                     <FormItem>
                       <FormLabel>Tipo de Perfil</FormLabel>
                       <FormControl>
-                        <select
-                          {...field}
-                          disabled={isLoading}
-                          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-solidario-purple"
-                        >
-                          <option value="donor">Doador</option>
-                          <option value="volunteer">Voluntário</option>
-                        </select>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um perfil" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="donor">Doador</SelectItem>
+                            <SelectItem value="volunteer">Voluntário</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
