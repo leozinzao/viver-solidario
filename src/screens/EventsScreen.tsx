@@ -2,63 +2,58 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { UserRole } from "@/lib/permissions";
 import EventCard from "@/components/events/EventCard";
-
-const eventos = [
-  {
-    titulo: "Participe da Pizzada da Viver 2022",
-    resumo:
-      "Edição acontece em 12/03. Renda será destinada à compra de leite integral para as crianças assistidas.",
-    link: "https://www.ongviver.org.br/dia-a-dia/participe-da-pizzada-da-viver-2022",
-    data_inicio: "2022-03-12",
-  },
-  {
-    titulo: "Dupla Manu e Gabriel realiza Live para a ONG Viver",
-    resumo:
-      "Ação arrecadou cestas básicas, doações em dinheiro e muita alegria.",
-    link: "https://www.ongviver.org.br/dia-a-dia/dupla-manu-e-gabriel-realiza-live",
-  },
-  {
-    titulo: "Pizzada da Viver 2.020",
-    resumo:
-      "Primeira edição do ano foi diferente, mas bateu recorde de vendas.",
-    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-2020",
-    data_inicio: "2020-12-15",
-  },
-  {
-    titulo: "Pizzada da Viver – Arapongas",
-    resumo: "Edição especial da Pizzada da Viver em Arapongas.",
-    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-arapongas",
-  },
-  {
-    titulo: "Pizzada da Viver 2019",
-    resumo: "Confira o resultado da Pizzada Viver 2019.",
-    link: "https://www.ongviver.org.br/dia-a-dia/pizzada-da-viver-2019",
-    data_inicio: "2019-11-20",
-  },
-  {
-    titulo: "Edital de Tomada de Preços 005/2024",
-    resumo: "Publicação oficial sobre contratação de serviços.",
-    link: "https://www.ongviver.org.br/dia-a-dia/edital-de-tomada-de-preco-005-2024",
-    data_inicio: "2024-05-10",
-  },
-];
+import { useOngViverEvents } from "@/hooks/useOngViverEvents";
 
 const EventsScreen: React.FC = () => {
   const { hasPermission } = useAuth();
   const [showEventForm, setShowEventForm] = useState(false);
+  const { data: eventos, isLoading, error, refetch } = useOngViverEvents();
+
+  const handleRefresh = () => {
+    refetch();
+  };
   
   return (
     <div className="flutter-screen bg-background p-4 relative">
-      <h1 className="text-2xl font-bold text-viver-yellow text-center mb-6">
-        Eventos
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-viver-yellow text-center flex-1">
+          Eventos
+        </h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Atualizar
+        </Button>
+      </div>
+
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-2 text-viver-yellow" />
+            <p className="text-muted-foreground">Carregando eventos...</p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <p className="text-sm text-yellow-800">
+            Não foi possível carregar os eventos mais recentes. Mostrando eventos em cache.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-6 mb-20">
-        {eventos.map((ev) => (
-          <EventCard key={ev.titulo} evento={ev} />
+        {eventos?.map((evento, index) => (
+          <EventCard key={`${evento.titulo}-${index}`} evento={evento} />
         ))}
       </div>
 
