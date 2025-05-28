@@ -1,22 +1,11 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@/context/NavigationContext';
-import { Permission, hasPermission } from '@/lib/permissions';
 
 export const useProfileNavigation = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { navigateToScreen } = useNavigation();
   
-  // Check if user has specific permissions
-  const hasAnalyticsAccess = isAuthenticated && 
-    user?.role && 
-    hasPermission(user.role, Permission.VIEW_ANALYTICS);
-  
-  const hasAdminAccess = isAuthenticated && 
-    user?.role && 
-    hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL);
-  
-  // Navigation handlers
   const goToProfile = () => {
     if (isAuthenticated) {
       navigateToScreen('profile');
@@ -25,18 +14,10 @@ export const useProfileNavigation = () => {
     }
   };
   
-  const goToImpact = () => {
-    if (isAuthenticated && hasAnalyticsAccess) {
-      navigateToScreen('impact');
-    } else if (!isAuthenticated) {
-      navigateToScreen('login');
-    }
-  };
-  
   const goToAdmin = () => {
-    if (isAuthenticated && hasAdminAccess) {
+    if (isAuthenticated) {
       navigateToScreen('admin');
-    } else if (!isAuthenticated) {
+    } else {
       navigateToScreen('login');
     }
   };
@@ -49,10 +30,7 @@ export const useProfileNavigation = () => {
   return {
     isAuthenticated,
     user,
-    hasAnalyticsAccess,
-    hasAdminAccess,
     goToProfile,
-    goToImpact,
     goToAdmin,
     handleLogout
   };
