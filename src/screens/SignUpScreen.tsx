@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, AlertTriangle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/lib/supabase";
 
 interface SignUpScreenProps {
@@ -42,6 +42,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showGoogleError, setShowGoogleError] = useState(false);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -102,13 +103,21 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
 
   const handleGoogleSignUp = async () => {
     setIsGoogleLoading(true);
+    setShowGoogleError(false);
+    
     try {
-      console.log('Iniciando cadastro com Google...');
+      console.log('=== DIAGNÓSTICO GOOGLE OAUTH ===');
+      console.log('URL do Supabase:', 'https://pwqhjgobwnzyegvqmpdm.supabase.co');
+      console.log('Origin atual:', window.location.origin);
+      console.log('Hostname atual:', window.location.hostname);
+      
+      // Tentar obter configuração do provedor primeiro
+      console.log('Verificando configuração do Google OAuth...');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
             prompt: 'select_account',
@@ -117,21 +126,50 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
       });
       
       if (error) {
-        console.error('Erro no Google OAuth:', error);
+        console.error('=== ERRO DETALHADO DO GOOGLE OAUTH ===');
+        console.error('Erro completo:', error);
+        console.error('Código do erro:', error.message);
+        console.error('Status do erro:', error.status);
+        
+        // Verificar diferentes tipos de erro
+        if (error.message.includes('provider is not enabled') || 
+            error.message.includes('validation_failed') ||
+            error.message.includes('Unsupported provider')) {
+          
+          console.error('DIAGNÓSTICO: Provedor Google não está configurado corretamente');
+          console.error('Possíveis causas:');
+          console.error('1. Google OAuth não habilitado no Supabase');
+          console.error('2. Client ID ou Secret incorretos');
+          console.error('3. URL de callback incorreta');
+          console.error('4. Domínio não autorizado');
+          
+          setShowGoogleError(true);
+          toast({
+            title: "Configuração Google incompleta",
+            description: "Verifique se o Google OAuth está corretamente configurado no Supabase. Use o cadastro com email por enquanto.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
         throw error;
       }
       
-      console.log('Redirecionamento do Google iniciado:', data);
+      console.log('=== GOOGLE OAUTH INICIADO COM SUCESSO ===');
+      console.log('Dados retornados:', data);
       
       toast({
-        title: "Redirecionando...",
+        title: "Redirecionando para Google...",
         description: "Você será redirecionado para se cadastrar com o Google.",
       });
+      
     } catch (error: any) {
-      console.error('Erro completo do Google signup:', error);
+      console.error('=== ERRO INESPERADO NO GOOGLE SIGNUP ===');
+      console.error('Erro:', error);
+      
       toast({
         title: "Erro ao cadastrar com Google",
-        description: error.message || "Verifique se o Google OAuth está configurado corretamente no Supabase.",
+        description: "Ocorreu um erro inesperado. Use o cadastro com email.",
         variant: "destructive"
       });
     } finally {
@@ -170,7 +208,25 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
             <p className="text-gray-500 text-sm mt-2">Junte-se à nossa comunidade solidária</p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Botão Google - movido para o topo */}
+            {/* Alerta de erro do Google */}
+            {showGoogleError && (
+              <Alert className="border-red-200 bg-red-50">
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">
+                  <div className="space-y-2">
+                    <p className="font-medium">Problema na configuração do Google</p>
+                    <p className="text-sm">
+                      O Google OAuth precisa de alguns ajustes na configuração. Verifique o console do navegador para detalhes técnicos.
+                    </p>
+                    <p className="text-xs text-red-600">
+                      Use o cadastro com email abaixo enquanto isso é resolvido.
+                    </p>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Botão Google */}
             <Button 
               onClick={handleGoogleSignUp}
               variant="outline"
@@ -183,7 +239,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   alt="Google"
                   className="w-5 h-5 mr-3"
                 />
-                {isGoogleLoading ? 'Conectando...' : 'Cadastrar com Google'}
+                {isGoogleLoading ? 'Conectando com Google...' : 'Cadastrar com Google'}
               </div>
             </Button>
 
