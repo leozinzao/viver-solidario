@@ -2,7 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, Phone, Mail } from "@/components/icons";
+import { Heart } from "@/components/icons";
+import { Phone, Mail } from "lucide-react";
 import VolunteerGroups from "@/components/volunteer/VolunteerGroups";
 
 const VolunteerScreen: React.FC = () => {

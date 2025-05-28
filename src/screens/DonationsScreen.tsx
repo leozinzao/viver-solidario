@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, MonetizationOn, Gift } from "@/components/icons";
+import { Heart, MonetizationOn } from "@/components/icons";
+import { Gift } from "lucide-react";
 import DonationMethods from "@/components/donation/DonationMethods";
 import PhysicalDonations from "@/components/donation/PhysicalDonations";
 
