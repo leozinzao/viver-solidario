@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, Mail, ArrowLeft } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,6 +32,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showEmailConfirmationAlert, setShowEmailConfirmationAlert] = useState(false);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
   const { login } = useAuth();
 
   const form = useForm<LoginFormValues>({
@@ -82,24 +83,39 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       return;
     }
 
+    setIsResendingEmail(true);
+    
     try {
+      console.log('Reenviando email de confirmação para:', email);
+      
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: email
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}`
+        }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao reenviar email:', error);
+        throw error;
+      }
 
       toast({
         title: "Email de confirmação reenviado",
-        description: "Verifique sua caixa de entrada e spam.",
+        description: "Verifique sua caixa de entrada e pasta de spam. O email pode levar alguns minutos para chegar.",
       });
+      
+      console.log('Email de confirmação reenviado com sucesso');
     } catch (error: any) {
+      console.error('Erro ao reenviar confirmação:', error);
       toast({
         title: "Erro ao reenviar confirmação",
         description: error.message || "Tente novamente mais tarde.",
         variant: "destructive"
       });
+    } finally {
+      setIsResendingEmail(false);
     }
   };
 
@@ -131,39 +147,54 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
   };
 
   return (
-    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-viver-yellow/5">
+    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-viver-yellow/10 via-white to-solidario-purple/10">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="border-none shadow-lg">
+        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-viver-yellow/10 flex items-center justify-center">
+            <Button
+              variant="ghost"
+              onClick={onBackToWelcome}
+              className="absolute top-4 left-4 p-2 hover:bg-gray-100 rounded-full"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Button>
+            
+            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-gradient-to-br from-viver-yellow/20 to-viver-yellow/10 flex items-center justify-center shadow-lg">
               <img 
                 src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
                 alt="ONG Viver"
                 className="w-14 h-14 object-contain"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-viver-yellow">Acesso ao Sistema</CardTitle>
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-viver-yellow to-solidario-purple bg-clip-text text-transparent">
+              Bem-vindo de volta
+            </CardTitle>
+            <p className="text-gray-500 text-sm mt-2">Entre em sua conta para continuar</p>
           </CardHeader>
-          <CardContent>
-            {/* Alerta de confirmação de email */}
+          <CardContent className="space-y-6">
+            {/* Alerta de confirmação de email melhorado */}
             {showEmailConfirmationAlert && (
-              <Alert className="mb-4 border-orange-200 bg-orange-50">
-                <AlertCircle className="h-4 w-4 text-orange-600" />
-                <AlertDescription className="text-orange-800">
-                  <div className="space-y-2">
-                    <p>Seu email ainda não foi confirmado. Verifique sua caixa de entrada e spam.</p>
+              <Alert className="border-amber-200 bg-amber-50">
+                <Mail className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="text-amber-800">
+                  <div className="space-y-3">
+                    <p className="font-medium">Email não confirmado</p>
+                    <p className="text-sm">
+                      Você precisa confirmar seu email antes de fazer login. Verifique sua caixa de entrada e pasta de spam.
+                    </p>
                     <Button 
                       onClick={handleResendConfirmation}
+                      disabled={isResendingEmail}
                       variant="outline" 
                       size="sm"
-                      className="text-orange-700 border-orange-300 hover:bg-orange-100"
+                      className="text-amber-700 border-amber-300 hover:bg-amber-100"
                     >
-                      Reenviar email de confirmação
+                      {isResendingEmail ? 'Reenviando...' : 'Reenviar email de confirmação'}
                     </Button>
                   </div>
                 </AlertDescription>
@@ -182,10 +213,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Seu email"
+                          placeholder="seu@email.com"
                           type="email"
                           autoComplete="email"
                           disabled={isLoading}
+                          className="h-12"
                         />
                       </FormControl>
                       <FormMessage />
@@ -208,12 +240,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
                             disabled={isLoading}
-                            className="pr-10"
+                            className="h-12 pr-12"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-gray-700 transition-colors"
                             tabIndex={-1}
                           >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -226,30 +258,28 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                 />
 
                 {/* Botão de Login */}
-                <div className="pt-2">
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium py-5"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Entrando...' : 'Entrar'}
-                  </Button>
-                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-viver-yellow to-yellow-400 hover:from-viver-yellow/90 hover:to-yellow-400/90 text-black font-semibold h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Entrando...' : 'Entrar'}
+                </Button>
               </form>
             </Form>
 
             {/* Divisor */}
-            <div className="flex items-center my-4">
-              <div className="flex-1 border-t border-gray-300"></div>
-              <span className="px-3 text-sm text-gray-500">ou</span>
-              <div className="flex-1 border-t border-gray-300"></div>
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-400">ou</span>
+              <div className="flex-1 border-t border-gray-200"></div>
             </div>
 
             {/* Botão Google */}
             <Button 
               onClick={handleGoogleLogin}
               variant="outline"
-              className="w-full py-5 border-gray-300 hover:bg-gray-50"
+              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl"
               disabled={isLoading}
             >
               <img 
@@ -259,17 +289,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
               />
               Entrar com Google
             </Button>
-            
-            {/* Botão para Voltar */}
-            <div className="mt-4 text-center">
-              <Button 
-                variant="link" 
-                onClick={onBackToWelcome}
-                className="text-viver-yellow"
-              >
-                Voltar para a tela inicial
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </motion.div>

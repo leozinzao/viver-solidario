@@ -138,30 +138,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
+      console.log('Tentando fazer login com email:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
+      console.log('Resposta do login:', { data, error });
+      
       if (error) {
+        console.error('Erro no login:', error);
+        
         // Mensagens de erro mais específicas
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
         } else if (error.message.includes('Email not confirmed')) {
-          throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
+          throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
         } else if (error.message.includes('Too many requests')) {
           throw new Error('Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.');
+        } else if (error.message.includes('signup_disabled')) {
+          throw new Error('O cadastro está temporariamente desabilitado. Tente novamente mais tarde.');
         } else {
           throw new Error(error.message);
         }
       }
       
       if (data.user && !data.user.email_confirmed_at) {
+        console.log('Email não confirmado para o usuário:', data.user.email);
         throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
       }
       
       if (data.user) {
+        console.log('Login bem-sucedido, buscando perfil...');
         const profile = await fetchUserProfile(data.user);
         
         if (profile) {
