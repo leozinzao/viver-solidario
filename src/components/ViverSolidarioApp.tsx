@@ -6,27 +6,38 @@ import { NavigationProvider, useNavigation } from "@/context/NavigationContext";
 import NavigationBar from "@/components/navigation/NavigationBar";
 import ScreenRenderer from "@/components/screens/ScreenRenderer";
 import PermissionDialog from "@/components/permissions/PermissionDialog";
-import { UserRole, Permission, hasPermission } from '@/lib/permissions';
 
 const AppContent: React.FC = () => {
-  const { currentScreen, navigateToScreen, handleEnterApp, handleGoToLogin, handleGoToSignUp, 
-    handleBackToWelcome, handleLoginSuccess, showPermissionDenied, setShowPermissionDenied } = useNavigation();
-  const { isAuthenticated, user } = useAuth();
+  const { 
+    currentScreen, 
+    navigateToScreen, 
+    handleEnterApp, 
+    handleGoToLogin, 
+    handleGoToSignUp, 
+    handleBackToWelcome, 
+    handleLoginSuccess, 
+    showPermissionDenied, 
+    setShowPermissionDenied 
+  } = useNavigation();
   
-  // Public screens that show navigation even for unauthenticated users
+  const { isAuthenticated } = useAuth();
+  
+  console.log('ViverSolidarioApp - Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
+  
+  // Telas públicas que mostram navegação mesmo para usuários não autenticados
   const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
   
-  // Authentication screens that don't show navigation
+  // Telas de autenticação que não mostram navegação
   const authScreens = ["welcome", "login", "signup"];
   
-  // Determine whether to show navigation
+  // Determinar se deve mostrar navegação
   const shouldShowNavigation = 
     (isAuthenticated || publicScreensWithNavigation.includes(currentScreen)) && 
     !authScreens.includes(currentScreen);
 
   return (
     <div className="flutter-app border border-border">
-      {/* Screen content */}
+      {/* Conteúdo da tela */}
       <div className={`flutter-screen ${shouldShowNavigation ? 'pb-14' : ''}`}>
         <ScreenRenderer
           currentScreen={currentScreen}
@@ -38,7 +49,7 @@ const AppContent: React.FC = () => {
         />
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Barra de Navegação Inferior */}
       {shouldShowNavigation && (
         <NavigationBar
           currentScreen={currentScreen}
@@ -46,7 +57,7 @@ const AppContent: React.FC = () => {
         />
       )}
       
-      {/* Permission Denied Dialog */}
+      {/* Diálogo de Permissão Negada */}
       <PermissionDialog
         open={showPermissionDenied}
         onOpenChange={setShowPermissionDenied}

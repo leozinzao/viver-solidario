@@ -25,84 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Load initial user state
-  useEffect(() => {
-    let mounted = true;
-
-    // Check for existing session first
-    const loadInitialState = async () => {
-      try {
-        console.log('Verificando sessão existente...');
-        const { data: sessionData } = await supabase.auth.getSession();
-        
-        if (mounted && sessionData?.session) {
-          console.log('Sessão existente encontrada');
-          const profile = await fetchUserProfile(sessionData.session.user);
-          
-          if (mounted && profile) {
-            setUser(profile);
-            setIsAuthenticated(true);
-            setSession(sessionData.session);
-            setSupabaseUser(sessionData.session.user);
-            localStorage.setItem('viverUser', JSON.stringify(profile));
-            console.log('Perfil carregado da sessão existente:', profile);
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao carregar sessão inicial:', error);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    // Subscribe to auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-        
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        setSession(session);
-        setSupabaseUser(session?.user || null);
-        
-        if (event === 'SIGNED_IN' && session?.user) {
-          console.log('Usuário logado, buscando perfil...');
-          const profile = await fetchUserProfile(session.user);
-          
-          if (mounted && profile) {
-            setUser(profile);
-            setIsAuthenticated(true);
-            localStorage.setItem('viverUser', JSON.stringify(profile));
-            console.log('Perfil do usuário carregado após login:', profile);
-            
-            toast({
-              title: "Login realizado com sucesso",
-              description: `Bem-vindo, ${profile.name}!`
-            });
-          }
-        } else if (event === 'SIGNED_OUT') {
-          console.log('Usuário deslogado');
-          setUser(null);
-          setIsAuthenticated(false);
-          localStorage.removeItem('viverUser');
-        }
-        
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    );
-
-    loadInitialState();
-
-    return () => {
-      mounted = false;
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
+  // Função para buscar perfil do usuário
   const fetchUserProfile = async (supabaseUser: User): Promise<UserInfo | null> => {
     try {
       console.log('Buscando perfil para usuário:', supabaseUser.id);
@@ -143,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       }
       
-      // Fallback para usuários do Google que ainda não foram inseridos nas tabelas
+      // Fallback para usuários que ainda não foram inseridos nas tabelas
       console.log('Usuário não encontrado nas tabelas, criando perfil básico...');
       const role = determineRole(supabaseUser.email || '');
       
@@ -168,22 +91,99 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Configurar estados do usuário
+  const setUserStates = async (session: Session | null) => {
+    console.log('Configurando estados do usuário:', session?.user?.email);
+    
+    if (session?.user) {
+      const profile = await fetchUserProfile(session.user);
+      if (profile) {
+        setUser(profile);
+        setIsAuthenticated(true);
+        setSession(session);
+        setSupabaseUser(session.user);
+        localStorage.setItem('viverUser', JSON.stringify(profile));
+        console.log('Usuário autenticado com sucesso:', profile);
+      }
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
+      setSession(null);
+      setSupabaseUser(null);
+      localStorage.removeItem('viverUser');
+      console.log('Usuário deslogado');
+    }
+  };
+
+  // Inicialização
+  useEffect(() => {
+    let mounted = true;
+    console.log('Inicializando AuthContext...');
+
+    const initializeAuth = async () => {
+      try {
+        // Verificar sessão existente
+        const { data: sessionData } = await supabase.auth.getSession();
+        console.log('Sessão inicial:', sessionData.session?.user?.email);
+        
+        if (mounted) {
+          await setUserStates(sessionData.session);
+        }
+      } catch (error) {
+        console.error('Erro ao inicializar auth:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Configurar listener de mudanças de auth
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.email);
+        
+        if (event === 'SIGNED_IN' && session) {
+          await setUserStates(session);
+          toast({
+            title: "Login realizado com sucesso",
+            description: `Bem-vindo!`
+          });
+        } else if (event === 'SIGNED_OUT') {
+          await setUserStates(null);
+        } else {
+          await setUserStates(session);
+        }
+        
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    );
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      console.log('Tentando fazer login com email:', email);
+      console.log('Iniciando login para:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      console.log('Resposta do login:', { data, error });
-      
       if (error) {
         console.error('Erro no login:', error);
         
-        // Mensagens de erro mais específicas
         if (error.message.includes('Invalid login credentials')) {
           throw new Error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
         } else if (error.message.includes('Email not confirmed')) {
@@ -200,8 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
       }
       
-      // O perfil será carregado automaticamente pelo onAuthStateChange
-      console.log('Login iniciado com sucesso, aguardando carregamento do perfil...');
+      console.log('Login bem-sucedido para:', data.user?.email);
       
     } catch (error: any) {
       console.error('Falha no login:', error);
@@ -221,11 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      setUser(null);
-      setIsAuthenticated(false);
-      setSession(null);
-      setSupabaseUser(null);
-      localStorage.removeItem('viverUser');
+      console.log('Logout realizado com sucesso');
       
       toast({
         title: "Logout realizado",
@@ -327,7 +322,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viver-yellow mx-auto mb-2"></div>
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

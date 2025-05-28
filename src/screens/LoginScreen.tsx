@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useNavigation } from '@/context/NavigationContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
-import { Eye, EyeOff, AlertCircle, Mail, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, Mail, ArrowLeft, AlertTriangle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -47,30 +47,33 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
     }
   });
 
-  // Redirect to home if already authenticated
+  // Monitorar autenticação e redirecionar
   useEffect(() => {
+    console.log('LoginScreen - Auth status:', isAuthenticated);
+    
     if (isAuthenticated) {
-      console.log('Usuário já autenticado, redirecionando para home...');
-      navigateToScreen('home');
+      console.log('Usuário autenticado, redirecionando para home...');
+      // Usar timeout para garantir que a mudança de estado seja processada
+      setTimeout(() => {
+        onLoginSuccess();
+        navigateToScreen('home');
+      }, 100);
     }
-  }, [isAuthenticated, navigateToScreen]);
+  }, [isAuthenticated, navigateToScreen, onLoginSuccess]);
 
   const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
     setShowEmailConfirmationAlert(false);
     
     try {
+      console.log('Tentando fazer login com:', values.email);
       await login(values.email, values.password);
       
-      // Aguardar um pouco para o estado de autenticação ser atualizado
-      setTimeout(() => {
-        console.log('Login concluído, redirecionando...');
-        onLoginSuccess();
-        navigateToScreen('home');
-      }, 100);
+      // O redirecionamento será feito pelo useEffect quando isAuthenticated mudar
+      console.log('Login iniciado, aguardando autenticação...');
       
     } catch (error: any) {
-      console.log('Login error:', error);
+      console.log('Erro no login:', error);
       
       // Verificar se é erro de email não confirmado
       if (error.message.includes('confirme seu email') || error.message.includes('Email not confirmed')) {
@@ -121,7 +124,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
         description: "Verifique sua caixa de entrada e pasta de spam. O email pode levar alguns minutos para chegar.",
       });
       
-      console.log('Email de confirmação reenviado com sucesso');
     } catch (error: any) {
       console.error('Erro ao reenviar confirmação:', error);
       toast({
@@ -139,11 +141,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
     setShowGoogleError(false);
     
     try {
-      console.log('=== DIAGNÓSTICO GOOGLE LOGIN ===');
-      console.log('URL do Supabase:', 'https://pwqhjgobwnzyegvqmpdm.supabase.co');
-      console.log('Origin atual:', window.location.origin);
-      console.log('Hostname atual:', window.location.hostname);
-      
       console.log('Iniciando login com Google...');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -158,27 +155,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       });
       
       if (error) {
-        console.error('=== ERRO DETALHADO DO GOOGLE LOGIN ===');
-        console.error('Erro completo:', error);
-        console.error('Código do erro:', error.message);
-        console.error('Status do erro:', error.status);
+        console.error('Erro no Google login:', error);
         
-        // Verificar diferentes tipos de erro
         if (error.message.includes('provider is not enabled') || 
             error.message.includes('validation_failed') ||
             error.message.includes('Unsupported provider')) {
           
-          console.error('DIAGNÓSTICO: Provedor Google não está configurado corretamente');
-          console.error('Verificações necessárias:');
-          console.error('1. Google OAuth habilitado no painel do Supabase');
-          console.error('2. Client ID e Secret configurados');
-          console.error('3. URLs de callback corretas');
-          console.error('4. Domínio autorizado no Google Console');
-          
           setShowGoogleError(true);
           toast({
             title: "Problema com Google OAuth",
-            description: "Há um problema na configuração do Google. Verifique o console e use o login com email.",
+            description: "Há um problema na configuração do Google. Use o login com email.",
             variant: "destructive"
           });
           return;
@@ -187,8 +173,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
         throw error;
       }
       
-      console.log('=== GOOGLE LOGIN INICIADO COM SUCESSO ===');
-      console.log('Dados retornados:', data);
+      console.log('Google login iniciado com sucesso');
       
       toast({
         title: "Redirecionando para Google...",
@@ -196,8 +181,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       });
       
     } catch (error: any) {
-      console.error('=== ERRO INESPERADO NO GOOGLE LOGIN ===');
-      console.error('Erro:', error);
+      console.error('Erro inesperado no Google login:', error);
       
       toast({
         title: "Erro ao fazer login com Google",
@@ -240,7 +224,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
             <p className="text-gray-500 text-sm mt-2">Entre em sua conta para continuar</p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Alerta de confirmação de email melhorado */}
+            {/* Alerta de confirmação de email */}
             {showEmailConfirmationAlert && (
               <Alert className="border-amber-200 bg-amber-50">
                 <Mail className="h-4 w-4 text-amber-600" />
@@ -272,10 +256,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                   <div className="space-y-2">
                     <p className="font-medium">Problema na configuração do Google</p>
                     <p className="text-sm">
-                      O Google OAuth precisa ser reconfigurado. Verifique o console do navegador para detalhes.
-                    </p>
-                    <p className="text-xs text-red-600">
-                      Use o login com email abaixo.
+                      O Google OAuth precisa ser reconfigurado. Use o login com email abaixo.
                     </p>
                   </div>
                 </AlertDescription>
