@@ -6,12 +6,12 @@ import {
     updatePassword, 
     getUserRole 
 } from "../controllers/profileController.js";
-import { verifyToken } from "../utils/authMiddleware.js";
+//import { verifyToken } from "../utils/authMiddleware.js";
 
 export const profileRouter = Router();
 
 // Aplicar middleware de autenticação em todas as rotas de perfil
-profileRouter.use(verifyToken);
+//profileRouter.use(verifyToken);
 
 profileRouter.get("/profile", getProfile);
 profileRouter.put("/profile", updateProfile);
