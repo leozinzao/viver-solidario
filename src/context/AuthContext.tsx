@@ -144,7 +144,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        // Mensagens de erro mais específicas
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
+        } else if (error.message.includes('Email not confirmed')) {
+          throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
+        } else if (error.message.includes('Too many requests')) {
+          throw new Error('Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.');
+        } else {
+          throw new Error(error.message);
+        }
+      }
+      
+      if (data.user && !data.user.email_confirmed_at) {
+        throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
+      }
       
       if (data.user) {
         const profile = await fetchUserProfile(data.user);

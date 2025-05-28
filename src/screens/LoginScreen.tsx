@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from '@/lib/supabase';
 
 interface LoginScreenProps {
@@ -30,6 +31,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showEmailConfirmationAlert, setShowEmailConfirmationAlert] = useState(false);
   const { login } = useAuth();
 
   const form = useForm<LoginFormValues>({
@@ -42,6 +44,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
 
   const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
+    setShowEmailConfirmationAlert(false);
     
     try {
       await login(values.email, values.password);
@@ -51,6 +54,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       });
       onLoginSuccess();
     } catch (error: any) {
+      console.log('Login error:', error);
+      
+      // Verificar se é erro de email não confirmado
+      if (error.message.includes('confirme seu email') || error.message.includes('Email not confirmed')) {
+        setShowEmailConfirmationAlert(true);
+      }
+      
       toast({
         title: "Erro ao fazer login",
         description: error.message || "Verifique suas credenciais e tente novamente.",
@@ -58,6 +68,38 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    const email = form.getValues('email');
+    if (!email) {
+      toast({
+        title: "Digite seu email",
+        description: "Por favor, digite seu email para reenviar a confirmação.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email de confirmação reenviado",
+        description: "Verifique sua caixa de entrada e spam.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao reenviar confirmação",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -108,6 +150,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
             <CardTitle className="text-2xl font-bold text-viver-yellow">Acesso ao Sistema</CardTitle>
           </CardHeader>
           <CardContent>
+            {/* Alerta de confirmação de email */}
+            {showEmailConfirmationAlert && (
+              <Alert className="mb-4 border-orange-200 bg-orange-50">
+                <AlertCircle className="h-4 w-4 text-orange-600" />
+                <AlertDescription className="text-orange-800">
+                  <div className="space-y-2">
+                    <p>Seu email ainda não foi confirmado. Verifique sua caixa de entrada e spam.</p>
+                    <Button 
+                      onClick={handleResendConfirmation}
+                      variant="outline" 
+                      size="sm"
+                      className="text-orange-700 border-orange-300 hover:bg-orange-100"
+                    >
+                      Reenviar email de confirmação
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
                 {/* Campo de Email */}
