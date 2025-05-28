@@ -27,10 +27,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load initial user state
   useEffect(() => {
-    // Subscribe to auth state changes first
+    let mounted = true;
+
+    // Check for existing session first
+    const loadInitialState = async () => {
+      try {
+        console.log('Verificando sessão existente...');
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (mounted && sessionData?.session) {
+          console.log('Sessão existente encontrada');
+          const profile = await fetchUserProfile(sessionData.session.user);
+          
+          if (mounted && profile) {
+            setUser(profile);
+            setIsAuthenticated(true);
+            setSession(sessionData.session);
+            setSupabaseUser(sessionData.session.user);
+            localStorage.setItem('viverUser', JSON.stringify(profile));
+            console.log('Perfil carregado da sessão existente:', profile);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar sessão inicial:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Subscribe to auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session);
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.email);
         
         setSession(session);
         setSupabaseUser(session?.user || null);
@@ -39,47 +71,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('Usuário logado, buscando perfil...');
           const profile = await fetchUserProfile(session.user);
           
-          if (profile) {
+          if (mounted && profile) {
             setUser(profile);
             setIsAuthenticated(true);
             localStorage.setItem('viverUser', JSON.stringify(profile));
-            console.log('Perfil do usuário carregado:', profile);
+            console.log('Perfil do usuário carregado após login:', profile);
+            
+            toast({
+              title: "Login realizado com sucesso",
+              description: `Bem-vindo, ${profile.name}!`
+            });
           }
         } else if (event === 'SIGNED_OUT') {
           console.log('Usuário deslogado');
           setUser(null);
           setIsAuthenticated(false);
           localStorage.removeItem('viverUser');
-        } else if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed');
         }
         
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     );
-
-    // Check for existing session
-    const loadInitialState = async () => {
-      console.log('Verificando sessão existente...');
-      const { data: sessionData } = await supabase.auth.getSession();
-      
-      if (sessionData?.session) {
-        console.log('Sessão existente encontrada');
-        const profile = await fetchUserProfile(sessionData.session.user);
-        
-        if (profile) {
-          setUser(profile);
-          setIsAuthenticated(true);
-          localStorage.setItem('viverUser', JSON.stringify(profile));
-        }
-      }
-      
-      setLoading(false);
-    };
 
     loadInitialState();
 
     return () => {
+      mounted = false;
       authListener.subscription.unsubscribe();
     };
   }, []);
@@ -89,13 +108,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Buscando perfil para usuário:', supabaseUser.id);
       
       // Primeiro tenta buscar na tabela voluntarios
-      const { data: voluntarioData } = await supabase
+      const { data: voluntarioData, error: voluntarioError } = await supabase
         .from('voluntarios')
         .select('nome, email, telefone')
         .eq('id', supabaseUser.id)
-        .single();
+        .maybeSingle();
       
-      if (voluntarioData) {
+      if (voluntarioData && !voluntarioError) {
         console.log('Usuário encontrado na tabela voluntarios:', voluntarioData);
         return {
           id: supabaseUser.id,
@@ -107,13 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Se não encontrar, tenta buscar na tabela doadores
-      const { data: doadorData } = await supabase
+      const { data: doadorData, error: doadorError } = await supabase
         .from('doadores')
         .select('nome, email, telefone')
         .eq('id', supabaseUser.id)
-        .single();
+        .maybeSingle();
       
-      if (doadorData) {
+      if (doadorData && !doadorError) {
         console.log('Usuário encontrado na tabela doadores:', doadorData);
         return {
           id: supabaseUser.id,
@@ -127,27 +146,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fallback para usuários do Google que ainda não foram inseridos nas tabelas
       console.log('Usuário não encontrado nas tabelas, criando perfil básico...');
       const role = determineRole(supabaseUser.email || '');
-      
-      // Para usuários do Google, vamos criar automaticamente na tabela apropriada
-      if (supabaseUser.app_metadata?.provider === 'google') {
-        console.log('Usuário do Google, criando entrada na tabela...');
-        const tableName = role === UserRole.volunteer ? 'voluntarios' : 'doadores';
-        
-        const { error: insertError } = await supabase
-          .from(tableName)
-          .insert({
-            id: supabaseUser.id,
-            nome: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
-            email: supabaseUser.email || '',
-            telefone: ''
-          });
-        
-        if (insertError) {
-          console.error('Erro ao criar entrada na tabela:', insertError);
-        } else {
-          console.log('Entrada criada com sucesso na tabela:', tableName);
-        }
-      }
       
       return {
         id: supabaseUser.id,
@@ -192,8 +190,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
         } else if (error.message.includes('Too many requests')) {
           throw new Error('Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.');
-        } else if (error.message.includes('signup_disabled')) {
-          throw new Error('O cadastro está temporariamente desabilitado. Tente novamente mais tarde.');
         } else {
           throw new Error(error.message);
         }
@@ -204,21 +200,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
       }
       
-      if (data.user) {
-        console.log('Login bem-sucedido, buscando perfil...');
-        const profile = await fetchUserProfile(data.user);
-        
-        if (profile) {
-          setUser(profile);
-          setIsAuthenticated(true);
-          localStorage.setItem('viverUser', JSON.stringify(profile));
-          
-          toast({
-            title: "Login realizado com sucesso",
-            description: `Bem-vindo, ${profile.name}!`
-          });
-        }
-      }
+      // O perfil será carregado automaticamente pelo onAuthStateChange
+      console.log('Login iniciado com sucesso, aguardando carregamento do perfil...');
+      
     } catch (error: any) {
       console.error('Falha no login:', error);
       toast({
@@ -239,6 +223,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(null);
       setIsAuthenticated(false);
+      setSession(null);
+      setSupabaseUser(null);
       localStorage.removeItem('viverUser');
       
       toast({

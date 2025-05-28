@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigation } from '@/context/NavigationContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
 import { Eye, EyeOff, AlertCircle, Mail, ArrowLeft, AlertTriangle } from "lucide-react";
@@ -34,7 +36,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
   const [isResendingEmail, setIsResendingEmail] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showGoogleError, setShowGoogleError] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const { navigateToScreen } = useNavigation();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -44,17 +47,28 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
     }
   });
 
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('Usuário já autenticado, redirecionando para home...');
+      navigateToScreen('home');
+    }
+  }, [isAuthenticated, navigateToScreen]);
+
   const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
     setShowEmailConfirmationAlert(false);
     
     try {
       await login(values.email, values.password);
-      toast({
-        title: "Login realizado com sucesso",
-        description: "Bem-vindo à ONG Viver!",
-      });
-      onLoginSuccess();
+      
+      // Aguardar um pouco para o estado de autenticação ser atualizado
+      setTimeout(() => {
+        console.log('Login concluído, redirecionando...');
+        onLoginSuccess();
+        navigateToScreen('home');
+      }, 100);
+      
     } catch (error: any) {
       console.log('Login error:', error);
       
