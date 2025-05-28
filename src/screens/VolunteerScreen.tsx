@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Heart } from "@/components/icons";
 import { Phone, Mail } from "lucide-react";
 import VolunteerGroups from "@/components/volunteer/VolunteerGroups";
+import VolunteerForm from "@/components/volunteer/VolunteerForm";
 
 const VolunteerScreen: React.FC = () => {
   return (
@@ -12,6 +13,11 @@ const VolunteerScreen: React.FC = () => {
       <h1 className="text-2xl font-bold text-viver-yellow text-center mb-6">
         Seja um Voluntário
       </h1>
+
+      {/* Formulário de Cadastro */}
+      <div className="mb-8">
+        <VolunteerForm />
+      </div>
 
       {/* Trabalhe Conosco */}
       <Card className="flutter-card mb-8">
@@ -70,7 +76,7 @@ const VolunteerScreen: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm">
-            Para se tornar um voluntário da ONG Viver, entre em contato conosco através dos canais abaixo:
+            Para se tornar um voluntário da ONG Viver, preencha o formulário acima ou entre em contato conosco:
           </p>
           <div className="space-y-2">
             <Button 
