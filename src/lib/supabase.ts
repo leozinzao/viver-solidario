@@ -1,19 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Use as variáveis corretas do .env para Vite
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON || import.meta.env.NEXT_PUBLIC_SUPABASE_KEY;
+// Use the correct environment variable names from .env
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY;
 
-// Para depuração
+// For debugging
 console.log("Supabase URL:", supabaseUrl);
 console.log("Supabase Anon Key exists:", !!supabaseAnonKey);
 
-// Criação do cliente Supabase
+// Validation to ensure both values exist
+if (!supabaseUrl) {
+  throw new Error("VITE_SUPABASE_URL is required");
+}
 
-export const supabase = createClient(
-  supabaseUrl!,
-  supabaseAnonKey!
-);
+if (!supabaseAnonKey) {
+  throw new Error("VITE_SUPABASE_KEY is required");
+}
+
+// Criação do cliente Supabase
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Funções auxiliares para operações comuns do Supabase
 export const supabaseAuth = {
