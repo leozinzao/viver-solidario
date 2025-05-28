@@ -6,6 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import WelcomeScreen from "@/screens/WelcomeScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import SignUpScreen from "@/screens/SignUpScreen";
+import HomeScreen from "@/screens/HomeScreen";
+import EventsScreen from "@/screens/EventsScreen";
+import DonationsScreen from "@/screens/DonationsScreen";
+import VolunteerScreen from "@/screens/VolunteerScreen";
+import ProfileScreen from "@/screens/ProfileScreen";
 
 type ScreenType =
   | "welcome"
@@ -76,22 +81,22 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       );
 
     case "home":
-      return <PlaceholderScreen title="Início" />;
+      return <HomeScreen />;
 
     case "donations":
-      return <PlaceholderScreen title="Doações" />;
+      return <DonationsScreen />;
 
     case "events":
-      return <PlaceholderScreen title="Eventos" />;
+      return <EventsScreen />;
 
     case "volunteer":
-      return <PlaceholderScreen title="Voluntariado" />;
+      return <VolunteerScreen />;
       
     case "profile":
       if (!isAuthenticated) {
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
-      return <PlaceholderScreen title="Perfil" />;
+      return <ProfileScreen />;
 
     case "impact":
       if (!isAuthenticated) {

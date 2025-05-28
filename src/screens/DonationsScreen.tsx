@@ -1,21 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, MonetizationOn } from "@/components/icons";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Heart, MonetizationOn, Gift } from "@/components/icons";
+import DonationMethods from "@/components/donation/DonationMethods";
+import PhysicalDonations from "@/components/donation/PhysicalDonations";
 
 const DonationsScreen: React.FC = () => {
-  const { hasPermission } = useAuth();
-
-  const copyPixKey = () => {
-    navigator.clipboard.writeText("04.565.017/0001-47");
-    toast({
-      title: "Chave Pix copiada",
-      description: "A chave Pix foi copiada para sua área de transferência."
-    });
-  };
+  const [activeTab, setActiveTab] = useState("financial");
 
   return (
     <div className="flutter-screen bg-background p-4 relative">
@@ -23,258 +16,116 @@ const DonationsScreen: React.FC = () => {
         Como apoiar
       </h1>
 
-      {/* ----------- PIX ----------- */}
-      <Card className="flutter-card bg-viver-yellow/10 border-viver-yellow mb-6">
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-viver-yellow mb-2 flex items-center">
-            <MonetizationOn className="mr-2 h-5 w-5" />
-            Doação via Pix
-          </h3>
-          <p className="text-sm mb-4">
-            O Pix é a forma mais rápida de apoiar a Viver em suas demandas
-            financeiras. Chave: <strong>04.565.017/0001-47</strong>
-          </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black" onClick={copyPixKey}>
-            Copiar Chave Pix
-          </Button>
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="financial" className="text-xs">
+            <MonetizationOn className="h-4 w-4 mr-1" />
+            Financeira
+          </TabsTrigger>
+          <TabsTrigger value="physical" className="text-xs">
+            <Gift className="h-4 w-4 mr-1" />
+            Física
+          </TabsTrigger>
+          <TabsTrigger value="services" className="text-xs">
+            <Heart className="h-4 w-4 mr-1" />
+            Serviços
+          </TabsTrigger>
+        </TabsList>
 
-      {/* ----------- DOAÇÃO ONLINE ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <MonetizationOn className="mr-2 h-5 w-5 text-viver-yellow" />
-            Doação Online
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm">
-            Clique em uma das opções abaixo e doe o valor que desejar.
-          </p>
-          <Button 
-            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
-            onClick={() => window.open("https://www.paypal.com/donate/?hosted_button_id=R3PPJ8XWS97KQ", "_blank")}
-          >
-            Doe pelo PayPal
-          </Button>
-          <Button 
-            className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black"
-            onClick={() => window.open("https://app.picpay.com/payment?type=store&hash=fFSm3I4XiFgTJQfU", "_blank")}
-          >
-            Doe pelo PicPay
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="financial">
+          <DonationMethods />
+        </TabsContent>
 
-      {/* ----------- CONTA DE LUZ / CARNÊ ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-            Conta de Luz / Carnê Solidário
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm mb-4">
-            Contribua com valores a partir de R$ 15,00 mensais. Deixe seus dados
-            e entraremos em contato.
-          </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Preencher Formulário
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="physical">
+          <PhysicalDonations />
+        </TabsContent>
 
-      {/* ----------- PRODUTOS E SERVIÇOS ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
-            Doar Produtos ou Serviços
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm mb-4">
-            A Viver precisa de diversos itens e serviços em seu dia-a-dia. Entre
-            em contato e faça a diferença.
-          </p>
-          <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
-            Entrar em Contato
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="services">
+          <div className="space-y-6">
+            {/* Produtos e Serviços */}
+            <Card className="flutter-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-lg">
+                  <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
+                  Doar Produtos ou Serviços
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm mb-4">
+                  A Viver precisa de diversos itens e serviços em seu dia-a-dia. Entre
+                  em contato e faça a diferença.
+                </p>
+                <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+                  Entrar em Contato
+                </Button>
+              </CardContent>
+            </Card>
 
-      {/* ----------- NOTA PARANÁ ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-            Cupons Fiscais (Nota Paraná)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-sm">
-            Ajude doando cupons sem CPF ou solicitando uma urna para seu
-            estabelecimento.
-          </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Locais com Urnas
-          </Button>
-          <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
-            Solicitar Urna
-          </Button>
-        </CardContent>
-      </Card>
+            {/* Nota Paraná */}
+            <Card className="flutter-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-lg">
+                  <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
+                  Cupons Fiscais (Nota Paraná)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm">
+                  Ajude doando cupons sem CPF ou solicitando uma urna para seu
+                  estabelecimento.
+                </p>
+                <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+                  Locais com Urnas
+                </Button>
+                <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+                  Solicitar Urna
+                </Button>
+              </CardContent>
+            </Card>
 
-      {/* ----------- BRECHÓ DO BEM ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-            Brechó do Bem
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm">
-            Doe roupas, calçados, acessórios, livros e brinquedos em bom estado
-            e ajude a gerar recursos para a instituição.
-          </p>
+            {/* Cofrinhos */}
+            <Card className="flutter-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-lg">
+                  <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
+                  Cofrinhos da Viver
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm mb-4">
+                  Deposite suas moedas ou solicite um cofrinho para seu
+                  estabelecimento.
+                </p>
+                <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+                  Solicitar Cofrinho
+                </Button>
+              </CardContent>
+            </Card>
 
-          <p className="text-sm font-semibold">Locais de entrega:</p>
-          <ul className="text-sm list-disc list-inside space-y-1">
-            <li>
-              <a
-                href="https://www.google.com/maps?q=Rua+Ataulpho+de+Paiva,+234"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                Rua Ataulpho de Paiva, 234, Jd. Monções
-              </a>{" "}
-              — seg-sex 8h30 – 12h
-            </li>
-            <li>
-              <a
-                href="https://www.google.com/maps?q=Rua+Bernardo+Sayão,+319"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                Rua Bernardo Sayão, 319, Jd. Petrópolis
-              </a>{" "}
-              — seg-sex 8h30 – 12h
-            </li>
-          </ul>
-
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Seguir no Instagram
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* ----------- LACRES E TAMPINHAS ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
-            Lacres & Tampinhas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm mb-4">
-            Doe lacres de alumínio e tampinhas plásticas ou promova a coleta na
-            sua empresa ou condomínio.
-          </p>
-          <p className="text-sm">
-            Você pode trazer sua doação na 
-            <a
-              href="https://www.google.com/maps?q=Rua+Bernardo+Sayão,+319"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Sede da Viver – Rua Bernardo Sayão, 319, Jd. Petrópolis
-            </a>
-            , seg-sex 8h30 – 17h.
-          </p>
-          <Button className="w-full mt-3 bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
-            Solicitar Material de Apoio
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* ----------- EVENTOS & CAMPANHAS ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <MonetizationOn className="mr-2 h-5 w-5 text-viver-yellow" />
-            Eventos & Campanhas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-sm">
-            Participe de ações como Pizzada, Feijoada, McDia Feliz ou torne-se
-            patrocinador.
-          </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Instagram
-          </Button>
-          <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
-            Facebook
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* ----------- COFRINHOS ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-            Cofrinhos da Viver
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm mb-4">
-            Deposite suas moedas ou solicite um cofrinho para seu
-            estabelecimento.
-          </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-            Solicitar Cofrinho
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* ----------- CESTAS & LEITE ----------- */}
-      <Card className="flutter-card mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
-            Cestas Básicas & Leite
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm">
-            Doe alimentos não perecíveis e leite integral. Sua doação garante
-            alimento mensal às famílias assistidas.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* ----------- ARTESANATO & PRODUTOS ----------- */}
-      <Card className="flutter-card mb-20">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-            Artesanato & Produtos Institucionais
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm">
-            Adquira peças artesanais e produtos personalizados no Brechó do Bem.
-          </p>
-        </CardContent>
-      </Card>
+            {/* Eventos & Campanhas */}
+            <Card className="flutter-card mb-20">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-lg">
+                  <MonetizationOn className="mr-2 h-5 w-5 text-viver-yellow" />
+                  Eventos & Campanhas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm">
+                  Participe de ações como Pizzada, Feijoada, McDia Feliz ou torne-se
+                  patrocinador.
+                </p>
+                <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+                  Instagram
+                </Button>
+                <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+                  Facebook
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
