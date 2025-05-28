@@ -1,22 +1,22 @@
 
 import React, { createContext, useState, useEffect } from 'react';
-import { supabase, supabaseAuth } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 import { Session, User } from '@supabase/supabase-js';
 import { UserRole } from '@/lib/permissions';
 import { Theme } from '@/context/ThemeContext';
 import { UserInfo, AuthContextType } from '@/types/auth';
-import { 
-  determineRole, 
-  fetchUserProfile, 
-  loginUser, 
-  logoutUser, 
-  updateProfile, 
-  updateUserPassword,
-  applyTheme 
-} from '@/services/authService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const determineRole = (email: string): UserRole => {
+  if (email.includes('interno') || email.includes('admin')) {
+    return UserRole.internal;
+  } else if (email.includes('voluntario')) {
+    return UserRole.volunteer;
+  }
+  return UserRole.donor;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -27,67 +27,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load initial user state
   useEffect(() => {
-    const loadInitialState = async () => {
-      // Check existing Supabase session
-      const { data: sessionData } = await supabaseAuth.getCurrentSession();
-      
-      if (sessionData?.session) {
-        setSession(sessionData.session);
-        const { data: userData } = await supabaseAuth.getCurrentUser();
-        setSupabaseUser(userData.user);
-        
-        if (userData.user) {
-          const profile = await fetchUserProfile(userData.user.id);
-          
-          if (profile) {
-            setUser(profile);
-            setIsAuthenticated(true);
-            
-            // Apply theme from user preferences
-            applyTheme(profile.theme || 'light');
-          }
-        }
-      } else {
-        // Fallback: Try loading from localStorage for compatibility
-        const savedUser = localStorage.getItem('viverUser');
-        if (savedUser) {
-          const parsedUser = JSON.parse(savedUser);
-          setUser(parsedUser);
-          setIsAuthenticated(true);
-          
-          if (parsedUser.theme) {
-            applyTheme(parsedUser.theme);
-          }
-        }
-      }
-      
-      setLoading(false);
-    };
-
-    // Subscribe to auth state changes
+    // Subscribe to auth state changes first
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session);
+        
         setSession(session);
         setSupabaseUser(session?.user || null);
         
         if (event === 'SIGNED_IN' && session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
+          const profile = await fetchUserProfile(session.user);
           
           if (profile) {
             setUser(profile);
             setIsAuthenticated(true);
             localStorage.setItem('viverUser', JSON.stringify(profile));
-            
-            // Apply user theme preference
-            applyTheme(profile.theme || 'light');
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setIsAuthenticated(false);
           localStorage.removeItem('viverUser');
         }
+        
+        setLoading(false);
       }
     );
+
+    // Check for existing session
+    const loadInitialState = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (sessionData?.session) {
+        const profile = await fetchUserProfile(sessionData.session.user);
+        
+        if (profile) {
+          setUser(profile);
+          setIsAuthenticated(true);
+          localStorage.setItem('viverUser', JSON.stringify(profile));
+        }
+      }
+      
+      setLoading(false);
+    };
 
     loadInitialState();
 
@@ -96,57 +77,94 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const fetchUserProfile = async (supabaseUser: User): Promise<UserInfo | null> => {
+    try {
+      // Primeiro tenta buscar na tabela voluntarios
+      const { data: voluntarioData } = await supabase
+        .from('voluntarios')
+        .select('nome, email, telefone')
+        .eq('id', supabaseUser.id)
+        .single();
+      
+      if (voluntarioData) {
+        return {
+          id: supabaseUser.id,
+          name: voluntarioData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+          email: voluntarioData.email || supabaseUser.email || '',
+          role: UserRole.volunteer,
+          theme: 'light'
+        };
+      }
+      
+      // Se não encontrar, tenta buscar na tabela doadores
+      const { data: doadorData } = await supabase
+        .from('doadores')
+        .select('nome, email, telefone')
+        .eq('id', supabaseUser.id)
+        .single();
+      
+      if (doadorData) {
+        return {
+          id: supabaseUser.id,
+          name: doadorData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+          email: doadorData.email || supabaseUser.email || '',
+          role: UserRole.donor,
+          theme: 'light'
+        };
+      }
+      
+      // Fallback caso não encontre em nenhuma tabela
+      return {
+        id: supabaseUser.id,
+        name: supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+        email: supabaseUser.email || '',
+        role: determineRole(supabaseUser.email || ''),
+        theme: 'light'
+      };
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      
+      // Fallback para dados do Supabase Auth
+      return {
+        id: supabaseUser.id,
+        name: supabaseUser.user_metadata?.nome || supabaseUser.email || '',
+        email: supabaseUser.email || '',
+        role: determineRole(supabaseUser.email || ''),
+        theme: 'light'
+      };
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       
-      // Try to login with Supabase
-      const { data, error } = await loginUser(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
       if (error) throw error;
       
       if (data.user) {
-        const profile = await fetchUserProfile(data.user.id);
+        const profile = await fetchUserProfile(data.user);
         
         if (profile) {
           setUser(profile);
           setIsAuthenticated(true);
           localStorage.setItem('viverUser', JSON.stringify(profile));
           
-          // Apply user theme preference
-          applyTheme(profile.theme || 'light');
-          
           toast({
             title: "Login realizado com sucesso",
             description: `Bem-vindo, ${profile.name}!`
           });
-          
-          return;
         }
-        
-        // Fallback if profile not found
-        const userInfo: UserInfo = {
-          id: data.user.id,
-          name: data.user.user_metadata?.name || '',
-          email: data.user.email || '',
-          role: determineRole(email),
-          theme: 'light'
-        };
-        
-        setUser(userInfo);
-        setIsAuthenticated(true);
-        localStorage.setItem('viverUser', JSON.stringify(userInfo));
-        
-        toast({
-          title: "Login realizado com sucesso",
-          description: `Bem-vindo!`
-        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Falha no login:', error);
       toast({
         title: "Erro de login",
-        description: "Email ou senha inválidos",
+        description: error.message || "Email ou senha inválidos",
         variant: "destructive"
       });
       throw error;
@@ -157,10 +175,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await logoutUser();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('viverUser');
+      
       toast({
         title: "Logout realizado",
         description: "Você foi desconectado com sucesso."
@@ -189,29 +210,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error('Usuário não autenticado');
       
-      const updatedData = await updateProfile(user.id, data);
-      
-      if (updatedData) {
-        const updatedUser = {
-          ...user,
-          name: data.name || user.name,
-          email: data.email || user.email,
-          theme: data.theme || user.theme
-        };
-        
-        setUser(updatedUser);
-        localStorage.setItem('viverUser', JSON.stringify(updatedUser));
-        
-        // Apply theme if updated
-        if (data.theme) {
-          applyTheme(data.theme);
-        }
-        
-        toast({
-          title: "Perfil atualizado",
-          description: "Suas informações foram atualizadas com sucesso!"
+      // Atualizar no Supabase Auth se necessário
+      if (data.email && data.email !== user.email) {
+        const { error } = await supabase.auth.updateUser({
+          email: data.email,
         });
+        if (error) throw error;
       }
+      
+      // Atualizar na tabela apropriada
+      const tableName = user.role === UserRole.volunteer ? 'voluntarios' : 'doadores';
+      
+      const { error } = await supabase
+        .from(tableName)
+        .update({
+          nome: data.name,
+          email: data.email,
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      const updatedUser = {
+        ...user,
+        name: data.name || user.name,
+        email: data.email || user.email,
+        theme: data.theme || user.theme
+      };
+      
+      setUser(updatedUser);
+      localStorage.setItem('viverUser', JSON.stringify(updatedUser));
+      
+      toast({
+        title: "Perfil atualizado",
+        description: "Suas informações foram atualizadas com sucesso!"
+      });
     } catch (error) {
       console.error('Falha ao atualizar perfil:', error);
       toast({
@@ -227,7 +260,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error('Usuário não autenticado');
       
-      await updateUserPassword(user.email, currentPassword, newPassword);
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      
+      if (error) throw error;
       
       toast({
         title: "Senha atualizada",

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 interface LoginScreenProps {
   onBackToWelcome: () => void;
@@ -53,6 +54,33 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       toast({
         title: "Erro ao fazer login",
         description: error.message || "Verifique suas credenciais e tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Redirecionando...",
+        description: "Você será redirecionado para fazer login com o Google.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao fazer login com Google",
+        description: error.message || "Tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -147,6 +175,28 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                 </div>
               </form>
             </Form>
+
+            {/* Divisor */}
+            <div className="flex items-center my-4">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-3 text-sm text-gray-500">ou</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            {/* Botão Google */}
+            <Button 
+              onClick={handleGoogleLogin}
+              variant="outline"
+              className="w-full py-5 border-gray-300 hover:bg-gray-50"
+              disabled={isLoading}
+            >
+              <img 
+                src="https://developers.google.com/identity/images/g-logo.png" 
+                alt="Google"
+                className="w-5 h-5 mr-2"
+              />
+              Entrar com Google
+            </Button>
             
             {/* Botão para Voltar */}
             <div className="mt-4 text-center">
@@ -158,15 +208,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                 Voltar para a tela inicial
               </Button>
             </div>
-            
-            {/* Acessos para Teste */}
-            <div className="mt-6 text-xs text-muted-foreground text-center px-4 py-3 bg-muted/30 rounded-md">
-              <p className="mb-1 font-medium">Acessos para teste:</p>
-              <p>interno@viver.org (acesso interno)</p>
-              <p>voluntario@viver.org (voluntário)</p>
-              <p>qualquer@email.com (doador)</p>
-              <p className="mt-1 text-[11px]">Senha: qualquer senha</p>
-            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -175,8 +216,3 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
 };
 
 export default LoginScreen;
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_KEY!
-);

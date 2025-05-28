@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,14 +11,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { supabase } from "@/lib/supabase"; // ajuste o caminho conforme seu projeto
+import { supabase } from "@/lib/supabase";
 
 interface SignUpScreenProps {
   onBackToWelcome: () => void;
   onSignUpSuccess: () => void;
 }
 
-// Atualize o schema para incluir o campo perfil
 const signUpSchema = z.object({
   nome: z.string()
     .min(3, { message: "O nome deve ter pelo menos 3 caracteres" })
@@ -29,12 +29,12 @@ const signUpSchema = z.object({
     .max(100, { message: "A senha não pode ter mais de 100 caracteres" }),
   confirmaSenha: z.string(),
   perfil: z.enum(["donor", "volunteer"], { required_error: "Selecione um perfil" }),
+  telefone: z.string().optional(),
 }).refine((data) => data.senha === data.confirmaSenha, {
   message: "As senhas não coincidem",
   path: ["confirmaSenha"],
 });
 
-// Define form values type from schema
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSuccess }) => {
@@ -49,7 +49,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
       email: "",
       senha: "",
       confirmaSenha: "",
-      perfil: "donor"
+      perfil: "donor",
+      telefone: ""
     }
   });
 
@@ -63,7 +64,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
         options: {
           data: {
             nome: values.nome,
-            perfil: values.perfil
+            perfil: values.perfil,
+            telefone: values.telefone
           }
         }
       });
@@ -90,8 +92,39 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Redirecionando...",
+        description: "Você será redirecionado para se cadastrar com o Google.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao cadastrar com Google",
+        description: error.message || "Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-solidario-purple/5">
+    <div className="flutter-screen p-4 flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-viver-yellow/5">
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -100,14 +133,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
       >
         <Card className="border-none shadow-lg">
           <CardHeader className="text-center pb-2">
-            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-solidario-purple/10 flex items-center justify-center">
+            <div className="mx-auto mb-4 w-20 h-20 rounded-full bg-viver-yellow/10 flex items-center justify-center">
               <img 
                 src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
                 alt="ONG Viver"
                 className="w-14 h-14 object-contain"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-solidario-purple">Cadastrar-se</CardTitle>
+            <CardTitle className="text-2xl font-bold text-viver-yellow">Cadastrar-se</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -147,6 +180,49 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                           autoComplete="email"
                           disabled={isLoading}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Campo Telefone */}
+                <FormField
+                  control={form.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone (opcional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Seu telefone"
+                          type="tel"
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Campo Perfil */}
+                <FormField
+                  control={form.control}
+                  name="perfil"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Perfil</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um perfil" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="donor">Doador</SelectItem>
+                            <SelectItem value="volunteer">Voluntário</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -217,33 +293,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                   )}
                 />
 
-                {/* Campo Perfil */}
-                <FormField
-                  control={form.control}
-                  name="perfil"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de Perfil</FormLabel>
-                      <FormControl>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um perfil" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="donor">Doador</SelectItem>
-                            <SelectItem value="volunteer">Voluntário</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="pt-2">
                   <Button 
                     type="submit" 
-                    className="w-full bg-solidario-purple hover:bg-solidario-purple/90 text-white font-medium py-5"
+                    className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium py-5"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Cadastrando...' : 'Cadastrar'}
@@ -251,12 +304,34 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
                 </div>
               </form>
             </Form>
+
+            {/* Divisor */}
+            <div className="flex items-center my-4">
+              <div className="flex-1 border-t border-gray-300"></div>
+              <span className="px-3 text-sm text-gray-500">ou</span>
+              <div className="flex-1 border-t border-gray-300"></div>
+            </div>
+
+            {/* Botão Google */}
+            <Button 
+              onClick={handleGoogleSignUp}
+              variant="outline"
+              className="w-full py-5 border-gray-300 hover:bg-gray-50"
+              disabled={isLoading}
+            >
+              <img 
+                src="https://developers.google.com/identity/images/g-logo.png" 
+                alt="Google"
+                className="w-5 h-5 mr-2"
+              />
+              Cadastrar com Google
+            </Button>
             
             <div className="mt-4 flex justify-center">
               <Button 
                 variant="ghost" 
                 onClick={onBackToWelcome}
-                className="text-solidario-purple flex items-center gap-1"
+                className="text-viver-yellow flex items-center gap-1"
               >
                 <ArrowLeft size={16} />
                 <span>Voltar para a tela inicial</span>

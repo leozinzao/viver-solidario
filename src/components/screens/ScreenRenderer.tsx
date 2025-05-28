@@ -2,8 +2,10 @@
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 
-// Simplified screen imports - using basic components for now
+// Import real screen components
 import WelcomeScreen from "@/screens/WelcomeScreen";
+import LoginScreen from "@/screens/LoginScreen";
+import SignUpScreen from "@/screens/SignUpScreen";
 
 type ScreenType =
   | "welcome"
@@ -58,10 +60,20 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       );
 
     case "login":
-      return <PlaceholderScreen title="Login" />;
+      return (
+        <LoginScreen 
+          onBackToWelcome={onBackToWelcome}
+          onLoginSuccess={onLoginSuccess}
+        />
+      );
       
     case "signup":
-      return <PlaceholderScreen title="Cadastro" />;
+      return (
+        <SignUpScreen 
+          onBackToWelcome={onBackToWelcome}
+          onSignUpSuccess={onLoginSuccess}
+        />
+      );
 
     case "home":
       return <PlaceholderScreen title="Início" />;
