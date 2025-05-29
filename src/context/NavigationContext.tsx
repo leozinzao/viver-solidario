@@ -7,6 +7,7 @@ type ScreenType =
   | "signup"
   | "home"
   | "donations"
+  | "doacoes-fisicas"
   | "profile"
   | "volunteer"
   | "events"
