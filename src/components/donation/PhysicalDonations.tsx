@@ -105,12 +105,12 @@ const PhysicalDonations: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Cestas & Leite */}
+      {/* Doar Alimentos / Cesta Básica */}
       <Card className="flutter-card">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center text-lg">
             <Heart className="mr-2 h-5 w-5 text-viver-yellow-medium" />
-            Cestas Básicas & Leite
+            Doar Alimentos / Cesta Básica
           </CardTitle>
         </CardHeader>
         <CardContent>
