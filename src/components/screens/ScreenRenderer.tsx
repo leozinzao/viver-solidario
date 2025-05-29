@@ -11,6 +11,7 @@ import EventsScreen from "@/screens/EventsScreen";
 import DonationsScreen from "@/screens/DonationsScreen";
 import VolunteerScreen from "@/screens/VolunteerScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
+import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
 
 type ScreenType =
   | "welcome"
@@ -18,6 +19,7 @@ type ScreenType =
   | "signup"
   | "home"
   | "donations"
+  | "doacoes-fisicas"
   | "profile"
   | "volunteer"
   | "events"
@@ -85,6 +87,9 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
 
     case "donations":
       return <DonationsScreen />;
+
+    case "doacoes-fisicas":
+      return <DoacoesFisicasScreen />;
 
     case "events":
       return <EventsScreen />;

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart } from '@/components/icons';
+import { Heart, Package } from 'lucide-react';
 import BrechoDialog from './BrechoDialog';
 import AlimentosDialog from './AlimentosDialog';
 
@@ -10,8 +10,36 @@ const PhysicalDonations: React.FC = () => {
   const [isBrechoOpen, setIsBrechoOpen] = useState(false);
   const [isAlimentosOpen, setIsAlimentosOpen] = useState(false);
 
+  const handleDoacoesFisicasClick = () => {
+    if (typeof window !== 'undefined' && (window as any).navigateTo) {
+      (window as any).navigateTo('doacoes-fisicas');
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Sistema de Doações Físicas */}
+      <Card className="flutter-card">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center text-lg">
+            <Package className="mr-2 h-5 w-5 text-viver-yellow" />
+            Sistema de Doações
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm">
+            Cadastre itens para doação ou encontre doações disponíveis em sua região.
+            Sistema completo com reserva e acompanhamento.
+          </p>
+          <Button 
+            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+            onClick={handleDoacoesFisicasClick}
+          >
+            Acessar Sistema de Doações
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Brechó do Bem */}
       <Card className="flutter-card">
         <CardHeader className="pb-2">

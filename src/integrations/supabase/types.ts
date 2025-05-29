@@ -68,6 +68,33 @@ export type Database = {
           },
         ]
       }
+      categorias_doacoes: {
+        Row: {
+          cor: string | null
+          created_at: string
+          descricao: string | null
+          icone: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          cor?: string | null
+          created_at?: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          cor?: string | null
+          created_at?: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       cofrinhos: {
         Row: {
           data_coleta: string | null
@@ -222,6 +249,86 @@ export type Database = {
           },
         ]
       }
+      doacoes_fisicas_novas: {
+        Row: {
+          avaliacao_beneficiario: number | null
+          avaliacao_doador: number | null
+          beneficiario_id: string | null
+          categoria_id: string | null
+          comentario_avaliacao: string | null
+          created_at: string
+          data_disponivel: string | null
+          data_entrega: string | null
+          data_reserva: string | null
+          descricao: string | null
+          doador_id: string | null
+          endereco_coleta: string | null
+          fotos: string[] | null
+          id: string
+          localizacao: string | null
+          observacoes: string | null
+          quantidade: number
+          status: string
+          titulo: string
+          unidade: string
+          updated_at: string
+        }
+        Insert: {
+          avaliacao_beneficiario?: number | null
+          avaliacao_doador?: number | null
+          beneficiario_id?: string | null
+          categoria_id?: string | null
+          comentario_avaliacao?: string | null
+          created_at?: string
+          data_disponivel?: string | null
+          data_entrega?: string | null
+          data_reserva?: string | null
+          descricao?: string | null
+          doador_id?: string | null
+          endereco_coleta?: string | null
+          fotos?: string[] | null
+          id?: string
+          localizacao?: string | null
+          observacoes?: string | null
+          quantidade?: number
+          status?: string
+          titulo: string
+          unidade?: string
+          updated_at?: string
+        }
+        Update: {
+          avaliacao_beneficiario?: number | null
+          avaliacao_doador?: number | null
+          beneficiario_id?: string | null
+          categoria_id?: string | null
+          comentario_avaliacao?: string | null
+          created_at?: string
+          data_disponivel?: string | null
+          data_entrega?: string | null
+          data_reserva?: string | null
+          descricao?: string | null
+          doador_id?: string | null
+          endereco_coleta?: string | null
+          fotos?: string[] | null
+          id?: string
+          localizacao?: string | null
+          observacoes?: string | null
+          quantidade?: number
+          status?: string
+          titulo?: string
+          unidade?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doacoes_fisicas_novas_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_doacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doacoes_produtos_servicos: {
         Row: {
           data: string | null
@@ -352,6 +459,85 @@ export type Database = {
           nome?: string
         }
         Relationships: []
+      }
+      mensagens_doacoes: {
+        Row: {
+          created_at: string
+          destinatario_id: string
+          doacao_id: string
+          id: string
+          lida: boolean | null
+          mensagem: string
+          remetente_id: string
+        }
+        Insert: {
+          created_at?: string
+          destinatario_id: string
+          doacao_id: string
+          id?: string
+          lida?: boolean | null
+          mensagem: string
+          remetente_id: string
+        }
+        Update: {
+          created_at?: string
+          destinatario_id?: string
+          doacao_id?: string
+          id?: string
+          lida?: boolean | null
+          mensagem?: string
+          remetente_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensagens_doacoes_doacao_id_fkey"
+            columns: ["doacao_id"]
+            isOneToOne: false
+            referencedRelation: "doacoes_fisicas_novas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notificacoes_doacoes: {
+        Row: {
+          created_at: string
+          doacao_id: string | null
+          id: string
+          lida: boolean | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          doacao_id?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem: string
+          tipo: string
+          titulo: string
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          doacao_id?: string | null
+          id?: string
+          lida?: boolean | null
+          mensagem?: string
+          tipo?: string
+          titulo?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_doacoes_doacao_id_fkey"
+            columns: ["doacao_id"]
+            isOneToOne: false
+            referencedRelation: "doacoes_fisicas_novas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pontos_de_coleta: {
         Row: {
