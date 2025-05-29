@@ -1,88 +1,79 @@
 
-// Define user roles
 export enum UserRole {
-  admin = 'admin',
-  internal = 'internal',
-  editor = 'editor',
-  volunteer = 'volunteer',
   donor = 'donor',
-  visitor = 'visitor'
+  volunteer = 'volunteer', 
+  internal = 'internal',
+  admin = 'admin'
 }
 
-// Define permissions for different features
 export enum Permission {
-  // Content management
-  CREATE_EVENT = 'create:event',
-  EDIT_EVENT = 'edit:event',
-  DELETE_EVENT = 'delete:event',
+  // Doações
+  VIEW_OWN_DONATIONS = 'view_own_donations',
+  CREATE_DONATION = 'create_donation',
   
-  CREATE_TESTIMONIAL = 'create:testimonial',
-  EDIT_TESTIMONIAL = 'edit:testimonial',
-  DELETE_TESTIMONIAL = 'delete:testimonial',
-  APPROVE_TESTIMONIAL = 'approve:testimonial',
+  // Admin - Doações
+  VIEW_ALL_DONATIONS = 'view_all_donations',
+  MANAGE_DONATIONS = 'manage_donations',
+  UPDATE_DONATION_STATUS = 'update_donation_status',
   
-  // User management
-  VIEW_USERS = 'view:users',
-  EDIT_USER = 'edit:user',
-  DELETE_USER = 'delete:user',
-  MANAGE_USER_ROLES = 'manage:user-roles',
+  // Admin - Sistema
+  ACCESS_ADMIN_PANEL = 'access_admin_panel',
+  MANAGE_USERS = 'manage_users',
+  MANAGE_CATEGORIES = 'manage_categories',
+  VIEW_ADMIN_LOGS = 'view_admin_logs',
   
-  // Admin features
-  ACCESS_ADMIN_PANEL = 'access:admin-panel',
-  VIEW_ANALYTICS = 'view:analytics',
-  EDIT_SYSTEM_SETTINGS = 'edit:system-settings',
-  MANAGE_SYSTEM_CONFIG = 'manage:system-config',
-  
-  // General user permissions
-  DONATE = 'donate',
-  VOLUNTEER = 'volunteer',
+  // Voluntários
+  ACCESS_VOLUNTEER_FEATURES = 'access_volunteer_features',
+  MANAGE_EVENTS = 'manage_events',
 }
 
-// Define permission mappings by role
 const rolePermissions: Record<UserRole, Permission[]> = {
-  [UserRole.admin]: Object.values(Permission),
-  [UserRole.internal]: [
-    Permission.CREATE_EVENT, Permission.EDIT_EVENT, Permission.DELETE_EVENT,
-    Permission.CREATE_TESTIMONIAL, Permission.EDIT_TESTIMONIAL, Permission.DELETE_TESTIMONIAL, Permission.APPROVE_TESTIMONIAL,
-    Permission.VIEW_USERS,
-    Permission.ACCESS_ADMIN_PANEL, Permission.VIEW_ANALYTICS,
-    Permission.DONATE, Permission.VOLUNTEER,
-  ],
-  [UserRole.editor]: [
-    Permission.CREATE_EVENT, Permission.EDIT_EVENT,
-    Permission.CREATE_TESTIMONIAL, Permission.EDIT_TESTIMONIAL, Permission.APPROVE_TESTIMONIAL,
-    Permission.VIEW_ANALYTICS,
-    Permission.DONATE, Permission.VOLUNTEER,
+  [UserRole.donor]: [
+    Permission.VIEW_OWN_DONATIONS,
+    Permission.CREATE_DONATION,
   ],
   [UserRole.volunteer]: [
-    Permission.CREATE_TESTIMONIAL,
-    Permission.DONATE, Permission.VOLUNTEER,
+    Permission.VIEW_OWN_DONATIONS,
+    Permission.CREATE_DONATION,
+    Permission.ACCESS_VOLUNTEER_FEATURES,
+    Permission.VIEW_ALL_DONATIONS,
+    Permission.UPDATE_DONATION_STATUS,
   ],
-  [UserRole.donor]: [
-    Permission.DONATE, Permission.VOLUNTEER,
+  [UserRole.internal]: [
+    Permission.VIEW_OWN_DONATIONS,
+    Permission.CREATE_DONATION,
+    Permission.ACCESS_VOLUNTEER_FEATURES,
+    Permission.VIEW_ALL_DONATIONS,
+    Permission.MANAGE_DONATIONS,
+    Permission.UPDATE_DONATION_STATUS,
+    Permission.ACCESS_ADMIN_PANEL,
+    Permission.MANAGE_CATEGORIES,
+    Permission.VIEW_ADMIN_LOGS,
   ],
-  [UserRole.visitor]: []
+  [UserRole.admin]: [
+    Permission.VIEW_OWN_DONATIONS,
+    Permission.CREATE_DONATION,
+    Permission.ACCESS_VOLUNTEER_FEATURES,
+    Permission.VIEW_ALL_DONATIONS,
+    Permission.MANAGE_DONATIONS,
+    Permission.UPDATE_DONATION_STATUS,
+    Permission.ACCESS_ADMIN_PANEL,
+    Permission.MANAGE_USERS,
+    Permission.MANAGE_CATEGORIES,
+    Permission.MANAGE_EVENTS,
+    Permission.VIEW_ADMIN_LOGS,
+  ],
 };
 
-/**
- * Check if a user role has a specific permission
- */
-export function hasPermission(role: UserRole | undefined, permission: Permission): boolean {
-  if (!role) return false;
-  return rolePermissions[role]?.includes(permission) || false;
-}
+export const hasPermission = (userRole: UserRole, permission: Permission): boolean => {
+  return rolePermissions[userRole]?.includes(permission) || false;
+};
 
-/**
- * Check if a user role has any of the specified permissions
- */
-export function hasAnyPermission(role: UserRole | undefined, permissions: Permission[]): boolean {
-  if (!role) return false;
-  return permissions.some(permission => rolePermissions[role]?.includes(permission));
-}
+export const canAccessAdminPanel = (userRole: UserRole): boolean => {
+  return hasPermission(userRole, Permission.ACCESS_ADMIN_PANEL);
+};
 
-/**
- * Get all permissions for a specific role
- */
-export function getPermissionsForRole(role: UserRole): Permission[] {
-  return [...(rolePermissions[role] || [])];
-}
+export const canManageDonations = (userRole: UserRole): boolean => {
+  return hasPermission(userRole, Permission.MANAGE_DONATIONS) || 
+         hasPermission(userRole, Permission.UPDATE_DONATION_STATUS);
+};

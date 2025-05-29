@@ -18,4 +18,6 @@ export interface AuthContextType {
   hasPermission: (requiredRole: UserRole | UserRole[]) => boolean;
   updateUserProfile: (data: { name?: string; email?: string; theme?: Theme }) => Promise<void>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  checkAdminAccess: () => Promise<boolean>;
+  refreshUserRole: () => Promise<void>;
 }

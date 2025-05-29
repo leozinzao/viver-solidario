@@ -12,6 +12,7 @@ import DonationsScreen from "@/screens/DonationsScreen";
 import VolunteerScreen from "@/screens/VolunteerScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
+import AdminScreen from "@/screens/AdminScreen";
 
 type ScreenType =
   | "welcome"
@@ -113,7 +114,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       if (!isAuthenticated) {
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
-      return <PlaceholderScreen title="Administração" />;
+      return <AdminScreen />;
 
     default:
       return <PlaceholderScreen title="Página não encontrada" />;

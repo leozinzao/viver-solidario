@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
       atividades_voluntarias: {
         Row: {
           data: string | null
@@ -603,8 +636,10 @@ export type Database = {
           id: string
           nascimento: string | null
           nome: string | null
+          role: string | null
           senha_hash: string | null
           telefone: string | null
+          theme: string | null
         }
         Insert: {
           ativo?: boolean | null
@@ -612,8 +647,10 @@ export type Database = {
           id?: string
           nascimento?: string | null
           nome?: string | null
+          role?: string | null
           senha_hash?: string | null
           telefone?: string | null
+          theme?: string | null
         }
         Update: {
           ativo?: boolean | null
@@ -621,8 +658,10 @@ export type Database = {
           id?: string
           nascimento?: string | null
           nome?: string | null
+          role?: string | null
           senha_hash?: string | null
           telefone?: string | null
+          theme?: string | null
         }
         Relationships: []
       }
@@ -700,7 +739,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_admin_access: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

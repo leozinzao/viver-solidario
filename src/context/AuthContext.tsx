@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
@@ -5,6 +6,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { UserRole } from '@/lib/permissions';
 import { Theme } from '@/context/ThemeContext';
 import { UserInfo, AuthContextType } from '@/types/auth';
+import { checkUserRole, hasAdminAccess } from '@/services/adminService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -22,6 +24,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const refreshUserRole = async () => {
+    if (!user) return;
+    
+    try {
+      const role = await checkUserRole(user.id);
+      if (role && role !== user.role) {
+        setUser(prev => prev ? { ...prev, role } : null);
+        console.log('Role do usuário atualizado:', role);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar role:', error);
+    }
+  };
+
+  const checkAdminAccess = async (): Promise<boolean> => {
+    if (!user) return false;
+    return await hasAdminAccess(user.id);
+  };
+
   useEffect(() => {
     console.log('AuthContext: Inicializando...');
     
@@ -31,20 +52,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('AuthContext: Auth state change:', event, session?.user?.email);
         
         if (session?.user) {
-          // Criar perfil básico do usuário
+          // Buscar role real do banco de dados
+          const role = await checkUserRole(session.user.id) || determineRole(session.user.email || '');
+          
+          // Criar perfil do usuário com role do banco
           const userProfile: UserInfo = {
             id: session.user.id,
             name: session.user.user_metadata?.full_name || 
                   session.user.user_metadata?.nome || 
                   session.user.email || 'Usuário',
             email: session.user.email || '',
-            role: determineRole(session.user.email || ''),
+            role: role,
             theme: 'light'
           };
           
           setUser(userProfile);
           setIsAuthenticated(true);
-          console.log('AuthContext: Usuário autenticado:', userProfile);
+          console.log('AuthContext: Usuário autenticado com role:', userProfile);
           
           if (event === 'SIGNED_IN') {
             toast({
@@ -202,7 +226,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout, 
       hasPermission,
       updateUserProfile,
-      updatePassword
+      updatePassword,
+      checkAdminAccess,
+      refreshUserRole
     }}>
       {children}
     </AuthContext.Provider>

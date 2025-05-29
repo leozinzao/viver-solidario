@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
+import { logAdminAction } from '@/services/adminService';
 
 export function useDoacoesFisicasAdmin() {
   const [loading, setLoading] = useState(false);
@@ -110,6 +111,17 @@ export function useDoacoesFisicasAdmin() {
       }
       
       console.log('Status atualizado:', data);
+
+      // Registrar ação administrativa
+      await logAdminAction(
+        user.id,
+        'update_donation_status',
+        'doacao_fisica',
+        `Status da doação alterado para: ${newStatus}`,
+        doacaoId,
+        { oldStatus: data.status, newStatus, observacoes }
+      );
+      
       return data;
     },
     onSuccess: (_, { newStatus }) => {
