@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,8 @@ import {
   ExternalLink,
   ArrowRight,
   MapPin,
-  Phone
+  Phone,
+  Package
 } from "lucide-react";
 
 const HomeScreen: React.FC = () => {
@@ -49,11 +49,18 @@ const HomeScreen: React.FC = () => {
       color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
     },
     {
+      title: 'Doações Físicas',
+      description: 'Doe itens físicos ou encontre doações',
+      icon: Package,
+      action: () => navigateToScreen('doacoes-fisicas'),
+      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
+    },
+    {
       title: 'Voluntariado',
       description: 'Seja um voluntário',
       icon: Handshake,
       action: () => navigateToScreen('volunteer'),
-      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
+      color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
     }
   ];
 
