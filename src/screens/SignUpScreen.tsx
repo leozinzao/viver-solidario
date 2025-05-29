@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +69,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
             perfil: values.perfil,
             telefone: values.telefone
           },
-          emailRedirectTo: `${window.location.origin}`
+          emailRedirectTo: window.location.origin
         }
       });
 
@@ -104,15 +103,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
     setIsGoogleLoading(true);
     
     try {
-      console.log('Iniciando login com Google...');
+      console.log('Iniciando cadastro com Google...');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account',
+            prompt: 'consent',
           },
         }
       });
@@ -124,20 +123,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ onBackToWelcome, onSignUpSu
       
       console.log('Google OAuth iniciado com sucesso');
       
-      // O redirecionamento acontece automaticamente
-      toast({
-        title: "Redirecionando para Google...",
-        description: "Você será redirecionado para se cadastrar com o Google.",
-      });
-      
     } catch (error: any) {
       console.error('Erro no Google signup:', error);
       toast({
         title: "Erro ao cadastrar com Google",
-        description: error.message || "Ocorreu um erro. Tente usar o cadastro com email.",
+        description: error.message || "Ocorreu um erro. Verifique a configuração do Google OAuth.",
         variant: "destructive"
       });
-    } finally {
       setIsGoogleLoading(false);
     }
   };

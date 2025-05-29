@@ -69,10 +69,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: window.location.origin,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account',
+            prompt: 'consent',
           },
         }
       });
@@ -84,20 +84,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       
       console.log('Google OAuth iniciado com sucesso');
       
-      // O redirecionamento acontece automaticamente
-      toast({
-        title: "Redirecionando para Google...",
-        description: "Você será redirecionado para fazer login com o Google.",
-      });
-      
     } catch (error: any) {
       console.error('Erro no Google login:', error);
       toast({
         title: "Erro ao entrar com Google",
-        description: error.message || "Ocorreu um erro. Tente usar o login com email.",
+        description: error.message || "Ocorreu um erro. Verifique a configuração do Google OAuth.",
         variant: "destructive"
       });
-    } finally {
       setIsGoogleLoading(false);
     }
   };
