@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Heart, Package } from 'lucide-react';
 import BrechoDialog from './BrechoDialog';
 import AlimentosDialog from './AlimentosDialog';
+import { useNavigation } from '@/context/NavigationContext';
 
 const PhysicalDonations: React.FC = () => {
   const [isBrechoOpen, setIsBrechoOpen] = useState(false);
   const [isAlimentosOpen, setIsAlimentosOpen] = useState(false);
+  const { navigateToScreen } = useNavigation();
 
   const handleDoacoesFisicasClick = () => {
-    if (typeof window !== 'undefined' && (window as any).navigateTo) {
-      (window as any).navigateTo('doacoes-fisicas');
-    }
+    navigateToScreen('doacoes-fisicas');
   };
 
   return (

@@ -51,6 +51,7 @@ export function useDoacoesFisicas() {
   const { data: doacoes = [], isLoading: isLoadingDoacoes } = useQuery({
     queryKey: ['doacoes-fisicas'],
     queryFn: async () => {
+      console.log('Buscando doações físicas...');
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
@@ -64,7 +65,11 @@ export function useDoacoesFisicas() {
         .eq('status', 'disponivel')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar doações:', error);
+        throw error;
+      }
+      console.log('Doações encontradas:', data);
       return data as DoacaoFisica[];
     },
   });
@@ -73,12 +78,17 @@ export function useDoacoesFisicas() {
   const { data: categorias = [], isLoading: isLoadingCategorias } = useQuery({
     queryKey: ['categorias-doacoes'],
     queryFn: async () => {
+      console.log('Buscando categorias...');
       const { data, error } = await supabase
         .from('categorias_doacoes')
         .select('*')
         .order('nome');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar categorias:', error);
+        throw error;
+      }
+      console.log('Categorias encontradas:', data);
       return data as CategoriaDoacao[];
     },
   });
@@ -86,6 +96,7 @@ export function useDoacoesFisicas() {
   // Criar nova doação
   const createDoacao = useMutation({
     mutationFn: async (doacao: Partial<DoacaoFisica>) => {
+      console.log('Criando doação:', doacao);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
@@ -98,7 +109,11 @@ export function useDoacoesFisicas() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao criar doação:', error);
+        throw error;
+      }
+      console.log('Doação criada:', data);
       return data;
     },
     onSuccess: () => {
@@ -109,6 +124,7 @@ export function useDoacoesFisicas() {
       });
     },
     onError: (error: Error) => {
+      console.error('Erro na mutação de criação:', error);
       toast({
         title: "Erro",
         description: `Não foi possível cadastrar a doação: ${error.message}`,
@@ -120,6 +136,7 @@ export function useDoacoesFisicas() {
   // Reservar doação
   const reservarDoacao = useMutation({
     mutationFn: async (doacaoId: string) => {
+      console.log('Reservando doação:', doacaoId);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
@@ -135,7 +152,11 @@ export function useDoacoesFisicas() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao reservar doação:', error);
+        throw error;
+      }
+      console.log('Doação reservada:', data);
       return data;
     },
     onSuccess: () => {
@@ -146,6 +167,7 @@ export function useDoacoesFisicas() {
       });
     },
     onError: (error: Error) => {
+      console.error('Erro na mutação de reserva:', error);
       toast({
         title: "Erro",
         description: `Não foi possível reservar a doação: ${error.message}`,
@@ -157,6 +179,7 @@ export function useDoacoesFisicas() {
   // Confirmar entrega
   const confirmarEntrega = useMutation({
     mutationFn: async (doacaoId: string) => {
+      console.log('Confirmando entrega:', doacaoId);
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .update({
@@ -167,7 +190,11 @@ export function useDoacoesFisicas() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao confirmar entrega:', error);
+        throw error;
+      }
+      console.log('Entrega confirmada:', data);
       return data;
     },
     onSuccess: () => {
@@ -178,6 +205,7 @@ export function useDoacoesFisicas() {
       });
     },
     onError: (error: Error) => {
+      console.error('Erro na mutação de entrega:', error);
       toast({
         title: "Erro",
         description: `Não foi possível confirmar a entrega: ${error.message}`,

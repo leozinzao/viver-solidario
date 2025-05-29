@@ -27,10 +27,10 @@ const HomeScreen: React.FC = () => {
   };
 
   const stats = [
-    { label: 'Famílias Assistidas', value: '150+', icon: Users, color: 'text-blue-600' },
-    { label: 'Voluntários Ativos', value: '80+', icon: Handshake, color: 'text-green-600' },
-    { label: 'Doações Recebidas', value: 'R$ 45.000', icon: DollarSign, color: 'text-yellow-600' },
-    { label: 'Impacto Social', value: '95%', icon: TrendingUp, color: 'text-purple-600' },
+    { label: 'Famílias Assistidas', value: '150+', icon: Users, color: 'text-viver-yellow' },
+    { label: 'Voluntários Ativos', value: '80+', icon: Handshake, color: 'text-viver-yellow-medium' },
+    { label: 'Doações Recebidas', value: 'R$ 45.000', icon: DollarSign, color: 'text-viver-yellow' },
+    { label: 'Impacto Social', value: '95%', icon: TrendingUp, color: 'text-viver-yellow-medium' },
   ];
 
   const quickActions = [
@@ -39,21 +39,21 @@ const HomeScreen: React.FC = () => {
       description: 'Veja nossos próximos eventos',
       icon: CalendarIcon,
       action: () => navigateToScreen('events'),
-      color: 'bg-blue-50 hover:bg-blue-100 border-blue-200'
+      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
     },
     {
       title: 'Doações',
       description: 'Faça uma doação hoje',
       icon: Heart,
       action: () => navigateToScreen('donations'),
-      color: 'bg-red-50 hover:bg-red-100 border-red-200'
+      color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
     },
     {
       title: 'Voluntariado',
       description: 'Seja um voluntário',
       icon: Handshake,
       action: () => navigateToScreen('volunteer'),
-      color: 'bg-green-50 hover:bg-green-100 border-green-200'
+      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
     }
   ];
 
@@ -91,10 +91,10 @@ const HomeScreen: React.FC = () => {
       
       {/* Hero Banner com Informações da Instituição */}
       <div className="rounded-2xl overflow-hidden mb-8 relative shadow-xl animate-fade-in">
-        <div className="bg-gradient-to-br from-viver-yellow/20 via-solidario-purple/10 to-viver-yellow/30 p-8">
+        <div className="bg-gradient-to-br from-viver-yellow/20 via-viver-yellow-medium/10 to-viver-yellow/30 p-8">
           <div className="grid md:grid-cols-2 gap-6 items-center">
             <div>
-              <h2 className="text-2xl font-bold text-solidario-purple mb-3">
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
                 Apoio à criança e adolescente com câncer
               </h2>
               <p className="text-gray-700 mb-4 leading-relaxed">
@@ -127,7 +127,7 @@ const HomeScreen: React.FC = () => {
         {stats.map((stat, index) => (
           <Card key={stat.label} className="flutter-card glass-morphism animate-scale-in hover:scale-105 transition-all duration-200">
             <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center mb-3 mx-auto shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-viver-yellow/20 flex items-center justify-center mb-3 mx-auto shadow-sm">
                 <stat.icon className={`h-6 w-6 ${stat.color}`} />
               </div>
               <h3 className="font-bold text-xl text-viver-yellow">{stat.value}</h3>
@@ -138,7 +138,7 @@ const HomeScreen: React.FC = () => {
       </div>
       
       {/* Ações Rápidas */}
-      <h2 className="text-xl font-semibold mb-4 text-solidario-purple/90">Como Participar</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Como Participar</h2>
       <div className="grid gap-4 mb-8">
         {quickActions.map((action, index) => (
           <Card 
@@ -149,15 +149,15 @@ const HomeScreen: React.FC = () => {
           >
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
-                  <action.icon className="h-6 w-6 text-solidario-purple" />
+                <div className="w-12 h-12 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-sm">
+                  <action.icon className="h-6 w-6 text-viver-yellow" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-solidario-purple">{action.title}</h3>
+                  <h3 className="font-semibold text-gray-800">{action.title}</h3>
                   <p className="text-sm text-gray-600">{action.description}</p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-solidario-purple/60" />
+              <ArrowRight className="h-5 w-5 text-viver-yellow" />
             </CardContent>
           </Card>
         ))}
@@ -166,8 +166,8 @@ const HomeScreen: React.FC = () => {
       {/* Destaques Recentes */}
       <Card className="flutter-card glass-morphism mb-8 animate-fade-in">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-solidario-purple font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-viver-yellow" />
             Últimas Notícias
           </CardTitle>
         </CardHeader>
@@ -199,19 +199,19 @@ const HomeScreen: React.FC = () => {
         </Button>
         <Button 
           variant="outline"
-          className="h-auto p-4 border-solidario-purple hover:bg-solidario-purple/10 transition-all hover:scale-105"
+          className="h-auto p-4 border-viver-yellow-medium hover:bg-viver-yellow-medium/10 transition-all hover:scale-105"
           onClick={() => window.open("https://www.instagram.com/ongviver", "_blank")}
         >
           <div className="text-center">
-            <Heart className="h-5 w-5 mx-auto mb-1 text-solidario-purple" />
-            <span className="text-sm font-medium text-solidario-purple">Instagram</span>
+            <Heart className="h-5 w-5 mx-auto mb-1 text-viver-yellow-medium" />
+            <span className="text-sm font-medium text-viver-yellow-medium">Instagram</span>
           </div>
         </Button>
       </div>
       
       {/* CTA principal */}
       <Button 
-        className="w-full bg-solidario-purple hover:bg-solidario-purple/90 text-white text-lg py-6 shadow-lg animate-fade-in transition-all hover:scale-105"
+        className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black text-lg py-6 shadow-lg animate-fade-in transition-all hover:scale-105"
         onClick={() => navigateToScreen('events')}
       >
         <CalendarIcon className="h-6 w-6 mr-2" />
