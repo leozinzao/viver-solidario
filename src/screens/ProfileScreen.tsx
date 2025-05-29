@@ -33,10 +33,10 @@ const ProfileScreen: React.FC = () => {
   } = useProfileActions();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="flutter-screen p-6 max-w-4xl mx-auto">
-        {/* Header com gradiente */}
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-viver-yellow to-orange-500 bg-clip-text text-transparent mb-2">
             Meu Perfil
           </h1>
@@ -45,63 +45,72 @@ const ProfileScreen: React.FC = () => {
           </p>
         </div>
         
-        {/* Profile Header melhorado */}
-        <div className="mb-8">
-          <ProfileHeader 
-            user={user} 
-            onEditProfile={openEditProfile} 
-          />
+        {/* Profile Header */}
+        <ProfileHeader 
+          user={user} 
+          onEditProfile={openEditProfile} 
+        />
+        
+        {/* Estatísticas */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-card border rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300">
+            <div className="text-3xl font-bold text-viver-yellow mb-2">0</div>
+            <div className="text-sm text-muted-foreground">Doações</div>
+            <div className="text-sm text-muted-foreground">Realizadas</div>
+          </div>
+          <div className="bg-card border rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300">
+            <div className="text-3xl font-bold text-green-500 mb-2">0</div>
+            <div className="text-sm text-muted-foreground">Horas</div>
+            <div className="text-sm text-muted-foreground">Voluntárias</div>
+          </div>
+          <div className="bg-card border rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300">
+            <div className="text-3xl font-bold text-blue-500 mb-2">0</div>
+            <div className="text-sm text-muted-foreground">Eventos</div>
+            <div className="text-sm text-muted-foreground">Participados</div>
+          </div>
         </div>
         
-        {/* Estatísticas rápidas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-card border rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300">
-            <div className="text-2xl font-bold text-viver-yellow mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Doações Realizadas</div>
-          </div>
-          <div className="bg-card border rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300">
-            <div className="text-2xl font-bold text-green-500 mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Horas Voluntárias</div>
-          </div>
-          <div className="bg-card border rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300">
-            <div className="text-2xl font-bold text-blue-500 mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Eventos Participados</div>
-          </div>
-        </div>
-        
-        {/* Profile Options em cards organizados */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Seções de Configurações */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Conta & Segurança */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-viver-yellow rounded-full"></div>
-              Conta & Segurança
-            </h3>
-            <ProfileOptions 
-              isDarkMode={isDarkMode}
-              toggleTheme={toggleTheme}
-              hasPermission={hasPermission}
-              onEditProfile={openEditProfile}
-              onChangePassword={() => setIsChangingPassword(true)}
-              onLogout={handleLogout}
-            />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-8 bg-viver-yellow rounded-full"></div>
+              <h3 className="text-xl font-semibold text-foreground">Conta & Segurança</h3>
+            </div>
+            <div className="space-y-3">
+              <ProfileOptions 
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                hasPermission={hasPermission}
+                onEditProfile={openEditProfile}
+                onChangePassword={() => setIsChangingPassword(true)}
+                onLogout={handleLogout}
+              />
+            </div>
           </div>
           
+          {/* Configurações */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
-              Configurações
-            </h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
+              <h3 className="text-xl font-semibold text-foreground">Configurações</h3>
+            </div>
+            
             {/* Área para configurações futuras */}
-            <div className="bg-card border rounded-xl p-6 text-center">
-              <div className="text-muted-foreground text-sm">
+            <div className="bg-card border rounded-xl p-8 text-center">
+              <div className="text-muted-foreground text-sm mb-2">
                 Configurações adicionais em breve...
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Notificações, preferências e mais
               </div>
             </div>
           </div>
         </div>
         
-        {/* Footer melhorado */}
-        <div className="text-center pt-8 border-t border-border">
+        {/* Footer */}
+        <div className="text-center pt-8 border-t border-border mt-8">
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-2">
             <div className="w-2 h-2 bg-viver-yellow rounded-full animate-pulse"></div>
             <span>Viver Solidário v1.0.0</span>
@@ -111,7 +120,7 @@ const ProfileScreen: React.FC = () => {
           </p>
         </div>
         
-        {/* Edit Profile Dialog */}
+        {/* Dialogs */}
         <EditProfileDialog 
           isOpen={isEditingProfile}
           onOpenChange={setIsEditingProfile}
@@ -122,7 +131,6 @@ const ProfileScreen: React.FC = () => {
           onSave={handleSaveProfile}
         />
         
-        {/* Change Password Dialog */}
         <ChangePasswordDialog 
           isOpen={isChangingPassword}
           onOpenChange={setIsChangingPassword}

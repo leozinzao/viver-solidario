@@ -23,22 +23,23 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
   onLogout
 }) => {
   return (
-    <div className="space-y-4 px-2">
+    <div className="space-y-3">
       <ProfileOption
-        icon={<History className="w-5 h-5 text-viver-yellow" />}
+        icon={<History className="w-5 h-5" />}
         title="Histórico de Ações"
         description="Visualize suas atividades recentes"
       />
       
       <ProfileOption
-        icon={<Edit className="w-5 h-5 text-viver-yellow" />}
+        icon={<Edit className="w-5 h-5" />}
         title="Editar Dados"
         description="Atualize suas informações pessoais"
         onClick={onEditProfile}
+        highlight
       />
       
       <ProfileOption
-        icon={<Lock className="w-5 h-5 text-viver-yellow" />}
+        icon={<Lock className="w-5 h-5" />}
         title="Alterar Senha"
         description="Atualize sua senha de acesso"
         onClick={onChangePassword}
@@ -46,7 +47,7 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
       
       {hasPermission(UserRole.internal) && (
         <ProfileOption
-          icon={<Shield className="w-5 h-5 text-viver-yellow" />}
+          icon={<Shield className="w-5 h-5" />}
           title="Painel Administrativo"
           description="Acesso às funções administrativas"
           highlight
@@ -55,7 +56,7 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
       
       {hasPermission([UserRole.internal, UserRole.volunteer]) && (
         <ProfileOption
-          icon={<Lock className="w-5 h-5 text-viver-yellow" />}
+          icon={<Lock className="w-5 h-5" />}
           title="Área Restrita"
           description="Acesso a documentos e informações restritas"
           highlight
@@ -64,14 +65,14 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
       
       {hasPermission(UserRole.internal) && (
         <ProfileOption
-          icon={<Settings className="w-5 h-5 text-viver-yellow" />}
+          icon={<Settings className="w-5 h-5" />}
           title="Configurações do Sistema"
           description="Ajustes e parametrizações internas"
         />
       )}
       
       <ProfileOption
-        icon={<Moon className="w-5 h-5 text-viver-yellow" />}
+        icon={<Moon className="w-5 h-5" />}
         title="Modo Escuro"
         description="Alternar tema de exibição"
         rightElement={
@@ -84,7 +85,7 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
       />
       
       <ProfileOption
-        icon={<LogOut className="w-5 h-5 text-red-500" />}
+        icon={<LogOut className="w-5 h-5" />}
         title="Sair"
         description="Encerrar sessão no aplicativo"
         onClick={onLogout}

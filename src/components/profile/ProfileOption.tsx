@@ -20,10 +20,10 @@ const ProfileOption: React.FC<ProfileOptionProps> = ({
   highlight,
   danger
 }) => {
-  const baseClasses = "bg-card border rounded-xl p-4 mb-3 transition-all duration-300 hover:shadow-md hover:border-border/80" + 
+  const baseClasses = "bg-card border rounded-xl p-4 transition-all duration-300 hover:shadow-md hover:border-border/80" + 
     (onClick ? " cursor-pointer hover:scale-[1.02]" : "") + 
     (highlight ? " border-l-4 border-l-viver-yellow bg-viver-yellow/5" : "") +
-    (danger ? " border-l-4 border-l-red-500 bg-red-50/50" : "");
+    (danger ? " border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-950/20" : "");
   
   return (
     <div 
@@ -32,8 +32,8 @@ const ProfileOption: React.FC<ProfileOptionProps> = ({
       role={onClick ? "button" : "presentation"}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`p-2.5 rounded-xl transition-colors ${
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl transition-colors ${
             danger 
               ? 'bg-red-500/10 text-red-500' 
               : highlight 
@@ -44,11 +44,11 @@ const ProfileOption: React.FC<ProfileOptionProps> = ({
           </div>
           <div className="text-left">
             <h3 className={`font-semibold text-base transition-colors ${
-              danger ? 'text-red-600' : 'text-foreground'
+              danger ? 'text-red-600 dark:text-red-400' : 'text-foreground'
             }`}>
               {title}
             </h3>
-            <p className={`text-sm mt-0.5 transition-colors ${
+            <p className={`text-sm mt-1 transition-colors ${
               danger ? 'text-red-500/70' : 'text-muted-foreground'
             }`}>
               {description}

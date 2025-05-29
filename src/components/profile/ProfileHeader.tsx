@@ -27,23 +27,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEditProfile }) =>
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 p-4 border border-border rounded-lg bg-card/50">
-      <div className="relative">
-        <div className="w-24 h-24 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-md">
-          <User className="w-12 h-12 text-viver-yellow" />
+    <div className="bg-card border rounded-xl p-8 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center gap-6">
+        <div className="relative">
+          <div className="w-20 h-20 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-md">
+            <User className="w-10 h-10 text-viver-yellow" />
+          </div>
+          <button 
+            className="absolute -bottom-1 -right-1 bg-viver-yellow rounded-full p-2 border-2 border-background shadow-sm hover:bg-viver-yellow/90 transition-colors"
+            onClick={onEditProfile}
+            aria-label="Editar perfil"
+          >
+            <Edit className="w-4 h-4 text-black" />
+          </button>
         </div>
-        <button 
-          className="absolute bottom-0 right-0 bg-viver-yellow rounded-full p-1.5 border-2 border-background shadow-sm hover:bg-viver-yellow/90 transition-colors"
-          onClick={onEditProfile}
-          aria-label="Editar perfil"
-        >
-          <Edit className="w-4 h-4 text-black" />
-        </button>
-      </div>
-      <div className="text-center sm:text-left sm:ml-4">
-        <h2 className="text-xl font-semibold">{user?.name || 'Nome do Usuário'}</h2>
-        <p className="text-sm text-muted-foreground">{user?.email || 'usuario@email.com'}</p>
-        <div className="mt-2">{getUserRoleBadge()}</div>
+        
+        <div className="text-center sm:text-left flex-1">
+          <h2 className="text-2xl font-bold mb-1">{user?.name || 'leonardo leo'}</h2>
+          <p className="text-muted-foreground mb-3">{user?.email || 'leoyuri024@gmail.com'}</p>
+          <div>{getUserRoleBadge()}</div>
+        </div>
       </div>
     </div>
   );
