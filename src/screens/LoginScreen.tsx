@@ -43,11 +43,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
     setIsLoading(true);
 
     try {
-      console.log('Tentando fazer login com email:', values.email);
+      console.log('Iniciando login com email:', values.email);
+      
+      // Usar o login do contexto de autenticação
       await login(values.email, values.senha);
       
       console.log('Login realizado com sucesso, redirecionando...');
-      onLoginSuccess();
+      
+      // Aguardar um pouco para garantir que o estado foi atualizado
+      setTimeout(() => {
+        onLoginSuccess();
+      }, 500);
+      
     } catch (error: any) {
       console.error('Erro no login:', error);
       toast({
@@ -69,7 +76,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -83,6 +90,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
       }
       
       console.log('Google OAuth iniciado com sucesso');
+      
+      // Para Google OAuth, o redirecionamento é automático
+      // Não precisamos chamar onLoginSuccess aqui
       
     } catch (error: any) {
       console.error('Erro no Google login:', error);

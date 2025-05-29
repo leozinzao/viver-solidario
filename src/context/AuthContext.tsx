@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
@@ -92,7 +91,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      setLoading(true);
       console.log('AuthContext: Tentando login:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -106,11 +104,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       console.log('AuthContext: Login bem-sucedido:', data.user?.email);
-      // O onAuthStateChange vai processar o resto
+      // O onAuthStateChange vai processar o resto automaticamente
       
     } catch (error: any) {
       console.error('AuthContext: Falha no login:', error);
-      setLoading(false);
       throw error;
     }
   };

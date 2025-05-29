@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { NavigationProvider, useNavigation } from "@/context/NavigationContext";
@@ -23,6 +23,14 @@ const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
   
   console.log('ViverSolidarioApp: Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
+  
+  // Efeito para redirecionar usuário autenticado automaticamente
+  useEffect(() => {
+    if (isAuthenticated && (currentScreen === 'welcome' || currentScreen === 'login' || currentScreen === 'signup')) {
+      console.log('ViverSolidarioApp: Usuário autenticado detectado, redirecionando para home');
+      navigateToScreen('home');
+    }
+  }, [isAuthenticated, currentScreen, navigateToScreen]);
   
   // Telas públicas que mostram navegação mesmo para usuários não autenticados
   const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
