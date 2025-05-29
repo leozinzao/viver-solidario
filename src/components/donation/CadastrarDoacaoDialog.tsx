@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -28,6 +27,27 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
     endereco_coleta: '',
     observacoes: '',
   });
+
+  // Debug das categorias
+  console.log('Categorias recebidas:', categorias);
+  
+  // Filtro mais robusto para categorias válidas
+  const categoriasValidas = categorias.filter(categoria => {
+    const isValid = categoria && 
+                   categoria.id && 
+                   typeof categoria.id === 'string' && 
+                   categoria.id.trim() !== '' &&
+                   categoria.nome &&
+                   categoria.nome.trim() !== '';
+    
+    if (!isValid) {
+      console.log('Categoria inválida filtrada:', categoria);
+    }
+    
+    return isValid;
+  });
+
+  console.log('Categorias válidas após filtro:', categoriasValidas);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,13 +102,11 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {categorias
-                  .filter(categoria => categoria.id && categoria.id.trim() !== '')
-                  .map((categoria) => (
-                    <SelectItem key={categoria.id} value={categoria.id}>
-                      {categoria.nome}
-                    </SelectItem>
-                  ))}
+                {categoriasValidas.map((categoria) => (
+                  <SelectItem key={categoria.id} value={categoria.id}>
+                    {categoria.nome}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
