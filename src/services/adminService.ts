@@ -15,26 +15,32 @@ export interface AdminActionLog {
 
 export const checkUserRole = async (userId: string): Promise<UserRole | null> => {
   try {
+    console.log('Verificando role do usuário:', userId);
+    
     const { data, error } = await supabase
       .from('voluntarios')
       .select('role')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // Use maybeSingle ao invés de single para evitar erro quando não encontra
 
     if (error) {
       console.error('Erro ao verificar role do usuário:', error);
       return null;
     }
 
-    return data?.role as UserRole || UserRole.donor;
+    const role = data?.role as UserRole;
+    console.log('Role encontrado:', role);
+    return role || UserRole.donor;
   } catch (error) {
     console.error('Erro ao verificar role:', error);
-    return null;
+    return UserRole.donor; // Fallback para donor
   }
 };
 
 export const isAdmin = async (userId: string): Promise<boolean> => {
   try {
+    console.log('Verificando se é admin:', userId);
+    
     const { data, error } = await supabase
       .rpc('is_admin', { user_id: userId });
 
@@ -43,6 +49,7 @@ export const isAdmin = async (userId: string): Promise<boolean> => {
       return false;
     }
 
+    console.log('Resultado is_admin:', data);
     return data || false;
   } catch (error) {
     console.error('Erro na verificação de admin:', error);
@@ -52,6 +59,8 @@ export const isAdmin = async (userId: string): Promise<boolean> => {
 
 export const hasAdminAccess = async (userId: string): Promise<boolean> => {
   try {
+    console.log('Verificando acesso admin:', userId);
+    
     const { data, error } = await supabase
       .rpc('has_admin_access', { user_id: userId });
 
@@ -60,6 +69,7 @@ export const hasAdminAccess = async (userId: string): Promise<boolean> => {
       return false;
     }
 
+    console.log('Resultado has_admin_access:', data);
     return data || false;
   } catch (error) {
     console.error('Erro na verificação de acesso admin:', error);
@@ -76,6 +86,8 @@ export const logAdminAction = async (
   metadata?: any
 ): Promise<void> => {
   try {
+    console.log('Registrando ação admin:', { adminId, actionType, targetType, description });
+    
     const { error } = await supabase
       .from('admin_actions')
       .insert({
@@ -89,6 +101,8 @@ export const logAdminAction = async (
 
     if (error) {
       console.error('Erro ao registrar ação admin:', error);
+    } else {
+      console.log('Ação admin registrada com sucesso');
     }
   } catch (error) {
     console.error('Erro ao registrar log de ação:', error);
@@ -97,6 +111,8 @@ export const logAdminAction = async (
 
 export const getAdminLogs = async (limit = 50): Promise<AdminActionLog[]> => {
   try {
+    console.log('Buscando logs admin...');
+    
     const { data, error } = await supabase
       .from('admin_actions')
       .select(`
@@ -114,6 +130,7 @@ export const getAdminLogs = async (limit = 50): Promise<AdminActionLog[]> => {
       return [];
     }
 
+    console.log('Logs admin encontrados:', data?.length);
     return data || [];
   } catch (error) {
     console.error('Erro ao buscar logs:', error);

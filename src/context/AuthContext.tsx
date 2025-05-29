@@ -43,6 +43,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return await hasAdminAccess(user.id);
   };
 
+  // Função para criar/atualizar perfil do usuário
+  const ensureUserProfile = async (authUser: User) => {
+    try {
+      console.log('Verificando perfil do usuário:', authUser.email);
+      
+      // Primeiro, verificar se o usuário já existe na tabela voluntarios
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('voluntarios')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Erro ao buscar perfil:', fetchError);
+        throw fetchError;
+      }
+
+      let userProfile;
+
+      if (!existingProfile) {
+        // Usuário não existe, criar perfil
+        console.log('Criando novo perfil para:', authUser.email);
+        
+        const newProfile = {
+          id: authUser.id,
+          nome: authUser.user_metadata?.full_name || 
+                authUser.user_metadata?.nome || 
+                authUser.email?.split('@')[0] || 'Usuário',
+          email: authUser.email || '',
+          role: determineRole(authUser.email || ''),
+          theme: 'light' as Theme
+        };
+
+        const { data: createdProfile, error: createError } = await supabase
+          .from('voluntarios')
+          .insert(newProfile)
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Erro ao criar perfil:', createError);
+          throw createError;
+        }
+
+        userProfile = createdProfile;
+        console.log('Perfil criado com sucesso:', userProfile);
+      } else {
+        userProfile = existingProfile;
+        console.log('Perfil existente encontrado:', userProfile);
+      }
+
+      return {
+        id: authUser.id,
+        name: userProfile.nome || authUser.email?.split('@')[0] || 'Usuário',
+        email: authUser.email || '',
+        role: (userProfile.role as UserRole) || UserRole.donor,
+        theme: (userProfile.theme as Theme) || 'light'
+      };
+
+    } catch (error) {
+      console.error('Erro ao garantir perfil do usuário:', error);
+      
+      // Fallback: criar perfil básico mesmo com erro
+      return {
+        id: authUser.id,
+        name: authUser.user_metadata?.full_name || 
+              authUser.user_metadata?.nome || 
+              authUser.email?.split('@')[0] || 'Usuário',
+        email: authUser.email || '',
+        role: determineRole(authUser.email || ''),
+        theme: 'light' as Theme
+      };
+    }
+  };
+
   useEffect(() => {
     console.log('AuthContext: Inicializando...');
     
@@ -51,45 +126,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       async (event, session) => {
         console.log('AuthContext: Auth state change:', event, session?.user?.email);
         
-        if (session?.user) {
-          // Buscar role real do banco de dados
-          const role = await checkUserRole(session.user.id) || determineRole(session.user.email || '');
-          
-          // Criar perfil do usuário com role do banco
-          const userProfile: UserInfo = {
-            id: session.user.id,
-            name: session.user.user_metadata?.full_name || 
-                  session.user.user_metadata?.nome || 
-                  session.user.email || 'Usuário',
-            email: session.user.email || '',
-            role: role,
-            theme: 'light'
-          };
-          
-          setUser(userProfile);
-          setIsAuthenticated(true);
-          console.log('AuthContext: Usuário autenticado com role:', userProfile);
-          
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Login realizado com sucesso",
-              description: `Bem-vindo, ${userProfile.name}!`
-            });
+        try {
+          if (session?.user) {
+            // Garantir que o usuário tem perfil e buscar role real
+            const userProfile = await ensureUserProfile(session.user);
+            
+            setUser(userProfile);
+            setIsAuthenticated(true);
+            console.log('AuthContext: Usuário autenticado com role:', userProfile);
+            
+            if (event === 'SIGNED_IN') {
+              toast({
+                title: "Login realizado com sucesso",
+                description: `Bem-vindo, ${userProfile.name}!`
+              });
+            }
+          } else {
+            setUser(null);
+            setIsAuthenticated(false);
+            console.log('AuthContext: Usuário desconectado');
+            
+            if (event === 'SIGNED_OUT') {
+              toast({
+                title: "Logout realizado",
+                description: "Você foi desconectado com sucesso."
+              });
+            }
           }
-        } else {
+        } catch (error) {
+          console.error('AuthContext: Erro no processamento de auth:', error);
+          // Em caso de erro, ainda definir loading como false
           setUser(null);
           setIsAuthenticated(false);
-          console.log('AuthContext: Usuário desconectado');
-          
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Logout realizado",
-              description: "Você foi desconectado com sucesso."
-            });
-          }
+        } finally {
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -212,7 +283,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viver-yellow mx-auto mb-2"></div>
-          <p className="text-gray-600">Inicializando aplicação...</p>
+          <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
     );
