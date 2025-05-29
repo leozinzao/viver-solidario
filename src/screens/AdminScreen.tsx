@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { UserRole, Permission, hasPermission } from '@/lib/permissions';
 import TestimonialManager from '@/components/admin/TestimonialManager';
 import DoacoesFisicasAdmin from '@/components/admin/DoacoesFisicasAdmin';
+import UserManagement from '@/components/admin/UserManagement';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
   ShieldAlert, 
@@ -182,18 +183,8 @@ const AdminScreen: React.FC = () => {
         </TabsContent>
         
         {hasPermission(user.role, Permission.MANAGE_USERS) && (
-          <TabsContent value="users" className="p-0 border rounded-lg bg-card shadow-sm">
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Gerenciamento de Usuários</h2>
-                <Button>Adicionar Usuário</Button>
-              </div>
-              <div className="text-center p-8 text-muted-foreground border border-dashed rounded-md">
-                Área para gerenciamento de usuários e permissões.
-                <br />
-                <span className="text-sm">Conteúdo a ser adicionado.</span>
-              </div>
-            </div>
+          <TabsContent value="users" className="p-0">
+            <UserManagement />
           </TabsContent>
         )}
         

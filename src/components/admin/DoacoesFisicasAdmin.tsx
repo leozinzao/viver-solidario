@@ -26,12 +26,24 @@ import {
   Calendar,
   Package,
   Download,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from 'lucide-react';
 import { useDoacoesFisicasAdmin } from '@/hooks/useDoacoesFisicasAdmin';
 import DetalheDoacaoDialog from './DetalheDoacaoDialog';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DoacoesFisicasAdmin: React.FC = () => {
   const { 
@@ -39,7 +51,9 @@ const DoacoesFisicasAdmin: React.FC = () => {
     categorias, 
     loading, 
     updateStatus, 
+    deleteDonation,
     isUpdating,
+    isDeleting,
     stats 
   } = useDoacoesFisicasAdmin();
   
@@ -81,6 +95,14 @@ const DoacoesFisicasAdmin: React.FC = () => {
       await updateStatus(doacaoId, newStatus, observacoes);
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
+    }
+  };
+
+  const handleDeleteDonation = async (doacaoId: string) => {
+    try {
+      await deleteDonation(doacaoId);
+    } catch (error) {
+      console.error('Erro ao deletar doação:', error);
     }
   };
 
@@ -295,7 +317,7 @@ const DoacoesFisicasAdmin: React.FC = () => {
                       </TableCell>
                       
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <Button
                             size="sm"
                             variant="outline"
@@ -325,6 +347,36 @@ const DoacoesFisicasAdmin: React.FC = () => {
                               Recebida
                             </Button>
                           )}
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={isDeleting}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir permanentemente a doação "{doacao.titulo}"? 
+                                  Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteDonation(doacao.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>

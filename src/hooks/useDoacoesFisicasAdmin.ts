@@ -148,13 +148,61 @@ export function useDoacoesFisicasAdmin() {
     },
   });
 
+  // Deletar doação
+  const deleteDonation = useMutation({
+    mutationFn: async (doacaoId: string) => {
+      console.log('Deletando doação:', doacaoId);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const { error } = await supabase
+        .from('doacoes_fisicas_novas')
+        .delete()
+        .eq('id', doacaoId);
+
+      if (error) {
+        console.error('Erro ao deletar doação:', error);
+        throw error;
+      }
+
+      // Registrar ação administrativa
+      await logAdminAction(
+        user.id,
+        'delete_donation',
+        'doacao_fisica',
+        `Doação deletada permanentemente`,
+        doacaoId
+      );
+      
+      return doacaoId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas-admin'] });
+      toast({
+        title: "Doação deletada",
+        description: "A doação foi removida permanentemente do sistema.",
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Erro na mutação de delete:', error);
+      toast({
+        title: "Erro",
+        description: `Não foi possível deletar a doação: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     doacoes,
     categorias,
     loading: loading || isLoadingDoacoes,
     updateStatus: (doacaoId: string, newStatus: string, observacoes?: string) =>
       updateStatus.mutate({ doacaoId, newStatus, observacoes }),
+    deleteDonation: (doacaoId: string) => deleteDonation.mutate(doacaoId),
     isUpdating: updateStatus.isPending,
+    isDeleting: deleteDonation.isPending,
     stats,
   };
 }

@@ -32,10 +32,10 @@ export const useAuthState = () => {
 
       if (fetchError && fetchError.code !== 'PGRST116') {
         console.error('Erro ao buscar perfil:', fetchError);
-        throw fetchError;
+        // Continue com fallback em caso de erro
       }
 
-      let userProfile;
+      let userProfile = existingProfile;
 
       if (!existingProfile) {
         console.log('Criando novo perfil para:', authUser.email);
@@ -58,27 +58,26 @@ export const useAuthState = () => {
 
         if (createError) {
           console.error('Erro ao criar perfil:', createError);
-          throw createError;
+          // Use fallback se não conseguir criar
+          userProfile = newProfile;
+        } else {
+          userProfile = createdProfile;
+          console.log('Perfil criado com sucesso:', userProfile);
         }
-
-        userProfile = createdProfile;
-        console.log('Perfil criado com sucesso:', userProfile);
-      } else {
-        userProfile = existingProfile;
-        console.log('Perfil existente encontrado:', userProfile);
       }
 
       return {
         id: authUser.id,
-        name: userProfile.nome || authUser.email?.split('@')[0] || 'Usuário',
+        name: userProfile?.nome || authUser.email?.split('@')[0] || 'Usuário',
         email: authUser.email || '',
-        role: (userProfile.role as UserRole) || UserRole.donor,
-        theme: (userProfile.theme as Theme) || 'light'
+        role: (userProfile?.role as UserRole) || UserRole.donor,
+        theme: (userProfile?.theme as Theme) || 'light'
       };
 
     } catch (error) {
       console.error('Erro ao garantir perfil do usuário:', error);
       
+      // Fallback seguro
       return {
         id: authUser.id,
         name: authUser.user_metadata?.full_name || 
@@ -97,9 +96,11 @@ export const useAuthState = () => {
     let mounted = true;
 
     const handleAuthStateChange = async (event: string, session: Session | null) => {
+      if (!mounted) return;
+      
       console.log('AuthState: Auth state change:', event, session?.user?.email);
       
-      if (!mounted) return;
+      setLoading(true);
       
       try {
         if (session?.user) {
@@ -130,8 +131,7 @@ export const useAuthState = () => {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
+    // Verificar sessão inicial primeiro
     const checkInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -149,6 +149,9 @@ export const useAuthState = () => {
     };
 
     checkInitialSession();
+
+    // Configurar listener para mudanças
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       mounted = false;
