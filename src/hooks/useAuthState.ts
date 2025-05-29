@@ -20,122 +20,120 @@ export const useAuthState = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const ensureUserProfile = async (authUser: User): Promise<UserInfo> => {
+  const createUserProfile = async (authUser: User): Promise<UserInfo> => {
+    console.log('Criando perfil simples para:', authUser.email);
+    
+    const userProfile: UserInfo = {
+      id: authUser.id,
+      name: authUser.user_metadata?.full_name || 
+            authUser.user_metadata?.nome || 
+            authUser.email?.split('@')[0] || 'Usuário',
+      email: authUser.email || '',
+      role: determineRole(authUser.email || ''),
+      theme: 'light' as Theme
+    };
+
+    // Tentar inserir no banco, mas não falhar se der erro
     try {
-      console.log('Verificando perfil do usuário:', authUser.email);
-      
-      const { data: existingProfile, error: fetchError } = await supabase
+      const { error } = await supabase
         .from('voluntarios')
-        .select('*')
-        .eq('id', authUser.id)
-        .maybeSingle();
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Erro ao buscar perfil:', fetchError);
-        // Continue com fallback em caso de erro
-      }
-
-      let userProfile = existingProfile;
-
-      if (!existingProfile) {
-        console.log('Criando novo perfil para:', authUser.email);
-        
-        const newProfile = {
+        .upsert({
           id: authUser.id,
-          nome: authUser.user_metadata?.full_name || 
-                authUser.user_metadata?.nome || 
-                authUser.email?.split('@')[0] || 'Usuário',
-          email: authUser.email || '',
-          role: determineRole(authUser.email || ''),
-          theme: 'light' as Theme
-        };
+          nome: userProfile.name,
+          email: userProfile.email,
+          role: userProfile.role,
+          theme: userProfile.theme
+        }, { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        });
 
-        const { data: createdProfile, error: createError } = await supabase
-          .from('voluntarios')
-          .insert(newProfile)
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Erro ao criar perfil:', createError);
-          // Use fallback se não conseguir criar
-          userProfile = newProfile;
-        } else {
-          userProfile = createdProfile;
-          console.log('Perfil criado com sucesso:', userProfile);
-        }
+      if (error) {
+        console.warn('Aviso ao salvar perfil (não crítico):', error.message);
+      } else {
+        console.log('Perfil salvo com sucesso');
       }
-
-      return {
-        id: authUser.id,
-        name: userProfile?.nome || authUser.email?.split('@')[0] || 'Usuário',
-        email: authUser.email || '',
-        role: (userProfile?.role as UserRole) || UserRole.donor,
-        theme: (userProfile?.theme as Theme) || 'light'
-      };
-
     } catch (error) {
-      console.error('Erro ao garantir perfil do usuário:', error);
-      
-      // Fallback seguro
-      return {
-        id: authUser.id,
-        name: authUser.user_metadata?.full_name || 
-              authUser.user_metadata?.nome || 
-              authUser.email?.split('@')[0] || 'Usuário',
-        email: authUser.email || '',
-        role: determineRole(authUser.email || ''),
-        theme: 'light' as Theme
-      };
+      console.warn('Erro ao salvar perfil (continuando mesmo assim):', error);
     }
+
+    return userProfile;
   };
 
   useEffect(() => {
-    console.log('AuthState: Inicializando...');
+    console.log('AuthState: Inicializando sistema simplificado...');
     
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
+    // Timeout de segurança para evitar loading infinito
+    const safetyTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('AuthState: Timeout de segurança - forçando fim do loading');
+        setLoading(false);
+      }
+    }, 10000); // 10 segundos máximo
 
     const handleAuthStateChange = async (event: string, session: Session | null) => {
       if (!mounted) return;
       
-      console.log('AuthState: Auth state change:', event, session?.user?.email);
-      
-      setLoading(true);
+      console.log('AuthState: Mudança de estado:', event, session?.user?.email || 'sem usuário');
       
       try {
         if (session?.user) {
-          const userProfile = await ensureUserProfile(session.user);
+          console.log('AuthState: Processando usuário autenticado...');
+          
+          const userProfile = await createUserProfile(session.user);
           
           if (mounted) {
             setUser(userProfile);
             setIsAuthenticated(true);
-            console.log('AuthState: Usuário autenticado:', userProfile);
+            console.log('AuthState: Usuário configurado:', userProfile.email);
           }
         } else {
+          console.log('AuthState: Usuário desconectado');
           if (mounted) {
             setUser(null);
             setIsAuthenticated(false);
-            console.log('AuthState: Usuário desconectado');
           }
         }
       } catch (error) {
-        console.error('AuthState: Erro no processamento:', error);
-        if (mounted) {
-          setUser(null);
-          setIsAuthenticated(false);
+        console.error('AuthState: Erro no processamento (continuando):', error);
+        
+        // Em caso de erro, ainda assim configurar usuário básico se existir
+        if (session?.user && mounted) {
+          const fallbackUser: UserInfo = {
+            id: session.user.id,
+            name: session.user.email?.split('@')[0] || 'Usuário',
+            email: session.user.email || '',
+            role: UserRole.donor,
+            theme: 'light'
+          };
+          setUser(fallbackUser);
+          setIsAuthenticated(true);
+          console.log('AuthState: Usuário configurado via fallback');
         }
       } finally {
         if (mounted) {
           setLoading(false);
+          clearTimeout(safetyTimeout);
         }
       }
     };
 
-    // Verificar sessão inicial primeiro
+    // Verificar sessão inicial
     const checkInitialSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('AuthState: Sessão inicial:', session?.user?.email);
+        console.log('AuthState: Verificando sessão inicial...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('AuthState: Erro ao verificar sessão:', error);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('AuthState: Sessão inicial encontrada:', !!session);
         
         if (session) {
           await handleAuthStateChange('INITIAL_SESSION', session);
@@ -143,21 +141,28 @@ export const useAuthState = () => {
           setLoading(false);
         }
       } catch (error) {
-        console.error('AuthState: Erro ao verificar sessão inicial:', error);
+        console.error('AuthState: Erro crítico na verificação inicial:', error);
         setLoading(false);
       }
     };
 
-    checkInitialSession();
-
-    // Configurar listener para mudanças
+    // Configurar listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+
+    // Verificar sessão inicial
+    checkInitialSession();
 
     return () => {
       mounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
+      console.log('AuthState: Cleanup realizado');
     };
   }, []);
+
+  const ensureUserProfile = async (authUser: User): Promise<UserInfo> => {
+    return createUserProfile(authUser);
+  };
 
   return {
     user,

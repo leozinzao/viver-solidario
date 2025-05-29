@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 import { UserInfo } from '@/types/auth';
 import { Theme } from '@/context/ThemeContext';
-import { checkUserRole, hasAdminAccess } from '@/services/adminService';
 
 export const useAuthActions = (
   user: UserInfo | null,
@@ -13,10 +12,17 @@ export const useAuthActions = (
     if (!user) return;
     
     try {
-      const role = await checkUserRole(user.id);
-      if (role && role !== user.role) {
-        setUser({ ...user, role });
-        console.log('Role do usuário atualizado:', role);
+      console.log('Atualizando role do usuário:', user.email);
+      
+      const { data, error } = await supabase
+        .from('voluntarios')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!error && data?.role && data.role !== user.role) {
+        setUser({ ...user, role: data.role });
+        console.log('Role atualizado para:', data.role);
       }
     } catch (error) {
       console.error('Erro ao atualizar role:', error);
@@ -25,7 +31,21 @@ export const useAuthActions = (
 
   const checkAdminAccess = async (): Promise<boolean> => {
     if (!user) return false;
-    return await hasAdminAccess(user.id);
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('has_admin_access', { user_id: user.id });
+
+      if (error) {
+        console.error('Erro ao verificar acesso admin:', error);
+        return false;
+      }
+
+      return data || false;
+    } catch (error) {
+      console.error('Erro na verificação de acesso admin:', error);
+      return false;
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -76,6 +96,20 @@ export const useAuthActions = (
         email: data.email || user.email,
         theme: data.theme || user.theme
       };
+      
+      // Tentar atualizar no banco
+      try {
+        await supabase
+          .from('voluntarios')
+          .update({
+            nome: updatedUser.name,
+            email: updatedUser.email,
+            theme: updatedUser.theme
+          })
+          .eq('id', user.id);
+      } catch (dbError) {
+        console.warn('Erro ao atualizar perfil no banco (continuando):', dbError);
+      }
       
       setUser(updatedUser);
       
