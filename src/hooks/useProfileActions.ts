@@ -1,36 +1,42 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useNavigation } from '@/context/NavigationContext';
 import { toast } from '@/components/ui/use-toast';
 
 export const useProfileActions = () => {
   const { user, updateUserProfile, updatePassword } = useAuth();
-  
+  const { logout } = useAuth();
+  const { navigateToScreen } = useNavigation();
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editName, setEditName] = useState(user?.name || '');
-  const [editEmail, setEditEmail] = useState(user?.email || '');
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
   
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const openEditProfile = () => {
+    if (user) {
+      setEditName(user.name);
+      setEditEmail(user.email);
+      setIsEditingProfile(true);
+    }
+  };
+
   const handleSaveProfile = async () => {
     try {
       await updateUserProfile({
         name: editName,
-        email: editEmail,
+        email: editEmail
       });
-      
       setIsEditingProfile(false);
+    } catch (error: any) {
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso!"
-      });
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o perfil",
+        title: "Erro ao atualizar perfil",
+        description: error.message,
         variant: "destructive"
       });
     }
@@ -40,35 +46,42 @@ export const useProfileActions = () => {
     if (newPassword !== confirmPassword) {
       toast({
         title: "Erro",
-        description: "As senhas não conferem",
+        description: "As senhas não coincidem",
         variant: "destructive"
       });
       return;
     }
-    
+
     try {
       await updatePassword(currentPassword, newPassword);
       setIsChangingPassword(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+    } catch (error: any) {
       toast({
-        title: "Senha atualizada",
-        description: "Sua senha foi alterada com sucesso!"
-      });
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar a senha",
+        title: "Erro ao alterar senha",
+        description: error.message,
         variant: "destructive"
       });
     }
   };
 
-  const openEditProfile = () => {
-    setEditName(user?.name || '');
-    setEditEmail(user?.email || '');
-    setIsEditingProfile(true);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigateToScreen('welcome'); // Redireciona para tela inicial
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso."
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao fazer logout",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   return {
@@ -88,6 +101,7 @@ export const useProfileActions = () => {
     setConfirmPassword,
     handleSaveProfile,
     handleChangePassword,
+    handleLogout,
     openEditProfile
   };
 };

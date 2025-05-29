@@ -1,10 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart } from '@/components/icons';
+import BrechoDialog from './BrechoDialog';
+import AlimentosDialog from './AlimentosDialog';
 
 const PhysicalDonations: React.FC = () => {
+  const [isBrechoOpen, setIsBrechoOpen] = useState(false);
+  const [isAlimentosOpen, setIsAlimentosOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       {/* Brechó do Bem */}
@@ -47,7 +52,17 @@ const PhysicalDonations: React.FC = () => {
             </li>
           </ul>
 
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+          <Button 
+            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+            onClick={() => setIsBrechoOpen(true)}
+          >
+            Doar Roupas/Itens
+          </Button>
+          
+          <Button 
+            className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black"
+            onClick={() => window.open("https://www.instagram.com/ongviver", "_blank")}
+          >
             Seguir no Instagram
           </Button>
         </CardContent>
@@ -66,7 +81,7 @@ const PhysicalDonations: React.FC = () => {
             Doe lacres de alumínio e tampinhas plásticas ou promova a coleta na
             sua empresa ou condomínio.
           </p>
-          <p className="text-sm">
+          <p className="text-sm mb-4">
             Você pode trazer sua doação na 
             <a
               href="https://www.google.com/maps?q=Rua+Bernardo+Sayão,+319"
@@ -78,7 +93,13 @@ const PhysicalDonations: React.FC = () => {
             </a>
             , seg-sex 8h30 – 17h.
           </p>
-          <Button className="w-full mt-3 bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+          <Button 
+            className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black mb-2"
+            onClick={() => window.open("mailto:projetos@ongviver.org.br", "_blank")}
+          >
+            Entrar em Contato
+          </Button>
+          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
             Solicitar Material de Apoio
           </Button>
         </CardContent>
@@ -93,12 +114,28 @@ const PhysicalDonations: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm">
+          <p className="text-sm mb-4">
             Doe alimentos não perecíveis e leite integral. Sua doação garante
             alimento mensal às famílias assistidas.
           </p>
+          <Button 
+            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+            onClick={() => setIsAlimentosOpen(true)}
+          >
+            Doar Alimentos
+          </Button>
         </CardContent>
       </Card>
+
+      <BrechoDialog 
+        isOpen={isBrechoOpen}
+        onOpenChange={setIsBrechoOpen}
+      />
+      
+      <AlimentosDialog 
+        isOpen={isAlimentosOpen}
+        onOpenChange={setIsAlimentosOpen}
+      />
     </div>
   );
 };

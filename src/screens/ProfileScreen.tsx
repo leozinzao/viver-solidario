@@ -10,7 +10,7 @@ import { useProfileActions } from '@/hooks/useProfileActions';
 
 const ProfileScreen: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { user, logout, hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
   const {
     isEditingProfile,
     setIsEditingProfile,
@@ -28,6 +28,7 @@ const ProfileScreen: React.FC = () => {
     setConfirmPassword,
     handleSaveProfile,
     handleChangePassword,
+    handleLogout,
     openEditProfile
   } = useProfileActions();
 
@@ -48,7 +49,7 @@ const ProfileScreen: React.FC = () => {
         hasPermission={hasPermission}
         onEditProfile={openEditProfile}
         onChangePassword={() => setIsChangingPassword(true)}
-        onLogout={logout}
+        onLogout={handleLogout}
       />
       
       <div className="mt-10 text-center">

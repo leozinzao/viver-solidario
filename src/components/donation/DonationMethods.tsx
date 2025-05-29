@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MonetizationOn } from '@/components/icons';
 import { toast } from '@/components/ui/use-toast';
+import ContaLuzDialog from './ContaLuzDialog';
 
 const DonationMethods: React.FC = () => {
+  const [isContaLuzOpen, setIsContaLuzOpen] = useState(false);
+
   const copyPixKey = () => {
     navigator.clipboard.writeText("04.565.017/0001-47");
     toast({
@@ -70,14 +73,21 @@ const DonationMethods: React.FC = () => {
         </CardHeader>
         <CardContent>
           <p className="text-sm mb-4">
-            Contribua com valores a partir de R$ 15,00 mensais. Deixe seus dados
-            e entraremos em contato.
+            As doações através da Conta de Luz (COPEL) e do Carnê Solidário são formas recorrentes de apoio à instituição com valores a partir de R$ 15,00 mensais.
           </p>
-          <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+          <Button 
+            className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+            onClick={() => setIsContaLuzOpen(true)}
+          >
             Preencher Formulário
           </Button>
         </CardContent>
       </Card>
+
+      <ContaLuzDialog 
+        isOpen={isContaLuzOpen}
+        onOpenChange={setIsContaLuzOpen}
+      />
     </div>
   );
 };

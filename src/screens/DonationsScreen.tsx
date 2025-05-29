@@ -71,15 +71,27 @@ const DonationsScreen: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm">
-                  Ajude doando cupons sem CPF ou solicitando uma urna para seu
+                <p className="text-sm mb-3">
+                  Doe cupons sem CPF ou solicite uma urna para seu
                   estabelecimento.
                 </p>
-                <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+                <Button 
+                  className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black mb-2"
+                  onClick={() => window.open("https://www.google.com.br/maps/@-23.2797152,-51.1792528,12.33z/data=!4m3!11m2!2squmqe4feRBWt7z2xcJOqwA!3e3", "_blank")}
+                >
                   Locais com Urnas
                 </Button>
-                <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+                <Button 
+                  className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black mb-2"
+                  onClick={() => window.open("mailto:notadobem@ongviver.org.br", "_blank")}
+                >
                   Solicitar Urna
+                </Button>
+                <Button 
+                  className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+                  onClick={() => window.open("https://www.youtube.com/watch?v=SyJo8wq0DfQ&t=1s", "_blank")}
+                >
+                  Tutorial Nota Paraná
                 </Button>
               </CardContent>
             </Card>
@@ -116,10 +128,16 @@ const DonationsScreen: React.FC = () => {
                   Participe de ações como Pizzada, Feijoada, McDia Feliz ou torne-se
                   patrocinador.
                 </p>
-                <Button className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
+                <Button 
+                  className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
+                  onClick={() => window.open("https://www.instagram.com/ongviver", "_blank")}
+                >
                   Instagram
                 </Button>
-                <Button className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black">
+                <Button 
+                  className="w-full bg-viver-yellow-medium hover:bg-viver-yellow-medium/90 text-black"
+                  onClick={() => window.open("https://www.facebook.com/ongviver", "_blank")}
+                >
                   Facebook
                 </Button>
               </CardContent>
