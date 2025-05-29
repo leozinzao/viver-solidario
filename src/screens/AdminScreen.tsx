@@ -5,18 +5,20 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole, Permission, hasPermission } from '@/lib/permissions';
 import TestimonialManager from '@/components/admin/TestimonialManager';
+import DoacoesFisicasAdmin from '@/components/admin/DoacoesFisicasAdmin';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
   ShieldAlert, 
   Users, 
   Settings, 
   CalendarDays, 
-  MessageSquare 
+  MessageSquare,
+  Package
 } from 'lucide-react';
 
 const AdminScreen: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('testimonials');
+  const [activeTab, setActiveTab] = useState('doacoes');
   
   if (!user || !hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
     return (
@@ -35,12 +37,19 @@ const AdminScreen: React.FC = () => {
   return (
     <div className="flutter-screen p-4">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Painel Administrativo</h1>
+        <h1 className="text-2xl font-bold">Painel Administrativo - ONG Viver</h1>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="border-b">
           <TabsList className="w-full justify-start overflow-x-auto bg-transparent p-0">
+            <TabsTrigger 
+              value="doacoes" 
+              className="data-[state=active]:border-b-2 data-[state=active]:border-viver-yellow rounded-none px-4 py-2"
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Doações Físicas
+            </TabsTrigger>
             <TabsTrigger 
               value="testimonials" 
               className="data-[state=active]:border-b-2 data-[state=active]:border-viver-yellow rounded-none px-4 py-2"
@@ -71,6 +80,10 @@ const AdminScreen: React.FC = () => {
             </TabsTrigger>
           </TabsList>
         </div>
+        
+        <TabsContent value="doacoes" className="p-0">
+          <DoacoesFisicasAdmin />
+        </TabsContent>
         
         <TabsContent value="testimonials" className="p-0 border rounded-lg bg-card shadow-sm">
           <div className="p-4">

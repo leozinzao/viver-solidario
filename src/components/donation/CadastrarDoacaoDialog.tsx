@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Heart } from 'lucide-react';
 import { useDoacoesFisicas } from '@/hooks/useDoacoesFisicas';
 
 interface CadastrarDoacaoDialogProps {
@@ -26,6 +28,8 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
     localizacao: '',
     endereco_coleta: '',
     observacoes: '',
+    telefone: '',
+    email: '',
   });
 
   // Debug das categorias
@@ -68,6 +72,8 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
       localizacao: '',
       endereco_coleta: '',
       observacoes: '',
+      telefone: '',
+      email: '',
     });
     
     onOpenChange(false);
@@ -75,19 +81,22 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova Doação</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-viver-yellow" />
+            Doar para a ONG Viver
+          </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="titulo">Título da Doação</Label>
+            <Label htmlFor="titulo">O que você quer doar?</Label>
             <Input
               id="titulo"
               value={formData.titulo}
               onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
-              placeholder="Ex: Arroz 5kg"
+              placeholder="Ex: Arroz 5kg, Roupas infantis..."
               required
             />
           </div>
@@ -155,23 +164,45 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="telefone">Seu Telefone</Label>
+              <Input
+                id="telefone"
+                value={formData.telefone}
+                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
+                placeholder="(11) 99999-9999"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Seu Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="seu@email.com"
+              />
+            </div>
+          </div>
+
           <div>
-            <Label htmlFor="localizacao">Localização</Label>
+            <Label htmlFor="localizacao">Sua Cidade</Label>
             <Input
               id="localizacao"
               value={formData.localizacao}
               onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-              placeholder="Cidade ou região"
+              placeholder="Ex: Londrina, Centro"
             />
           </div>
 
           <div>
-            <Label htmlFor="endereco_coleta">Endereço para Coleta</Label>
+            <Label htmlFor="endereco_coleta">Endereço para Retirada</Label>
             <Input
               id="endereco_coleta"
               value={formData.endereco_coleta}
               onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })}
-              placeholder="Endereço onde retirar a doação"
+              placeholder="Endereço onde a ONG pode retirar a doação"
             />
           </div>
 
@@ -181,9 +212,16 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
               id="observacoes"
               value={formData.observacoes}
               onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="Informações adicionais, horários de retirada, etc."
+              placeholder="Horários disponíveis, informações adicionais..."
               rows={2}
             />
+          </div>
+
+          <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+            <p className="text-sm text-yellow-800">
+              💛 Sua doação será analisada pela equipe da ONG Viver. 
+              Você receberá atualizações sobre o status da sua doação.
+            </p>
           </div>
 
           <div className="flex gap-3">
@@ -200,7 +238,7 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
               disabled={isCreating}
               className="flex-1 bg-viver-yellow hover:bg-viver-yellow/90 text-black"
             >
-              {isCreating ? 'Cadastrando...' : 'Cadastrar'}
+              {isCreating ? 'Cadastrando...' : 'Doar para ONG Viver'}
             </Button>
           </div>
         </form>

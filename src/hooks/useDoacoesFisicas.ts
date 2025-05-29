@@ -7,7 +7,6 @@ import { useToast } from '@/components/ui/use-toast';
 export interface DoacaoFisica {
   id: string;
   doador_id?: string;
-  beneficiario_id?: string;
   categoria_id?: string;
   titulo: string;
   descricao?: string;
@@ -15,15 +14,16 @@ export interface DoacaoFisica {
   unidade: string;
   localizacao?: string;
   endereco_coleta?: string;
-  status: 'disponivel' | 'reservado' | 'em_transito' | 'entregue' | 'cancelado';
+  status: 'cadastrada' | 'aceita' | 'recebida' | 'cancelada';
   data_disponivel?: string;
-  data_reserva?: string;
+  data_aceita?: string;
   data_entrega?: string;
   fotos?: string[];
   observacoes?: string;
-  avaliacao_doador?: number;
-  avaliacao_beneficiario?: number;
-  comentario_avaliacao?: string;
+  observacoes_ong?: string;
+  telefone_doador?: string;
+  email_doador?: string;
+  responsavel_ong_id?: string;
   created_at: string;
   updated_at: string;
   categorias_doacoes?: {
@@ -47,11 +47,14 @@ export function useDoacoesFisicas() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Buscar todas as doações disponíveis
-  const { data: doacoes = [], isLoading: isLoadingDoacoes } = useQuery({
-    queryKey: ['doacoes-fisicas'],
+  // Buscar doações do usuário atual
+  const { data: minhasDoacoes = [], isLoading: isLoadingDoacoes } = useQuery({
+    queryKey: ['minhas-doacoes-fisicas'],
     queryFn: async () => {
-      console.log('Buscando doações físicas...');
+      console.log('Buscando minhas doações físicas...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
@@ -62,14 +65,14 @@ export function useDoacoesFisicas() {
             cor
           )
         `)
-        .eq('status', 'disponivel')
+        .eq('doador_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar doações:', error);
+        console.error('Erro ao buscar minhas doações:', error);
         throw error;
       }
-      console.log('Doações encontradas:', data);
+      console.log('Minhas doações encontradas:', data);
       return data as DoacaoFisica[];
     },
   });
@@ -95,7 +98,7 @@ export function useDoacoesFisicas() {
 
   // Criar nova doação
   const createDoacao = useMutation({
-    mutationFn: async (doacao: Partial<DoacaoFisica>) => {
+    mutationFn: async (doacao: Partial<DoacaoFisica> & { telefone?: string; email?: string }) => {
       console.log('Criando doação:', doacao);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -105,6 +108,9 @@ export function useDoacoesFisicas() {
         .insert([{
           ...doacao,
           doador_id: user.id,
+          status: 'cadastrada',
+          telefone_doador: doacao.telefone,
+          email_doador: doacao.email,
         }])
         .select()
         .single();
@@ -117,10 +123,10 @@ export function useDoacoesFisicas() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] });
+      queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] });
       toast({
         title: "Sucesso",
-        description: "Doação cadastrada com sucesso!",
+        description: "Doação cadastrada com sucesso! A ONG Viver analisará sua doação em breve.",
       });
     },
     onError: (error: Error) => {
@@ -133,97 +139,12 @@ export function useDoacoesFisicas() {
     },
   });
 
-  // Reservar doação
-  const reservarDoacao = useMutation({
-    mutationFn: async (doacaoId: string) => {
-      console.log('Reservando doação:', doacaoId);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
-
-      const { data, error } = await supabase
-        .from('doacoes_fisicas_novas')
-        .update({
-          beneficiario_id: user.id,
-          status: 'reservado',
-          data_reserva: new Date().toISOString(),
-        })
-        .eq('id', doacaoId)
-        .eq('status', 'disponivel')
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao reservar doação:', error);
-        throw error;
-      }
-      console.log('Doação reservada:', data);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] });
-      toast({
-        title: "Sucesso",
-        description: "Doação reservada com sucesso!",
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Erro na mutação de reserva:', error);
-      toast({
-        title: "Erro",
-        description: `Não foi possível reservar a doação: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Confirmar entrega
-  const confirmarEntrega = useMutation({
-    mutationFn: async (doacaoId: string) => {
-      console.log('Confirmando entrega:', doacaoId);
-      const { data, error } = await supabase
-        .from('doacoes_fisicas_novas')
-        .update({
-          status: 'entregue',
-          data_entrega: new Date().toISOString(),
-        })
-        .eq('id', doacaoId)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao confirmar entrega:', error);
-        throw error;
-      }
-      console.log('Entrega confirmada:', data);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] });
-      toast({
-        title: "Sucesso",
-        description: "Entrega confirmada com sucesso!",
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Erro na mutação de entrega:', error);
-      toast({
-        title: "Erro",
-        description: `Não foi possível confirmar a entrega: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
   return {
-    doacoes,
+    minhasDoacoes,
     categorias,
     loading: loading || isLoadingDoacoes || isLoadingCategorias,
     error,
     createDoacao: createDoacao.mutate,
-    reservarDoacao: reservarDoacao.mutate,
-    confirmarEntrega: confirmarEntrega.mutate,
     isCreating: createDoacao.isPending,
-    isReserving: reservarDoacao.isPending,
-    isConfirming: confirmarEntrega.isPending,
   };
 }
