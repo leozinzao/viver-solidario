@@ -1,4 +1,5 @@
-import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar, Handshake, GraduationCap, Settings as LucideSettings, Shield as LucideShield, Lock as LucideLock, Save as LucideSave, X as LucideX } from "lucide-react";
+
+import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar, Handshake, GraduationCap, Settings as LucideSettings, Shield as LucideShield, Lock as LucideLock, Save as LucideSave, X as LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database } from "lucide-react";
 
 // Custom icon for volunteer activism
 export const VolunteerActivism = (props: LucideProps) => (
@@ -165,8 +166,8 @@ export const Settings = (props: LucideProps) => (
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0
-    0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2
+    0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0
     1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2
     0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2
     2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2
@@ -253,4 +254,4 @@ export const X = (props: LucideProps) => (
   </svg>
 );
 
-export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap, LucideSave, LucideX };
+export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap, LucideSave, LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database };
