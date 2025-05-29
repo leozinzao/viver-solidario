@@ -13,6 +13,8 @@ import VolunteerScreen from "@/screens/VolunteerScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
 import AdminScreen from "@/screens/AdminScreen";
+import HistoricoAcoesScreen from "@/screens/HistoricoAcoesScreen";
+import ConfiguracoesScreen from "@/screens/ConfiguracoesScreen";
 
 type ScreenType =
   | "welcome"
@@ -25,7 +27,9 @@ type ScreenType =
   | "volunteer"
   | "events"
   | "impact"
-  | "admin";
+  | "admin"
+  | "historico-acoes"
+  | "configuracoes";
 
 interface ScreenRendererProps {
   currentScreen: ScreenType;
@@ -103,6 +107,18 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
       return <ProfileScreen />;
+
+    case "historico-acoes":
+      if (!isAuthenticated) {
+        return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
+      }
+      return <HistoricoAcoesScreen />;
+
+    case "configuracoes":
+      if (!isAuthenticated) {
+        return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
+      }
+      return <ConfiguracoesScreen />;
 
     case "impact":
       if (!isAuthenticated) {

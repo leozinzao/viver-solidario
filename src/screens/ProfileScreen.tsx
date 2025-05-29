@@ -34,7 +34,7 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-viver-yellow to-orange-500 bg-clip-text text-transparent mb-2">
@@ -70,43 +70,21 @@ const ProfileScreen: React.FC = () => {
           </div>
         </div>
         
-        {/* Seções de Configurações */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Conta & Segurança */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-1 h-8 bg-viver-yellow rounded-full"></div>
-              <h3 className="text-xl font-semibold text-foreground">Conta & Segurança</h3>
-            </div>
-            <div className="space-y-3">
-              <ProfileOptions 
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                hasPermission={hasPermission}
-                onEditProfile={openEditProfile}
-                onChangePassword={() => setIsChangingPassword(true)}
-                onLogout={handleLogout}
-              />
-            </div>
+        {/* Opções do Perfil - Uma coluna única */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-8 bg-viver-yellow rounded-full"></div>
+            <h3 className="text-xl font-semibold text-foreground">Configurações da Conta</h3>
           </div>
           
-          {/* Configurações */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
-              <h3 className="text-xl font-semibold text-foreground">Configurações</h3>
-            </div>
-            
-            {/* Área para configurações futuras */}
-            <div className="bg-card border rounded-xl p-8 text-center">
-              <div className="text-muted-foreground text-sm mb-2">
-                Configurações adicionais em breve...
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Notificações, preferências e mais
-              </div>
-            </div>
-          </div>
+          <ProfileOptions 
+            isDarkMode={isDarkMode}
+            toggleTheme={toggleTheme}
+            hasPermission={hasPermission}
+            onEditProfile={openEditProfile}
+            onChangePassword={() => setIsChangingPassword(true)}
+            onLogout={handleLogout}
+          />
         </div>
         
         {/* Footer */}

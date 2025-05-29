@@ -12,7 +12,9 @@ type ScreenType =
   | "volunteer"
   | "events"
   | "impact"
-  | "admin";
+  | "admin"
+  | "historico-acoes"
+  | "configuracoes";
 
 interface NavigationContextType {
   currentScreen: ScreenType;
