@@ -22,7 +22,7 @@ const AppContent: React.FC = () => {
   
   const { isAuthenticated } = useAuth();
   
-  console.log('ViverSolidarioApp - Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
+  console.log('ViverSolidarioApp: Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
   
   // Telas públicas que mostram navegação mesmo para usuários não autenticados
   const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
@@ -36,7 +36,7 @@ const AppContent: React.FC = () => {
     !authScreens.includes(currentScreen);
 
   return (
-    <div className="flutter-app border border-border">
+    <div className="flutter-app border border-border bg-white min-h-screen">
       {/* Conteúdo da tela */}
       <div className={`flutter-screen ${shouldShowNavigation ? 'pb-14' : ''}`}>
         <ScreenRenderer
@@ -66,14 +66,18 @@ const AppContent: React.FC = () => {
   );
 };
 
-const ViverSolidarioApp: React.FC = () => (
-  <AuthProvider>
-    <ThemeProvider>
-      <NavigationProvider>
-        <AppContent />
-      </NavigationProvider>
-    </ThemeProvider>
-  </AuthProvider>
-);
+const ViverSolidarioApp: React.FC = () => {
+  console.log('ViverSolidarioApp: Iniciando aplicação...');
+  
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <NavigationProvider>
+          <AppContent />
+        </NavigationProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+};
 
 export default ViverSolidarioApp;

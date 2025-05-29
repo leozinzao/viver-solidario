@@ -20,161 +20,80 @@ const determineRole = (email: string): UserRole => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
-  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Função para buscar perfil do usuário
-  const fetchUserProfile = async (supabaseUser: User): Promise<UserInfo | null> => {
-    try {
-      console.log('Buscando perfil para usuário:', supabaseUser.id);
-      
-      // Primeiro tenta buscar na tabela voluntarios
-      const { data: voluntarioData, error: voluntarioError } = await supabase
-        .from('voluntarios')
-        .select('nome, email, telefone')
-        .eq('id', supabaseUser.id)
-        .maybeSingle();
-      
-      if (voluntarioData && !voluntarioError) {
-        console.log('Usuário encontrado na tabela voluntarios:', voluntarioData);
-        return {
-          id: supabaseUser.id,
-          name: voluntarioData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
-          email: voluntarioData.email || supabaseUser.email || '',
-          role: UserRole.volunteer,
-          theme: 'light'
-        };
-      }
-      
-      // Se não encontrar, tenta buscar na tabela doadores
-      const { data: doadorData, error: doadorError } = await supabase
-        .from('doadores')
-        .select('nome, email, telefone')
-        .eq('id', supabaseUser.id)
-        .maybeSingle();
-      
-      if (doadorData && !doadorError) {
-        console.log('Usuário encontrado na tabela doadores:', doadorData);
-        return {
-          id: supabaseUser.id,
-          name: doadorData.nome || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
-          email: doadorData.email || supabaseUser.email || '',
-          role: UserRole.donor,
-          theme: 'light'
-        };
-      }
-      
-      // Fallback para usuários que ainda não foram inseridos nas tabelas
-      console.log('Usuário não encontrado nas tabelas, criando perfil básico...');
-      const role = determineRole(supabaseUser.email || '');
-      
-      return {
-        id: supabaseUser.id,
-        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
-        email: supabaseUser.email || '',
-        role: role,
-        theme: 'light'
-      };
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      
-      // Fallback para dados do Supabase Auth
-      return {
-        id: supabaseUser.id,
-        name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.nome || supabaseUser.email || '',
-        email: supabaseUser.email || '',
-        role: determineRole(supabaseUser.email || ''),
-        theme: 'light'
-      };
-    }
-  };
-
-  // Configurar estados do usuário
-  const setUserStates = async (session: Session | null) => {
-    console.log('Configurando estados do usuário:', session?.user?.email);
-    
-    if (session?.user) {
-      const profile = await fetchUserProfile(session.user);
-      if (profile) {
-        setUser(profile);
-        setIsAuthenticated(true);
-        setSession(session);
-        setSupabaseUser(session.user);
-        localStorage.setItem('viverUser', JSON.stringify(profile));
-        console.log('Usuário autenticado com sucesso:', profile);
-      }
-    } else {
-      setUser(null);
-      setIsAuthenticated(false);
-      setSession(null);
-      setSupabaseUser(null);
-      localStorage.removeItem('viverUser');
-      console.log('Usuário deslogado');
-    }
-  };
-
-  // Inicialização
   useEffect(() => {
-    let mounted = true;
-    console.log('Inicializando AuthContext...');
-
-    const initializeAuth = async () => {
-      try {
-        // Verificar sessão existente
-        const { data: sessionData } = await supabase.auth.getSession();
-        console.log('Sessão inicial:', sessionData.session?.user?.email);
-        
-        if (mounted) {
-          await setUserStates(sessionData.session);
-        }
-      } catch (error) {
-        console.error('Erro ao inicializar auth:', error);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    // Configurar listener de mudanças de auth
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+    console.log('AuthContext: Inicializando...');
+    
+    // Configurar listener primeiro
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted) return;
+        console.log('AuthContext: Auth state change:', event, session?.user?.email);
         
-        console.log('Auth state changed:', event, session?.user?.email);
-        
-        if (event === 'SIGNED_IN' && session) {
-          await setUserStates(session);
-          toast({
-            title: "Login realizado com sucesso",
-            description: `Bem-vindo!`
-          });
-        } else if (event === 'SIGNED_OUT') {
-          await setUserStates(null);
+        if (session?.user) {
+          // Criar perfil básico do usuário
+          const userProfile: UserInfo = {
+            id: session.user.id,
+            name: session.user.user_metadata?.full_name || 
+                  session.user.user_metadata?.nome || 
+                  session.user.email || 'Usuário',
+            email: session.user.email || '',
+            role: determineRole(session.user.email || ''),
+            theme: 'light'
+          };
+          
+          setUser(userProfile);
+          setIsAuthenticated(true);
+          console.log('AuthContext: Usuário autenticado:', userProfile);
+          
+          if (event === 'SIGNED_IN') {
+            toast({
+              title: "Login realizado com sucesso",
+              description: "Bem-vindo!"
+            });
+          }
         } else {
-          await setUserStates(session);
+          setUser(null);
+          setIsAuthenticated(false);
+          console.log('AuthContext: Usuário desconectado');
+          
+          if (event === 'SIGNED_OUT') {
+            toast({
+              title: "Logout realizado",
+              description: "Você foi desconectado com sucesso."
+            });
+          }
         }
         
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     );
 
-    initializeAuth();
+    // Verificar sessão inicial
+    const checkInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('AuthContext: Sessão inicial verificada:', session?.user?.email);
+        // O onAuthStateChange vai processar isso
+      } catch (error) {
+        console.error('AuthContext: Erro ao verificar sessão inicial:', error);
+        setLoading(false);
+      }
+    };
+
+    checkInitialSession();
 
     return () => {
-      mounted = false;
-      authListener.subscription.unsubscribe();
+      console.log('AuthContext: Cleanup');
+      subscription.unsubscribe();
     };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
-      console.log('Iniciando login para:', email);
+      console.log('AuthContext: Tentando login:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -182,36 +101,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (error) {
-        console.error('Erro no login:', error);
-        
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
-        } else if (error.message.includes('Email not confirmed')) {
-          throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
-        } else if (error.message.includes('Too many requests')) {
-          throw new Error('Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.');
-        } else {
-          throw new Error(error.message);
-        }
+        console.error('AuthContext: Erro no login:', error);
+        throw new Error('Email ou senha incorretos');
       }
       
-      if (data.user && !data.user.email_confirmed_at) {
-        console.log('Email não confirmado para o usuário:', data.user.email);
-        throw new Error('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e spam.');
-      }
-      
-      console.log('Login bem-sucedido para:', data.user?.email);
+      console.log('AuthContext: Login bem-sucedido:', data.user?.email);
+      // O onAuthStateChange vai processar o resto
       
     } catch (error: any) {
-      console.error('Falha no login:', error);
-      toast({
-        title: "Erro de login",
-        description: error.message || "Email ou senha inválidos",
-        variant: "destructive"
-      });
-      throw error;
-    } finally {
+      console.error('AuthContext: Falha no login:', error);
       setLoading(false);
+      throw error;
     }
   };
 
@@ -219,15 +119,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      console.log('Logout realizado com sucesso');
-      
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso."
-      });
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      console.error('AuthContext: Erro ao fazer logout:', error);
       toast({
         title: "Erro ao desconectar",
         description: "Houve um problema ao fazer logout.",
@@ -250,27 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (!user) throw new Error('Usuário não autenticado');
       
-      // Atualizar no Supabase Auth se necessário
-      if (data.email && data.email !== user.email) {
-        const { error } = await supabase.auth.updateUser({
-          email: data.email,
-        });
-        if (error) throw error;
-      }
-      
-      // Atualizar na tabela apropriada
-      const tableName = user.role === UserRole.volunteer ? 'voluntarios' : 'doadores';
-      
-      const { error } = await supabase
-        .from(tableName)
-        .update({
-          nome: data.name,
-          email: data.email,
-        })
-        .eq('id', user.id);
-      
-      if (error) throw error;
-      
       const updatedUser = {
         ...user,
         name: data.name || user.name,
@@ -279,19 +151,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       
       setUser(updatedUser);
-      localStorage.setItem('viverUser', JSON.stringify(updatedUser));
       
       toast({
         title: "Perfil atualizado",
         description: "Suas informações foram atualizadas com sucesso!"
       });
     } catch (error) {
-      console.error('Falha ao atualizar perfil:', error);
-      toast({
-        title: "Erro ao atualizar perfil",
-        description: "Não foi possível atualizar suas informações.",
-        variant: "destructive"
-      });
+      console.error('AuthContext: Falha ao atualizar perfil:', error);
       throw error;
     }
   };
@@ -311,22 +177,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Sua senha foi atualizada com sucesso!"
       });
     } catch (error) {
-      console.error('Falha ao atualizar senha:', error);
-      toast({
-        title: "Erro ao atualizar senha",
-        description: "Não foi possível atualizar sua senha.",
-        variant: "destructive"
-      });
+      console.error('AuthContext: Falha ao atualizar senha:', error);
       throw error;
     }
   };
 
+  console.log('AuthContext: Renderizando - loading:', loading, 'isAuthenticated:', isAuthenticated);
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viver-yellow mx-auto mb-2"></div>
-          <p>Carregando...</p>
+          <p className="text-gray-600">Inicializando aplicação...</p>
         </div>
       </div>
     );
