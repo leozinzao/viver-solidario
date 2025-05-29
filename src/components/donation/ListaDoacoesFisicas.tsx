@@ -14,13 +14,13 @@ const ListaDoacoesFisicas: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { doacoes, categorias, loading, reservarDoacao, isReserving } = useDoacoesFisicas();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('todas');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredDoacoes = doacoes.filter(doacao => {
     const matchesSearch = doacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doacao.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || doacao.categoria_id === selectedCategory;
+    const matchesCategory = selectedCategory === 'todas' || doacao.categoria_id === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -73,7 +73,7 @@ const ListaDoacoesFisicas: React.FC = () => {
                     <SelectValue placeholder="Todas as categorias" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas as categorias</SelectItem>
+                    <SelectItem value="todas">Todas as categorias</SelectItem>
                     {categorias.map((categoria) => (
                       <SelectItem key={categoria.id} value={categoria.id}>
                         {categoria.nome}
@@ -103,7 +103,7 @@ const ListaDoacoesFisicas: React.FC = () => {
           <CardContent className="p-6 text-center">
             <Heart className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">
-              {searchTerm || selectedCategory 
+              {searchTerm || selectedCategory !== 'todas'
                 ? 'Nenhuma doação encontrada com os filtros aplicados.'
                 : 'Ainda não há doações disponíveis. Seja o primeiro a doar!'}
             </p>
