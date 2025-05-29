@@ -97,6 +97,9 @@ export const useAuthActions = (
         theme: data.theme || user.theme
       };
       
+      // Atualizar estado imediatamente
+      setUser(updatedUser);
+      
       // Tentar atualizar no banco
       try {
         await supabase
@@ -110,8 +113,6 @@ export const useAuthActions = (
       } catch (dbError) {
         console.warn('Erro ao atualizar perfil no banco (continuando):', dbError);
       }
-      
-      setUser(updatedUser);
       
       toast({
         title: "Perfil atualizado",

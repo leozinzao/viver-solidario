@@ -20,10 +20,10 @@ export const useAuthState = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const createUserProfile = async (authUser: User): Promise<UserInfo> => {
+  const createSimpleUserProfile = (authUser: User): UserInfo => {
     console.log('Criando perfil simples para:', authUser.email);
     
-    const userProfile: UserInfo = {
+    return {
       id: authUser.id,
       name: authUser.user_metadata?.full_name || 
             authUser.user_metadata?.nome || 
@@ -32,13 +32,15 @@ export const useAuthState = () => {
       role: determineRole(authUser.email || ''),
       theme: 'light' as Theme
     };
+  };
 
-    // Tentar inserir no banco, mas não falhar se der erro
+  const saveUserProfileAsync = async (userProfile: UserInfo) => {
+    // Salvar no banco de forma assíncrona sem bloquear a UI
     try {
-      const { error } = await supabase
+      await supabase
         .from('voluntarios')
         .upsert({
-          id: authUser.id,
+          id: userProfile.id,
           nome: userProfile.name,
           email: userProfile.email,
           role: userProfile.role,
@@ -47,24 +49,16 @@ export const useAuthState = () => {
           onConflict: 'id',
           ignoreDuplicates: false 
         });
-
-      if (error) {
-        console.warn('Aviso ao salvar perfil (não crítico):', error.message);
-      } else {
-        console.log('Perfil salvo com sucesso');
-      }
+      console.log('Perfil salvo no banco com sucesso');
     } catch (error) {
-      console.warn('Erro ao salvar perfil (continuando mesmo assim):', error);
+      console.warn('Erro ao salvar perfil no banco (não crítico):', error);
     }
-
-    return userProfile;
   };
 
   useEffect(() => {
     console.log('AuthState: Inicializando sistema simplificado...');
     
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
 
     // Timeout de segurança para evitar loading infinito
     const safetyTimeout = setTimeout(() => {
@@ -72,9 +66,9 @@ export const useAuthState = () => {
         console.warn('AuthState: Timeout de segurança - forçando fim do loading');
         setLoading(false);
       }
-    }, 10000); // 10 segundos máximo
+    }, 5000); // Reduzido para 5 segundos
 
-    const handleAuthStateChange = async (event: string, session: Session | null) => {
+    const handleAuthStateChange = (event: string, session: Session | null) => {
       if (!mounted) return;
       
       console.log('AuthState: Mudança de estado:', event, session?.user?.email || 'sem usuário');
@@ -83,24 +77,32 @@ export const useAuthState = () => {
         if (session?.user) {
           console.log('AuthState: Processando usuário autenticado...');
           
-          const userProfile = await createUserProfile(session.user);
+          // Criar perfil simples imediatamente
+          const userProfile = createSimpleUserProfile(session.user);
           
           if (mounted) {
             setUser(userProfile);
             setIsAuthenticated(true);
-            console.log('AuthState: Usuário configurado:', userProfile.email);
+            setLoading(false);
+            clearTimeout(safetyTimeout);
+            console.log('AuthState: Usuário configurado imediatamente:', userProfile.email);
+            
+            // Salvar no banco de forma assíncrona
+            saveUserProfileAsync(userProfile);
           }
         } else {
           console.log('AuthState: Usuário desconectado');
           if (mounted) {
             setUser(null);
             setIsAuthenticated(false);
+            setLoading(false);
+            clearTimeout(safetyTimeout);
           }
         }
       } catch (error) {
-        console.error('AuthState: Erro no processamento (continuando):', error);
+        console.error('AuthState: Erro no processamento:', error);
         
-        // Em caso de erro, ainda assim configurar usuário básico se existir
+        // Em caso de erro, ainda assim configurar usuário básico se existir sessão
         if (session?.user && mounted) {
           const fallbackUser: UserInfo = {
             id: session.user.id,
@@ -111,12 +113,9 @@ export const useAuthState = () => {
           };
           setUser(fallbackUser);
           setIsAuthenticated(true);
-          console.log('AuthState: Usuário configurado via fallback');
-        }
-      } finally {
-        if (mounted) {
           setLoading(false);
           clearTimeout(safetyTimeout);
+          console.log('AuthState: Usuário configurado via fallback');
         }
       }
     };
@@ -129,20 +128,22 @@ export const useAuthState = () => {
         
         if (error) {
           console.error('AuthState: Erro ao verificar sessão:', error);
-          setLoading(false);
+          if (mounted) {
+            setLoading(false);
+            clearTimeout(safetyTimeout);
+          }
           return;
         }
         
         console.log('AuthState: Sessão inicial encontrada:', !!session);
+        handleAuthStateChange('INITIAL_SESSION', session);
         
-        if (session) {
-          await handleAuthStateChange('INITIAL_SESSION', session);
-        } else {
-          setLoading(false);
-        }
       } catch (error) {
         console.error('AuthState: Erro crítico na verificação inicial:', error);
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          clearTimeout(safetyTimeout);
+        }
       }
     };
 
@@ -160,16 +161,11 @@ export const useAuthState = () => {
     };
   }, []);
 
-  const ensureUserProfile = async (authUser: User): Promise<UserInfo> => {
-    return createUserProfile(authUser);
-  };
-
   return {
     user,
     setUser,
     isAuthenticated,
     setIsAuthenticated,
-    loading,
-    ensureUserProfile
+    loading
   };
 };
