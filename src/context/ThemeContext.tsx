@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
 
 export type Theme = 'light' | 'dark';
 
@@ -12,19 +11,47 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, updateUserProfile } = useAuth();
-  const [isDarkMode, setIsDarkMode] = useState(user?.theme === 'dark');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Verificar se existe AuthContext antes de tentar usar
+  let authContext;
+  try {
+    const AuthContext = React.createContext(undefined);
+    const { useAuth } = require('@/context/AuthContext');
+    authContext = useAuth();
+  } catch (error) {
+    console.log('AuthContext não disponível ainda, usando valores padrão');
+    authContext = null;
+  }
 
   useEffect(() => {
-    // Initialize theme based on user preference
-    if (user?.theme === 'dark') {
+    // Inicializar tema baseado no localStorage primeiro
+    const savedTheme = localStorage.getItem('viverSolidarioTheme');
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDarkMode(true);
     } else {
       document.documentElement.classList.remove('dark');
       setIsDarkMode(false);
     }
-  }, [user?.theme]);
+    setIsInitialized(true);
+  }, []);
+
+  // Atualizar tema quando o usuário mudar (se disponível)
+  useEffect(() => {
+    if (authContext?.user?.theme && isInitialized) {
+      const userTheme = authContext.user.theme === 'dark';
+      if (userTheme !== isDarkMode) {
+        setIsDarkMode(userTheme);
+        if (userTheme) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    }
+  }, [authContext?.user?.theme, isDarkMode, isInitialized]);
 
   const toggleTheme = async () => {
     setIsDarkMode((prev) => {
@@ -38,9 +65,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         localStorage.setItem('viverSolidarioTheme', 'light');
       }
       
-      // Update user preference in the backend if authenticated
-      if (user) {
-        updateUserProfile({ theme: newTheme ? 'dark' : 'light' }).catch(console.error);
+      // Atualizar preferência do usuário se disponível
+      if (authContext?.updateUserProfile) {
+        authContext.updateUserProfile({ theme: newTheme ? 'dark' : 'light' }).catch(console.error);
       }
       
       return newTheme;
