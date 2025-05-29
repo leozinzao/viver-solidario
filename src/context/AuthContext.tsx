@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (event === 'SIGNED_IN') {
             toast({
               title: "Login realizado com sucesso",
-              description: "Bem-vindo!"
+              description: `Bem-vindo, ${userProfile.name}!`
             });
           }
         } else {
@@ -117,8 +117,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
+      console.log('AuthContext: Fazendo logout...');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      console.log('AuthContext: Logout realizado com sucesso');
     } catch (error) {
       console.error('AuthContext: Erro ao fazer logout:', error);
       toast({

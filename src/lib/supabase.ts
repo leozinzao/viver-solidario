@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 
 // Use the Supabase project configuration directly
@@ -8,8 +9,15 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 console.log("Supabase URL:", supabaseUrl);
 console.log("Supabase Anon Key exists:", !!supabaseAnonKey);
 
-// Criação do cliente Supabase
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Criação do cliente Supabase com configurações otimizadas para autenticação
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: localStorage,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 // Funções auxiliares para operações comuns do Supabase
 export const supabaseAuth = {

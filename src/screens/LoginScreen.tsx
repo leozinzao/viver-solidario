@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/context/AuthContext';
-import { useNavigation } from '@/context/NavigationContext';
 import { toast } from '@/components/ui/use-toast';
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
@@ -12,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 interface LoginScreenProps {
   onBackToWelcome: () => void;
@@ -20,7 +20,7 @@ interface LoginScreenProps {
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
-  password: z.string().min(1, { message: "A senha é obrigatória" })
+  senha: z.string().min(1, { message: "Senha é obrigatória" }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -28,51 +28,77 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isAuthenticated } = useAuth();
-  const { navigateToScreen } = useNavigation();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { login } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
-      password: ""
+      senha: ""
     }
   });
 
-  // Redirecionar se já autenticado
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      console.log('LoginScreen: Usuário já autenticado, redirecionando...');
-      setTimeout(() => {
-        onLoginSuccess();
-        navigateToScreen('home');
-      }, 100);
-    }
-  }, [isAuthenticated, onLoginSuccess, navigateToScreen]);
-
   const handleLogin = async (values: LoginFormValues) => {
     setIsLoading(true);
-    
+
     try {
-      console.log('LoginScreen: Iniciando login para:', values.email);
-      await login(values.email, values.password);
+      console.log('Tentando fazer login com email:', values.email);
+      await login(values.email, values.senha);
       
-      // Aguardar um pouco para o estado atualizar
-      setTimeout(() => {
-        console.log('LoginScreen: Login concluído, redirecionando...');
-        onLoginSuccess();
-        navigateToScreen('home');
-      }, 500);
-      
+      console.log('Login realizado com sucesso, redirecionando...');
+      onLoginSuccess();
     } catch (error: any) {
-      console.error('LoginScreen: Erro no login:', error);
+      console.error('Erro no login:', error);
       toast({
-        title: "Erro ao fazer login",
-        description: error.message || "Verifique suas credenciais e tente novamente.",
+        title: "Erro no login",
+        description: error.message || "Email ou senha incorretos.",
         variant: "destructive"
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    
+    try {
+      console.log('Iniciando login com Google...');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        }
+      });
+      
+      if (error) {
+        console.error('Erro no Google OAuth:', error);
+        throw error;
+      }
+      
+      console.log('Google OAuth iniciado com sucesso');
+      
+      // O redirecionamento acontece automaticamente
+      toast({
+        title: "Redirecionando para Google...",
+        description: "Você será redirecionado para fazer login com o Google.",
+      });
+      
+    } catch (error: any) {
+      console.error('Erro no Google login:', error);
+      toast({
+        title: "Erro ao entrar com Google",
+        description: error.message || "Ocorreu um erro. Tente usar o login com email.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -102,12 +128,35 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
               />
             </div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-viver-yellow to-solidario-purple bg-clip-text text-transparent">
-              Bem-vindo de volta
+              Entrar
             </CardTitle>
-            <p className="text-gray-500 text-sm mt-2">Entre em sua conta para continuar</p>
+            <p className="text-gray-500 text-sm mt-2">Acesse sua conta</p>
           </CardHeader>
-          
           <CardContent className="space-y-6">
+            {/* Botão Google */}
+            <Button 
+              onClick={handleGoogleLogin}
+              variant="outline"
+              className="w-full h-12 border-2 border-gray-200 hover:bg-gray-50 rounded-xl font-medium shadow-sm hover:shadow-md transition-all duration-300"
+              disabled={isGoogleLoading || isLoading}
+            >
+              <div className="flex items-center justify-center">
+                <img 
+                  src="https://developers.google.com/identity/images/g-logo.png" 
+                  alt="Google"
+                  className="w-5 h-5 mr-3"
+                />
+                {isGoogleLoading ? 'Conectando com Google...' : 'Entrar com Google'}
+              </div>
+            </Button>
+
+            {/* Divisor */}
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-400">ou entre com email</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
                 <FormField
@@ -122,18 +171,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                           placeholder="seu@email.com"
                           type="email"
                           autoComplete="email"
-                          disabled={isLoading}
-                          className="h-12"
+                          disabled={isLoading || isGoogleLoading}
+                          className="h-11"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
+                
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="senha"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Senha</FormLabel>
@@ -144,8 +193,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                             placeholder="Sua senha"
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
-                            disabled={isLoading}
-                            className="h-12 pr-12"
+                            disabled={isLoading || isGoogleLoading}
+                            className="h-11 pr-12"
                           />
                           <button
                             type="button"
@@ -162,13 +211,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onBackToWelcome, onLoginSucce
                   )}
                 />
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-viver-yellow to-yellow-400 hover:from-viver-yellow/90 hover:to-yellow-400/90 text-black font-semibold h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Entrando...' : 'Entrar'}
-                </Button>
+                <div className="pt-2">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-viver-yellow to-yellow-400 hover:from-viver-yellow/90 hover:to-yellow-400/90 text-black font-semibold h-12 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isLoading || isGoogleLoading}
+                  >
+                    {isLoading ? 'Entrando...' : 'Entrar'}
+                  </Button>
+                </div>
               </form>
             </Form>
           </CardContent>
