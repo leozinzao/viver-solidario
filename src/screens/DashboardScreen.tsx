@@ -44,11 +44,11 @@ const DashboardScreen: React.FC = () => {
           <div className="w-14 h-14 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-lg backdrop-blur-xl">
             <img 
               src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
-              alt="Logo ONG Viver" 
+              alt="Logo Viver Solidário" 
               className="h-10 w-10 object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold text-viver-yellow drop-shadow-md">ONG Viver</h1>
+          <h1 className="text-3xl font-bold text-viver-yellow drop-shadow-md">Viver Solidário</h1>
         </div>
         
         {/* Só mostrar botão de login se não estiver autenticado */}
@@ -110,8 +110,8 @@ const DashboardScreen: React.FC = () => {
         </Card>
         <Card className="flutter-card bg-gradient-to-br from-viver-yellow-medium/20 to-viver-yellow-medium/10 border-viver-yellow-medium/30">
           <CardContent className="p-4 text-center">
-            <TrendingUp className="h-8 w-8 text-viver-yellow-medium mx-auto mb-2" />
-            <div className="text-2xl font-bold text-viver-yellow-medium">15+</div>
+            <TrendingUp className="h-8 w-8 text-viver-yellow mx-auto mb-2" />
+            <div className="text-2xl font-bold text-viver-yellow">15+</div>
             <div className="text-sm text-gray-600">Anos de atuação</div>
           </CardContent>
         </Card>
@@ -138,7 +138,7 @@ const DashboardScreen: React.FC = () => {
           onClick={() => handleNavigate('donations')}
         >
           <div className="mr-4 bg-viver-yellow-medium/20 p-3 rounded-full">
-            <Gift className="w-6 h-6 text-viver-yellow-medium" />
+            <Gift className="w-6 h-6 text-viver-yellow" />
           </div>
           <div>
             <h3 className="font-semibold">Campanha Ativa</h3>
@@ -169,7 +169,7 @@ const DashboardScreen: React.FC = () => {
         >
           <CardContent className="p-4 text-center">
             <div className="w-12 h-12 rounded-full bg-viver-yellow-medium/20 flex items-center justify-center mb-3 mx-auto group-hover:bg-viver-yellow-medium/30 transition-colors">
-              <Heart className="h-7 w-7 text-viver-yellow-medium" />
+              <Heart className="h-7 w-7 text-viver-yellow" />
             </div>
             <h3 className="font-semibold text-sm mb-1">Faça uma Doação</h3>
             <p className="text-xs text-gray-600">Contribua financeiramente</p>
@@ -180,11 +180,11 @@ const DashboardScreen: React.FC = () => {
       {/* Informações da ONG */}
       <Card className="flutter-card mb-6 animate-fade-in">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base text-gray-800 font-semibold">Sobre a ONG Viver</CardTitle>
+          <CardTitle className="text-base text-gray-800 font-semibold">Sobre o Viver Solidário</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-gray-700 leading-relaxed">
-            A ONG Viver atua há mais de 15 anos oferecendo apoio integral a crianças e adolescentes 
+            O Viver Solidário atua há mais de 15 anos oferecendo apoio integral a crianças e adolescentes 
             com câncer e suas famílias, proporcionando suporte emocional, social e material.
           </p>
           

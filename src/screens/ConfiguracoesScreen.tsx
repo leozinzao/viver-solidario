@@ -1,339 +1,190 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from "@/components/ui/switch";
+import { ArrowLeft, Bell, Globe, Palette, Database } from '@/components/icons';
 import { useNavigation } from '@/context/NavigationContext';
 import { useTheme } from '@/context/ThemeContext';
-import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Settings, Bell, Shield, Globe, Palette, Database } from '@/components/icons';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
-import { toast } from '@/components/ui/use-toast';
 
 const ConfiguracoesScreen: React.FC = () => {
   const { navigateToScreen } = useNavigation();
   const { isDarkMode, toggleTheme } = useTheme();
-  const { user } = useAuth();
-  
-  // Estados das configurações
-  const [notificacoes, setNotificacoes] = useState({
-    email: true,
-    push: false,
-    doacoes: true,
-    eventos: true,
-    newsletter: false
-  });
-  
-  const [privacidade, setPrivacidade] = useState({
-    perfilPublico: false,
-    mostrarDoacoes: false,
-    mostrarHorasVoluntarias: true
-  });
-  
-  const [preferencias, setPreferencias] = useState({
-    idioma: 'pt-BR',
-    timezone: 'America/Sao_Paulo',
-    formato24h: true
-  });
-
-  const salvarConfiguracoes = () => {
-    // Aqui você salvaria as configurações no backend
-    toast({
-      title: "Configurações salvas",
-      description: "Suas preferências foram atualizadas com sucesso.",
-    });
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigateToScreen('profile')}
-            className="hover:bg-viver-yellow/20"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-viver-yellow to-orange-500 bg-clip-text text-transparent">
-              Configurações
-            </h1>
-            <p className="text-muted-foreground">
-              Personalize sua experiência no Viver Solidário
-            </p>
+    <div className="flutter-screen bg-gradient-to-b from-viver-yellow/5 to-white p-4 min-h-screen">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8 animate-fade-in">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigateToScreen('profile')}
+          className="hover:bg-viver-yellow/10"
+        >
+          <ArrowLeft className="h-5 w-5 text-viver-yellow" />
+        </Button>
+        <h1 className="text-2xl font-bold text-viver-yellow">Configurações</h1>
+      </div>
+
+      {/* Seção de Aparência */}
+      <Card className="flutter-card mb-6 animate-fade-in bg-white/90 backdrop-blur-sm shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <Palette className="h-5 w-5 text-viver-yellow" />
+            Aparência
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Modo Escuro</h3>
+              <p className="text-sm text-gray-600">Alternar entre tema claro e escuro</p>
+            </div>
+            <Switch 
+              checked={isDarkMode}
+              onCheckedChange={toggleTheme}
+              className="data-[state=checked]:bg-viver-yellow"
+            />
           </div>
-        </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Tamanho da Fonte</h3>
+              <p className="text-sm text-gray-600">Ajustar tamanho do texto</p>
+            </div>
+            <Button variant="outline" size="sm">Padrão</Button>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Aparência */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="w-5 h-5" />
-              Aparência
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="dark-mode">Modo Escuro</Label>
-                <p className="text-sm text-muted-foreground">
-                  Alternar entre tema claro e escuro
-                </p>
-              </div>
-              <Switch 
-                id="dark-mode"
-                checked={isDarkMode}
-                onCheckedChange={toggleTheme}
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+      {/* Seção de Notificações */}
+      <Card className="flutter-card mb-6 animate-fade-in bg-white/90 backdrop-blur-sm shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <Bell className="h-5 w-5 text-viver-yellow" />
+            Notificações
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Notificações Push</h3>
+              <p className="text-sm text-gray-600">Receber notificações no dispositivo</p>
             </div>
-            
-            <Separator />
-            
-            <div className="space-y-2">
-              <Label>Idioma</Label>
-              <Select value={preferencias.idioma} onValueChange={(valor) => 
-                setPreferencias(prev => ({ ...prev, idioma: valor }))
-              }>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
-                  <SelectItem value="en-US">English (US)</SelectItem>
-                  <SelectItem value="es-ES">Español</SelectItem>
-                </SelectContent>
-              </Select>
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Eventos</h3>
+              <p className="text-sm text-gray-600">Notificações sobre novos eventos</p>
             </div>
-          </CardContent>
-        </Card>
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Campanhas</h3>
+              <p className="text-sm text-gray-600">Atualizações sobre campanhas ativas</p>
+            </div>
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Voluntariado</h3>
+              <p className="text-sm text-gray-600">Oportunidades de voluntariado</p>
+            </div>
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Notificações */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              Notificações
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Notificações por Email</Label>
-                <p className="text-sm text-muted-foreground">
-                  Receba atualizações importantes por email
-                </p>
-              </div>
-              <Switch 
-                checked={notificacoes.email}
-                onCheckedChange={(checked) => 
-                  setNotificacoes(prev => ({ ...prev, email: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+      {/* Seção de Idioma */}
+      <Card className="flutter-card mb-6 animate-fade-in bg-white/90 backdrop-blur-sm shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <Globe className="h-5 w-5 text-viver-yellow" />
+            Idioma e Região
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Idioma</h3>
+              <p className="text-sm text-gray-600">Idioma da interface</p>
             </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Notificações Push</Label>
-                <p className="text-sm text-muted-foreground">
-                  Notificações instantâneas no navegador
-                </p>
-              </div>
-              <Switch 
-                checked={notificacoes.push}
-                onCheckedChange={(checked) => 
-                  setNotificacoes(prev => ({ ...prev, push: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+            <Button variant="outline" size="sm">Português (BR)</Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Fuso Horário</h3>
+              <p className="text-sm text-gray-600">Configurar fuso horário local</p>
             </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Atualizações sobre Doações</Label>
-                <p className="text-sm text-muted-foreground">
-                  Notificações sobre suas doações e impacto
-                </p>
-              </div>
-              <Switch 
-                checked={notificacoes.doacoes}
-                onCheckedChange={(checked) => 
-                  setNotificacoes(prev => ({ ...prev, doacoes: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Eventos e Atividades</Label>
-                <p className="text-sm text-muted-foreground">
-                  Novos eventos e oportunidades de voluntariado
-                </p>
-              </div>
-              <Switch 
-                checked={notificacoes.eventos}
-                onCheckedChange={(checked) => 
-                  setNotificacoes(prev => ({ ...prev, eventos: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
-            </div>
-          </CardContent>
-        </Card>
+            <Button variant="outline" size="sm">GMT-3</Button>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Privacidade */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              Privacidade e Segurança
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Perfil Público</Label>
-                <p className="text-sm text-muted-foreground">
-                  Permitir que outros usuários vejam seu perfil
-                </p>
-              </div>
-              <Switch 
-                checked={privacidade.perfilPublico}
-                onCheckedChange={(checked) => 
-                  setPrivacidade(prev => ({ ...prev, perfilPublico: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+      {/* Seção de Dados */}
+      <Card className="flutter-card mb-6 animate-fade-in bg-white/90 backdrop-blur-sm shadow-lg">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <Database className="h-5 w-5 text-viver-yellow" />
+            Dados e Privacidade
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Cache de Dados</h3>
+              <p className="text-sm text-gray-600">Limpar cache local do aplicativo</p>
             </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Mostrar Histórico de Doações</Label>
-                <p className="text-sm text-muted-foreground">
-                  Exibir suas doações publicamente (sem valores)
-                </p>
-              </div>
-              <Switch 
-                checked={privacidade.mostrarDoacoes}
-                onCheckedChange={(checked) => 
-                  setPrivacidade(prev => ({ ...prev, mostrarDoacoes: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+            <Button variant="outline" size="sm" className="border-viver-yellow text-viver-yellow hover:bg-viver-yellow/10">
+              Limpar
+            </Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Dados Offline</h3>
+              <p className="text-sm text-gray-600">Sincronizar dados para uso offline</p>
             </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Mostrar Horas Voluntárias</Label>
-                <p className="text-sm text-muted-foreground">
-                  Exibir suas horas de voluntariado no perfil
-                </p>
-              </div>
-              <Switch 
-                checked={privacidade.mostrarHorasVoluntarias}
-                onCheckedChange={(checked) => 
-                  setPrivacidade(prev => ({ ...prev, mostrarHorasVoluntarias: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-gray-800">Backup Automático</h3>
+              <p className="text-sm text-gray-600">Backup automático dos dados</p>
             </div>
-          </CardContent>
-        </Card>
+            <Switch defaultChecked className="data-[state=checked]:bg-viver-yellow" />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Preferências Gerais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="w-5 h-5" />
-              Preferências Gerais
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Fuso Horário</Label>
-              <Select value={preferencias.timezone} onValueChange={(valor) => 
-                setPreferencias(prev => ({ ...prev, timezone: valor }))
-              }>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="America/Sao_Paulo">São Paulo (GMT-3)</SelectItem>
-                  <SelectItem value="America/New_York">Nova York (GMT-4)</SelectItem>
-                  <SelectItem value="Europe/London">Londres (GMT+0)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Formato 24 Horas</Label>
-                <p className="text-sm text-muted-foreground">
-                  Usar formato 24h ao invés de AM/PM
-                </p>
-              </div>
-              <Switch 
-                checked={preferencias.formato24h}
-                onCheckedChange={(checked) => 
-                  setPreferencias(prev => ({ ...prev, formato24h: checked }))
-                }
-                className="data-[state=checked]:bg-viver-yellow"
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Botões de Ação */}
+      <div className="space-y-3 animate-fade-in">
+        <Button 
+          variant="outline" 
+          className="w-full border-viver-yellow text-viver-yellow hover:bg-viver-yellow/10"
+          onClick={() => window.open('/politica', '_blank')}
+        >
+          Política de Privacidade
+        </Button>
+        <Button 
+          variant="outline" 
+          className="w-full border-viver-yellow text-viver-yellow hover:bg-viver-yellow/10"
+          onClick={() => window.open('/termos', '_blank')}
+        >
+          Termos de Uso
+        </Button>
+        <Button 
+          variant="outline" 
+          className="w-full border-viver-yellow-medium text-viver-yellow-medium hover:bg-viver-yellow-medium/10"
+        >
+          Sobre o App
+        </Button>
+      </div>
 
-        {/* Dados e Backup */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="w-5 h-5" />
-              Dados e Backup
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button variant="outline" className="w-full">
-                Exportar Dados
-              </Button>
-              <Button variant="outline" className="w-full">
-                Baixar Relatório
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Seus dados são automaticamente salvos e sincronizados com segurança.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Botão Salvar */}
-        <div className="flex justify-end">
-          <Button 
-            onClick={salvarConfiguracoes}
-            className="bg-viver-yellow hover:bg-viver-yellow/90 text-black"
-          >
-            Salvar Configurações
-          </Button>
-        </div>
+      {/* Versão do App */}
+      <div className="text-center mt-8 text-sm text-gray-500 animate-fade-in">
+        <p>Viver Solidário v1.0.0</p>
+        <p>© 2025 Todos os direitos reservados</p>
       </div>
     </div>
   );
