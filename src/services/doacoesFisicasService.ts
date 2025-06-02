@@ -33,23 +33,49 @@ export interface DoacaoFisica {
 export const doacoesFisicasService = {
   // Criar nova doação física
   async criarDoacao(dadosDoacao: any): Promise<DoacaoFisica> {
-    // Validar dados
-    const validation = validateData(doacaoFisicaSchema, dadosDoacao);
+    // Validar dados básicos
+    const validation = validateData(doacaoFisicaSchema, {
+      titulo: dadosDoacao.titulo,
+      descricao: dadosDoacao.descricao,
+      categoria_id: dadosDoacao.categoria_id,
+      quantidade: dadosDoacao.quantidade,
+      unidade: dadosDoacao.unidade,
+      endereco_coleta: dadosDoacao.endereco_coleta,
+      observacoes: dadosDoacao.observacoes
+    });
+    
     if (!validation.success) {
       throw new Error('Dados de doação inválidos');
     }
 
+    // Preparar dados para inserção - usar apenas campos que existem na tabela
+    const dadosParaInserir = {
+      titulo: dadosDoacao.titulo,
+      descricao: dadosDoacao.descricao,
+      categoria_id: dadosDoacao.categoria_id,
+      quantidade: Number(dadosDoacao.quantidade),
+      unidade: dadosDoacao.unidade,
+      endereco_coleta: dadosDoacao.endereco_coleta,
+      observacoes: dadosDoacao.observacoes,
+      doador_id: dadosDoacao.doador_id,
+      localizacao: dadosDoacao.localizacao,
+      status: 'disponivel'
+    };
+
+    console.log('Dados para inserir:', dadosParaInserir);
+
     const { data, error } = await supabase
-      .from('doacoes_fisicas')
-      .insert([validation.data])
+      .from('doacoes_fisicas_novas')
+      .insert([dadosParaInserir])
       .select(`
         *,
         categoria:categorias_doacoes(nome),
-        doador:profiles(nome, email)
+        doador:doadores(nome, email)
       `)
       .single();
 
     if (error) {
+      console.error('Erro ao criar doação:', error);
       throw ErrorHandler.handleApiError(error);
     }
 
@@ -63,12 +89,12 @@ export const doacoesFisicasService = {
     doador_id?: string;
   }): Promise<DoacaoFisica[]> {
     let query = supabase
-      .from('doacoes_fisicas')
+      .from('doacoes_fisicas_novas')
       .select(`
         *,
         categoria:categorias_doacoes(nome),
-        doador:profiles(nome, email),
-        reservado_por:profiles(nome, email)
+        doador:doadores(nome, email),
+        reservado_por:doadores(nome, email)
       `)
       .order('created_at', { ascending: false });
 
@@ -96,12 +122,12 @@ export const doacoesFisicasService = {
   // Buscar doação por ID
   async buscarPorId(id: string): Promise<DoacaoFisica | null> {
     const { data, error } = await supabase
-      .from('doacoes_fisicas')
+      .from('doacoes_fisicas_novas')
       .select(`
         *,
         categoria:categorias_doacoes(nome),
-        doador:profiles(nome, email),
-        reservado_por:profiles(nome, email)
+        doador:doadores(nome, email),
+        reservado_por:doadores(nome, email)
       `)
       .eq('id', id)
       .single();
@@ -127,20 +153,24 @@ export const doacoesFisicasService = {
     const updateData: any = { status };
     
     if (status === 'reservada' && usuarioId) {
-      updateData.reservado_por_id = usuarioId;
+      updateData.beneficiario_id = usuarioId;
+      updateData.data_reserva = new Date().toISOString();
     } else if (status === 'disponivel') {
-      updateData.reservado_por_id = null;
+      updateData.beneficiario_id = null;
+      updateData.data_reserva = null;
+    } else if (status === 'entregue') {
+      updateData.data_entrega = new Date().toISOString();
     }
 
     const { data, error } = await supabase
-      .from('doacoes_fisicas')
+      .from('doacoes_fisicas_novas')
       .update(updateData)
       .eq('id', id)
       .select(`
         *,
         categoria:categorias_doacoes(nome),
-        doador:profiles(nome, email),
-        reservado_por:profiles(nome, email)
+        doador:doadores(nome, email),
+        reservado_por:doadores(nome, email)
       `)
       .single();
 
@@ -154,7 +184,7 @@ export const doacoesFisicasService = {
   // Excluir doação
   async excluirDoacao(id: string): Promise<void> {
     const { error } = await supabase
-      .from('doacoes_fisicas')
+      .from('doacoes_fisicas_novas')
       .delete()
       .eq('id', id);
 

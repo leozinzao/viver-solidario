@@ -66,6 +66,7 @@ export const useDoacoesFisicasImproved = () => {
     setLoading(true);
 
     try {
+      console.log('Hook: Criando doação com dados:', dadosDoacao);
       await doacoesFisicasService.criarDoacao({ ...dadosDoacao, doador_id: user.id });
       
       toast({
@@ -78,9 +79,10 @@ export const useDoacoesFisicasImproved = () => {
       await carregarDoacoes();
       return true;
     } catch (err) {
+      console.error('Hook: Erro ao criar doação:', err);
       toast({
         title: "Erro",
-        description: "Erro ao criar doação",
+        description: "Erro ao criar doação. Verifique os dados e tente novamente.",
         variant: "destructive"
       });
       return false;

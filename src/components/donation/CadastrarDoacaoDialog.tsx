@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Heart } from 'lucide-react';
-import { useDoacoesFisicas } from '@/hooks/useDoacoesFisicas';
+import { useDoacoesFisicasImproved } from '@/hooks/useDoacoesFisicasImproved';
+import { useAuth } from '@/context/AuthContext';
 
 interface CadastrarDoacaoDialogProps {
   isOpen: boolean;
@@ -18,7 +19,22 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
   isOpen,
   onOpenChange
 }) => {
-  const { categorias, createDoacao, isCreating } = useDoacoesFisicas();
+  const { criarDoacao } = useDoacoesFisicasImproved();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Categorias hardcoded por enquanto - pode ser melhorado futuramente
+  const categorias = [
+    { id: '1', nome: 'Alimentos' },
+    { id: '2', nome: 'Roupas' },
+    { id: '3', nome: 'Móveis' },
+    { id: '4', nome: 'Eletrônicos' },
+    { id: '5', nome: 'Livros' },
+    { id: '6', nome: 'Brinquedos' },
+    { id: '7', nome: 'Materiais de Construção' },
+    { id: '8', nome: 'Outros' }
+  ];
+
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
@@ -28,55 +44,48 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
     localizacao: '',
     endereco_coleta: '',
     observacoes: '',
-    telefone: '',
-    email: '',
   });
 
-  // Debug das categorias
-  console.log('Categorias recebidas:', categorias);
-  
-  // Filtro mais robusto para categorias válidas
-  const categoriasValidas = categorias.filter(categoria => {
-    const isValid = categoria && 
-                   categoria.id && 
-                   typeof categoria.id === 'string' && 
-                   categoria.id.trim() !== '' &&
-                   categoria.nome &&
-                   categoria.nome.trim() !== '';
-    
-    if (!isValid) {
-      console.log('Categoria inválida filtrada:', categoria);
-    }
-    
-    return isValid;
-  });
-
-  console.log('Categorias válidas após filtro:', categoriasValidas);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.titulo || !formData.categoria_id) {
+    if (!formData.titulo || !formData.categoria_id || !user) {
       return;
     }
 
-    createDoacao(formData);
-    
-    // Reset form
-    setFormData({
-      titulo: '',
-      descricao: '',
-      categoria_id: '',
-      quantidade: 1,
-      unidade: 'unidade',
-      localizacao: '',
-      endereco_coleta: '',
-      observacoes: '',
-      telefone: '',
-      email: '',
-    });
-    
-    onOpenChange(false);
+    setIsSubmitting(true);
+
+    try {
+      // Preparar dados com o ID do usuário
+      const dadosCompletos = {
+        ...formData,
+        doador_id: user.id
+      };
+
+      console.log('Enviando dados:', dadosCompletos);
+      
+      const sucesso = await criarDoacao(dadosCompletos);
+      
+      if (sucesso) {
+        // Reset form
+        setFormData({
+          titulo: '',
+          descricao: '',
+          categoria_id: '',
+          quantidade: 1,
+          unidade: 'unidade',
+          localizacao: '',
+          endereco_coleta: '',
+          observacoes: '',
+        });
+        
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar doação:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -111,7 +120,7 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {categoriasValidas.map((categoria) => (
+                {categorias.map((categoria) => (
                   <SelectItem key={categoria.id} value={categoria.id}>
                     {categoria.nome}
                   </SelectItem>
@@ -164,28 +173,6 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="telefone">Seu Telefone</Label>
-              <Input
-                id="telefone"
-                value={formData.telefone}
-                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                placeholder="(11) 99999-9999"
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Seu Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="seu@email.com"
-              />
-            </div>
-          </div>
-
           <div>
             <Label htmlFor="localizacao">Sua Cidade</Label>
             <Input
@@ -203,6 +190,7 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
               value={formData.endereco_coleta}
               onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })}
               placeholder="Endereço onde a ONG pode retirar a doação"
+              required
             />
           </div>
 
@@ -235,10 +223,10 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={isCreating}
+              disabled={isSubmitting}
               className="flex-1 bg-viver-yellow hover:bg-viver-yellow/90 text-black"
             >
-              {isCreating ? 'Cadastrando...' : 'Doar para ONG Viver'}
+              {isSubmitting ? 'Cadastrando...' : 'Doar para ONG Viver'}
             </Button>
           </div>
         </form>
