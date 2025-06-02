@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { validateData, doacaoFisicaSchema, statusDoacaoSchema } from '@/lib/validation';
 import { ErrorHandler } from '@/lib/errorHandler';
@@ -37,8 +36,10 @@ export interface DoacaoFisica {
 export const doacoesFisicasService = {
   // Criar nova doação física
   async criarDoacao(dadosDoacao: any): Promise<DoacaoFisica> {
-    // Validar dados básicos
-    const validation = validateData(doacaoFisicaSchema, {
+    console.log('Service: Dados recebidos para criação:', dadosDoacao);
+
+    // Validar dados básicos - remover campos que podem causar erro
+    const dadosParaValidacao = {
       titulo: dadosDoacao.titulo,
       descricao: dadosDoacao.descricao,
       categoria_id: dadosDoacao.categoria_id,
@@ -46,20 +47,25 @@ export const doacoesFisicasService = {
       unidade: dadosDoacao.unidade,
       endereco_coleta: dadosDoacao.endereco_coleta,
       observacoes: dadosDoacao.observacoes
-    });
+    };
+
+    console.log('Service: Dados para validação:', dadosParaValidacao);
+
+    const validation = validateData(doacaoFisicaSchema, dadosParaValidacao);
     
     if (!validation.success) {
-      throw new Error('Dados de doação inválidos');
+      console.error('Service: Erro de validação:', validation.error);
+      throw new Error(`Dados de doação inválidos: ${validation.error}`);
     }
 
-    // Preparar dados para inserção
+    // Preparar dados para inserção - apenas campos que existem na tabela
     const dadosParaInserir = {
       titulo: dadosDoacao.titulo,
       descricao: dadosDoacao.descricao || null,
       categoria_id: dadosDoacao.categoria_id,
       quantidade: Number(dadosDoacao.quantidade),
       unidade: dadosDoacao.unidade,
-      endereco_coleta: dadosDoacao.endereco_coleta,
+      endereco_coleta: dadosDoacao.endereco_coleta || null,
       tipo_entrega: dadosDoacao.tipo_entrega || 'retirada',
       endereco_entrega: dadosDoacao.endereco_entrega || null,
       observacoes: dadosDoacao.observacoes || null,
@@ -69,24 +75,33 @@ export const doacoesFisicasService = {
       status: 'disponivel'
     };
 
-    console.log('Dados para inserir:', dadosParaInserir);
+    console.log('Service: Dados preparados para inserção:', dadosParaInserir);
 
-    const { data, error } = await supabase
-      .from('doacoes_fisicas_novas')
-      .insert([dadosParaInserir])
-      .select(`
-        *,
-        categoria:categorias_doacoes(nome),
-        doador:doadores(nome, email)
-      `)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('doacoes_fisicas_novas')
+        .insert([dadosParaInserir])
+        .select(`
+          *,
+          categoria:categorias_doacoes(nome),
+          doador:doadores(nome, email)
+        `)
+        .single();
 
-    if (error) {
-      console.error('Erro ao criar doação:', error);
-      throw ErrorHandler.handleApiError(error);
+      if (error) {
+        console.error('Service: Erro do Supabase:', error);
+        console.error('Service: Código do erro:', error.code);
+        console.error('Service: Mensagem do erro:', error.message);
+        console.error('Service: Detalhes do erro:', error.details);
+        throw new Error(`Erro do banco de dados: ${error.message}`);
+      }
+
+      console.log('Service: Doação criada com sucesso:', data);
+      return data;
+    } catch (err) {
+      console.error('Service: Erro na execução:', err);
+      throw err;
     }
-
-    return data;
   },
 
   // Listar doações físicas
@@ -95,36 +110,44 @@ export const doacoesFisicasService = {
     categoria_id?: string;
     doador_id?: string;
   }): Promise<DoacaoFisica[]> {
-    let query = supabase
-      .from('doacoes_fisicas_novas')
-      .select(`
-        *,
-        categoria:categorias_doacoes(nome),
-        doador:doadores(nome, email),
-        reservado_por:doadores!beneficiario_id(nome, email)
-      `)
-      .order('created_at', { ascending: false });
+    console.log('Service: Carregando doações com filtros:', filtros);
 
-    if (filtros?.status) {
-      query = query.eq('status', filtros.status);
+    try {
+      let query = supabase
+        .from('doacoes_fisicas_novas')
+        .select(`
+          *,
+          categoria:categorias_doacoes(nome),
+          doador:doadores(nome, email),
+          reservado_por:doadores!beneficiario_id(nome, email)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (filtros?.status) {
+        query = query.eq('status', filtros.status);
+      }
+
+      if (filtros?.categoria_id) {
+        query = query.eq('categoria_id', filtros.categoria_id);
+      }
+
+      if (filtros?.doador_id) {
+        query = query.eq('doador_id', filtros.doador_id);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Service: Erro ao listar doações:', error);
+        throw new Error(`Erro ao carregar doações: ${error.message}`);
+      }
+
+      console.log('Service: Doações carregadas:', data);
+      return data || [];
+    } catch (err) {
+      console.error('Service: Erro na listagem:', err);
+      throw err;
     }
-
-    if (filtros?.categoria_id) {
-      query = query.eq('categoria_id', filtros.categoria_id);
-    }
-
-    if (filtros?.doador_id) {
-      query = query.eq('doador_id', filtros.doador_id);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Erro ao listar doações:', error);
-      throw ErrorHandler.handleApiError(error);
-    }
-
-    return data || [];
   },
 
   // Buscar doação por ID
