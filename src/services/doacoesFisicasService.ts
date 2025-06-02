@@ -36,7 +36,7 @@ export const doacoesFisicasService = {
     // Validar dados
     const validation = validateData(doacaoFisicaSchema, dadosDoacao);
     if (!validation.success) {
-      throw new Error(validation.error);
+      throw new Error('Dados de doação inválidos');
     }
 
     const { data, error } = await supabase
@@ -121,7 +121,7 @@ export const doacoesFisicasService = {
     // Validar status
     const validation = validateData(statusDoacaoSchema, { status });
     if (!validation.success) {
-      throw new Error(validation.error);
+      throw new Error('Status inválido');
     }
 
     const updateData: any = { status };

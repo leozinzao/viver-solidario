@@ -1,11 +1,14 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { NavigationProvider, useNavigation } from "@/context/NavigationContext";
 import NavigationBar from "@/components/navigation/NavigationBar";
 import ScreenRenderer from "@/components/screens/ScreenRenderer";
 import PermissionDialog from "@/components/permissions/PermissionDialog";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
+import OfflineIndicator from "@/components/pwa/OfflineIndicator";
+import { usePWA } from "@/hooks/usePWA";
 
 const AppContent: React.FC = () => {
   const { 
@@ -21,6 +24,8 @@ const AppContent: React.FC = () => {
   } = useNavigation();
   
   const { isAuthenticated } = useAuth();
+  const { isInstallable, isInstalled } = usePWA();
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   
   console.log('ViverSolidarioApp: Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
   
@@ -31,6 +36,17 @@ const AppContent: React.FC = () => {
       navigateToScreen('home');
     }
   }, [isAuthenticated, currentScreen, navigateToScreen]);
+
+  // Mostrar prompt de instalação após um tempo
+  useEffect(() => {
+    if (isInstallable && !isInstalled && isAuthenticated) {
+      const timer = setTimeout(() => {
+        setShowInstallPrompt(true);
+      }, 30000); // 30 segundos
+
+      return () => clearTimeout(timer);
+    }
+  }, [isInstallable, isInstalled, isAuthenticated]);
   
   // Telas públicas que mostram navegação mesmo para usuários não autenticados
   const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
@@ -45,6 +61,9 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="flutter-app border border-border bg-white min-h-screen">
+      {/* Indicador de status offline */}
+      <OfflineIndicator />
+      
       {/* Conteúdo da tela */}
       <div className={`flutter-screen ${shouldShowNavigation ? 'pb-20' : ''}`}>
         <ScreenRenderer
@@ -63,6 +82,11 @@ const AppContent: React.FC = () => {
           currentScreen={currentScreen}
           onNavigate={navigateToScreen}
         />
+      )}
+      
+      {/* Prompt de instalação PWA */}
+      {showInstallPrompt && isInstallable && !isInstalled && (
+        <InstallPrompt onDismiss={() => setShowInstallPrompt(false)} />
       )}
       
       {/* Diálogo de Permissão Negada */}
