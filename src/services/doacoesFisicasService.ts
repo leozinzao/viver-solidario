@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { validateData, doacaoFisicaSchema, statusDoacaoSchema } from '@/lib/validation';
 import { ErrorHandler } from '@/lib/errorHandler';
@@ -9,6 +10,8 @@ export interface DoacaoFisica {
   categoria_id: string;
   categoria?: {
     nome: string;
+    cor?: string;
+    icone?: string;
   };
   quantidade: number;
   unidade: string;
@@ -33,12 +36,20 @@ export interface DoacaoFisica {
   updated_at: string;
 }
 
+export interface Categoria {
+  id: string;
+  nome: string;
+  descricao?: string;
+  cor?: string;
+  icone?: string;
+}
+
 export const doacoesFisicasService = {
   // Criar nova doação física
   async criarDoacao(dadosDoacao: any): Promise<DoacaoFisica> {
     console.log('Service: Dados recebidos para criação:', dadosDoacao);
 
-    // Validar dados básicos - remover campos que podem causar erro
+    // Validar dados básicos
     const dadosParaValidacao = {
       titulo: dadosDoacao.titulo,
       descricao: dadosDoacao.descricao,
@@ -58,7 +69,7 @@ export const doacoesFisicasService = {
       throw new Error(`Dados de doação inválidos: ${validation.error}`);
     }
 
-    // Preparar dados para inserção - apenas campos que existem na tabela
+    // Preparar dados para inserção
     const dadosParaInserir = {
       titulo: dadosDoacao.titulo,
       descricao: dadosDoacao.descricao || null,
@@ -83,16 +94,13 @@ export const doacoesFisicasService = {
         .insert([dadosParaInserir])
         .select(`
           *,
-          categoria:categorias_doacoes(nome),
+          categoria:categorias_doacoes(nome, cor, icone),
           doador:doadores(nome, email)
         `)
         .single();
 
       if (error) {
         console.error('Service: Erro do Supabase:', error);
-        console.error('Service: Código do erro:', error.code);
-        console.error('Service: Mensagem do erro:', error.message);
-        console.error('Service: Detalhes do erro:', error.details);
         throw new Error(`Erro do banco de dados: ${error.message}`);
       }
 
@@ -109,6 +117,8 @@ export const doacoesFisicasService = {
     status?: string;
     categoria_id?: string;
     doador_id?: string;
+    page?: number;
+    limit?: number;
   }): Promise<DoacaoFisica[]> {
     console.log('Service: Carregando doações com filtros:', filtros);
 
@@ -117,7 +127,7 @@ export const doacoesFisicasService = {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(nome),
+          categoria:categorias_doacoes(nome, cor, icone),
           doador:doadores(nome, email),
           reservado_por:doadores!beneficiario_id(nome, email)
         `)
@@ -133,6 +143,13 @@ export const doacoesFisicasService = {
 
       if (filtros?.doador_id) {
         query = query.eq('doador_id', filtros.doador_id);
+      }
+
+      // Implementar paginação
+      if (filtros?.page && filtros?.limit) {
+        const from = (filtros.page - 1) * filtros.limit;
+        const to = from + filtros.limit - 1;
+        query = query.range(from, to);
       }
 
       const { data, error } = await query;
@@ -156,7 +173,7 @@ export const doacoesFisicasService = {
       .from('doacoes_fisicas_novas')
       .select(`
         *,
-        categoria:categorias_doacoes(nome),
+        categoria:categorias_doacoes(nome, cor, icone),
         doador:doadores(nome, email),
         reservado_por:doadores!beneficiario_id(nome, email)
       `)
@@ -199,7 +216,7 @@ export const doacoesFisicasService = {
       .eq('id', id)
       .select(`
         *,
-        categoria:categorias_doacoes(nome),
+        categoria:categorias_doacoes(nome, cor, icone),
         doador:doadores(nome, email),
         reservado_por:doadores!beneficiario_id(nome, email)
       `)
@@ -225,10 +242,10 @@ export const doacoesFisicasService = {
   },
 
   // Listar categorias de doações
-  async listarCategorias(): Promise<{ id: string; nome: string }[]> {
+  async listarCategorias(): Promise<Categoria[]> {
     const { data, error } = await supabase
       .from('categorias_doacoes')
-      .select('id, nome')
+      .select('id, nome, descricao, cor, icone')
       .order('nome');
 
     if (error) {
@@ -236,5 +253,44 @@ export const doacoesFisicasService = {
     }
 
     return data || [];
+  },
+
+  // Contar doações por status
+  async contarDoacoesPorStatus(doadorId?: string): Promise<{
+    total: number;
+    disponivel: number;
+    reservada: number;
+    entregue: number;
+    cancelada: number;
+  }> {
+    let query = supabase
+      .from('doacoes_fisicas_novas')
+      .select('status');
+
+    if (doadorId) {
+      query = query.eq('doador_id', doadorId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
+
+    const contadores = {
+      total: data?.length || 0,
+      disponivel: 0,
+      reservada: 0,
+      entregue: 0,
+      cancelada: 0
+    };
+
+    data?.forEach(item => {
+      if (item.status in contadores) {
+        contadores[item.status as keyof typeof contadores]++;
+      }
+    });
+
+    return contadores;
   }
 };
