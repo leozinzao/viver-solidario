@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { DoacoesFisicasService, DoacaoFisica } from '@/services/doacoesFisicasService';
+import { doacoesFisicasService, DoacaoFisica } from '@/services/doacoesFisicasService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
@@ -29,19 +29,16 @@ export const useDoacoesFisicasImproved = () => {
     setError(null);
 
     try {
-      const resultado = await DoacoesFisicasService.listarDoacoes(filtros);
+      const doacoesList = await doacoesFisicasService.listarDoacoes(filtros);
+      setDoacoes(doacoesList);
       
-      if (resultado.success) {
-        setDoacoes(resultado.data);
-        setPagination(resultado.pagination);
-      } else {
-        setError(resultado.error);
-        toast({
-          title: "Erro",
-          description: resultado.error,
-          variant: "destructive"
-        });
-      }
+      // Simular paginação básica
+      setPagination({
+        page: filtros?.page || 1,
+        limit: filtros?.limit || 10,
+        total: doacoesList.length,
+        pages: Math.ceil(doacoesList.length / (filtros?.limit || 10))
+      });
     } catch (err) {
       const errorMessage = 'Erro ao carregar doações';
       setError(errorMessage);
@@ -69,26 +66,17 @@ export const useDoacoesFisicasImproved = () => {
     setLoading(true);
 
     try {
-      const resultado = await DoacoesFisicasService.criarDoacao(dadosDoacao, user.id);
+      await doacoesFisicasService.criarDoacao({ ...dadosDoacao, doador_id: user.id });
       
-      if (resultado.success) {
-        toast({
-          title: "Sucesso",
-          description: resultado.message,
-          variant: "default"
-        });
-        
-        // Recarregar a lista
-        await carregarDoacoes();
-        return true;
-      } else {
-        toast({
-          title: "Erro",
-          description: resultado.error,
-          variant: "destructive"
-        });
-        return false;
-      }
+      toast({
+        title: "Sucesso",
+        description: "Doação criada com sucesso!",
+        variant: "default"
+      });
+      
+      // Recarregar a lista
+      await carregarDoacoes();
+      return true;
     } catch (err) {
       toast({
         title: "Erro",
@@ -115,30 +103,21 @@ export const useDoacoesFisicasImproved = () => {
     setLoading(true);
 
     try {
-      const resultado = await DoacoesFisicasService.atualizarStatus(doacaoId, 'reservada', user.id);
+      await doacoesFisicasService.atualizarStatus(doacaoId, 'reservada', user.id);
       
-      if (resultado.success) {
-        toast({
-          title: "Sucesso",
-          description: "Doação reservada com sucesso!",
-          variant: "default"
-        });
-        
-        // Atualizar a lista local
-        setDoacoes(prev => prev.map(doacao => 
-          doacao.id === doacaoId 
-            ? { ...doacao, status: 'reservada', beneficiario_id: user.id }
-            : doacao
-        ));
-        return true;
-      } else {
-        toast({
-          title: "Erro", 
-          description: resultado.error,
-          variant: "destructive"
-        });
-        return false;
-      }
+      toast({
+        title: "Sucesso",
+        description: "Doação reservada com sucesso!",
+        variant: "default"
+      });
+      
+      // Atualizar a lista local
+      setDoacoes(prev => prev.map(doacao => 
+        doacao.id === doacaoId 
+          ? { ...doacao, status: 'reservada' as const, reservado_por_id: user.id }
+          : doacao
+      ));
+      return true;
     } catch (err) {
       toast({
         title: "Erro",
@@ -156,30 +135,21 @@ export const useDoacoesFisicasImproved = () => {
     setLoading(true);
 
     try {
-      const resultado = await DoacoesFisicasService.atualizarStatus(doacaoId, 'entregue', user?.id || '');
+      await doacoesFisicasService.atualizarStatus(doacaoId, 'entregue', user?.id || '');
       
-      if (resultado.success) {
-        toast({
-          title: "Sucesso",
-          description: "Entrega confirmada com sucesso!",
-          variant: "default"
-        });
-        
-        // Atualizar a lista local
-        setDoacoes(prev => prev.map(doacao => 
-          doacao.id === doacaoId 
-            ? { ...doacao, status: 'entregue' }
-            : doacao
-        ));
-        return true;
-      } else {
-        toast({
-          title: "Erro",
-          description: resultado.error,
-          variant: "destructive"
-        });
-        return false;
-      }
+      toast({
+        title: "Sucesso",
+        description: "Entrega confirmada com sucesso!",
+        variant: "default"
+      });
+      
+      // Atualizar a lista local
+      setDoacoes(prev => prev.map(doacao => 
+        doacao.id === doacaoId 
+          ? { ...doacao, status: 'entregue' as const }
+          : doacao
+      ));
+      return true;
     } catch (err) {
       toast({
         title: "Erro",
