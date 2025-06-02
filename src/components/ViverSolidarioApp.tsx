@@ -46,7 +46,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="flutter-app border border-border bg-white min-h-screen">
       {/* Conteúdo da tela */}
-      <div className={`flutter-screen ${shouldShowNavigation ? 'pb-14' : ''}`}>
+      <div className={`flutter-screen ${shouldShowNavigation ? 'pb-20' : ''}`}>
         <ScreenRenderer
           currentScreen={currentScreen}
           onEnterApp={handleEnterApp}
