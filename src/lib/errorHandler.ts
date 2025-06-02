@@ -8,8 +8,6 @@ export interface ApiError {
 }
 
 export class ErrorHandler {
-  private static toast = useToast();
-
   // Manipular erros de API de forma padronizada
   static handleApiError(error: any): ApiError {
     console.error('API Error:', error);
@@ -44,26 +42,6 @@ export class ErrorHandler {
       message: 'Ocorreu um erro inesperado',
       status: 500
     };
-  }
-
-  // Mostrar erro com toast
-  static showError(error: any, customMessage?: string) {
-    const apiError = this.handleApiError(error);
-    
-    this.toast?.({
-      title: "Erro",
-      description: customMessage || apiError.message,
-      variant: "destructive"
-    });
-  }
-
-  // Mostrar sucesso
-  static showSuccess(message: string, description?: string) {
-    this.toast?.({
-      title: message,
-      description,
-      variant: "default"
-    });
   }
 
   // Validar resposta de API
