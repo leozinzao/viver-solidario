@@ -296,12 +296,15 @@ export type Database = {
           descricao: string | null
           doador_id: string | null
           endereco_coleta: string | null
+          endereco_entrega: string | null
           fotos: string[] | null
           id: string
           localizacao: string | null
           observacoes: string | null
+          observacoes_entrega: string | null
           quantidade: number
           status: string
+          tipo_entrega: string | null
           titulo: string
           unidade: string
           updated_at: string
@@ -319,12 +322,15 @@ export type Database = {
           descricao?: string | null
           doador_id?: string | null
           endereco_coleta?: string | null
+          endereco_entrega?: string | null
           fotos?: string[] | null
           id?: string
           localizacao?: string | null
           observacoes?: string | null
+          observacoes_entrega?: string | null
           quantidade?: number
           status?: string
+          tipo_entrega?: string | null
           titulo: string
           unidade?: string
           updated_at?: string
@@ -342,12 +348,15 @@ export type Database = {
           descricao?: string | null
           doador_id?: string | null
           endereco_coleta?: string | null
+          endereco_entrega?: string | null
           fotos?: string[] | null
           id?: string
           localizacao?: string | null
           observacoes?: string | null
+          observacoes_entrega?: string | null
           quantidade?: number
           status?: string
+          tipo_entrega?: string | null
           titulo?: string
           unidade?: string
           updated_at?: string

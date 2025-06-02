@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Heart, Truck, Package } from 'lucide-react';
 import { useDoacoesFisicasImproved } from '@/hooks/useDoacoesFisicasImproved';
 import { useAuth } from '@/context/AuthContext';
 
@@ -43,13 +44,25 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
     unidade: 'unidade',
     localizacao: '',
     endereco_coleta: '',
+    tipo_entrega: 'retirada',
+    endereco_entrega: '',
     observacoes: '',
+    observacoes_entrega: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.titulo || !formData.categoria_id || !user) {
+      return;
+    }
+
+    // Validar campos obrigatórios baseado no tipo de entrega
+    if (formData.tipo_entrega === 'retirada' && !formData.endereco_coleta) {
+      return;
+    }
+    
+    if (formData.tipo_entrega === 'entrega_doador' && !formData.endereco_entrega) {
       return;
     }
 
@@ -76,7 +89,10 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
           unidade: 'unidade',
           localizacao: '',
           endereco_coleta: '',
+          tipo_entrega: 'retirada',
+          endereco_entrega: '',
           observacoes: '',
+          observacoes_entrega: '',
         });
         
         onOpenChange(false);
@@ -183,24 +199,80 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
             />
           </div>
 
-          <div>
-            <Label htmlFor="endereco_coleta">Endereço para Retirada</Label>
-            <Input
-              id="endereco_coleta"
-              value={formData.endereco_coleta}
-              onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })}
-              placeholder="Endereço onde a ONG pode retirar a doação"
-              required
-            />
+          {/* Tipo de Entrega */}
+          <div className="space-y-3">
+            <Label>Como será a entrega?</Label>
+            <RadioGroup
+              value={formData.tipo_entrega}
+              onValueChange={(value) => setFormData({ ...formData, tipo_entrega: value })}
+              className="space-y-2"
+            >
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="retirada" id="retirada" />
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4 text-viver-yellow" />
+                  <Label htmlFor="retirada" className="flex-1 cursor-pointer">
+                    A ONG retira no meu endereço
+                  </Label>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="entrega_doador" id="entrega_doador" />
+                <div className="flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-viver-yellow" />
+                  <Label htmlFor="entrega_doador" className="flex-1 cursor-pointer">
+                    Eu entrego na sede da ONG
+                  </Label>
+                </div>
+              </div>
+            </RadioGroup>
           </div>
 
+          {/* Endereço baseado no tipo de entrega */}
+          {formData.tipo_entrega === 'retirada' && (
+            <div>
+              <Label htmlFor="endereco_coleta">Endereço para Retirada</Label>
+              <Input
+                id="endereco_coleta"
+                value={formData.endereco_coleta}
+                onChange={(e) => setFormData({ ...formData, endereco_coleta: e.target.value })}
+                placeholder="Endereço onde a ONG pode retirar a doação"
+                required
+              />
+            </div>
+          )}
+
+          {formData.tipo_entrega === 'entrega_doador' && (
+            <div>
+              <Label htmlFor="endereco_entrega">Endereço da ONG para Entrega</Label>
+              <Input
+                id="endereco_entrega"
+                value={formData.endereco_entrega}
+                onChange={(e) => setFormData({ ...formData, endereco_entrega: e.target.value })}
+                placeholder="Endereço da sede da ONG onde você vai entregar"
+                required
+              />
+            </div>
+          )}
+
           <div>
-            <Label htmlFor="observacoes">Observações</Label>
+            <Label htmlFor="observacoes">Observações Gerais</Label>
             <Textarea
               id="observacoes"
               value={formData.observacoes}
               onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-              placeholder="Horários disponíveis, informações adicionais..."
+              placeholder="Informações adicionais sobre a doação..."
+              rows={2}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="observacoes_entrega">Observações sobre Entrega</Label>
+            <Textarea
+              id="observacoes_entrega"
+              value={formData.observacoes_entrega}
+              onChange={(e) => setFormData({ ...formData, observacoes_entrega: e.target.value })}
+              placeholder="Horários disponíveis, instruções especiais..."
               rows={2}
             />
           </div>

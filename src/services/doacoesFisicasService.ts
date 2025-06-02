@@ -15,17 +15,21 @@ export interface DoacaoFisica {
   unidade: string;
   status: 'disponivel' | 'reservada' | 'entregue' | 'cancelada';
   endereco_coleta: string;
+  tipo_entrega: 'retirada' | 'entrega_doador';
+  endereco_entrega?: string;
   observacoes?: string;
+  observacoes_entrega?: string;
   doador_id: string;
   doador?: {
     nome: string;
     email: string;
   };
-  reservado_por_id?: string;
+  beneficiario_id?: string;
   reservado_por?: {
     nome: string;
     email: string;
   };
+  localizacao?: string;
   created_at: string;
   updated_at: string;
 }
@@ -48,17 +52,20 @@ export const doacoesFisicasService = {
       throw new Error('Dados de doação inválidos');
     }
 
-    // Preparar dados para inserção - usar apenas campos que existem na tabela
+    // Preparar dados para inserção
     const dadosParaInserir = {
       titulo: dadosDoacao.titulo,
-      descricao: dadosDoacao.descricao,
+      descricao: dadosDoacao.descricao || null,
       categoria_id: dadosDoacao.categoria_id,
       quantidade: Number(dadosDoacao.quantidade),
       unidade: dadosDoacao.unidade,
       endereco_coleta: dadosDoacao.endereco_coleta,
-      observacoes: dadosDoacao.observacoes,
+      tipo_entrega: dadosDoacao.tipo_entrega || 'retirada',
+      endereco_entrega: dadosDoacao.endereco_entrega || null,
+      observacoes: dadosDoacao.observacoes || null,
+      observacoes_entrega: dadosDoacao.observacoes_entrega || null,
       doador_id: dadosDoacao.doador_id,
-      localizacao: dadosDoacao.localizacao,
+      localizacao: dadosDoacao.localizacao || null,
       status: 'disponivel'
     };
 
@@ -94,7 +101,7 @@ export const doacoesFisicasService = {
         *,
         categoria:categorias_doacoes(nome),
         doador:doadores(nome, email),
-        reservado_por:doadores(nome, email)
+        reservado_por:doadores!beneficiario_id(nome, email)
       `)
       .order('created_at', { ascending: false });
 
@@ -113,6 +120,7 @@ export const doacoesFisicasService = {
     const { data, error } = await query;
 
     if (error) {
+      console.error('Erro ao listar doações:', error);
       throw ErrorHandler.handleApiError(error);
     }
 
@@ -127,7 +135,7 @@ export const doacoesFisicasService = {
         *,
         categoria:categorias_doacoes(nome),
         doador:doadores(nome, email),
-        reservado_por:doadores(nome, email)
+        reservado_por:doadores!beneficiario_id(nome, email)
       `)
       .eq('id', id)
       .single();
@@ -170,7 +178,7 @@ export const doacoesFisicasService = {
         *,
         categoria:categorias_doacoes(nome),
         doador:doadores(nome, email),
-        reservado_por:doadores(nome, email)
+        reservado_por:doadores!beneficiario_id(nome, email)
       `)
       .single();
 

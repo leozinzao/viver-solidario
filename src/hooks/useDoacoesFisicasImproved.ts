@@ -29,7 +29,9 @@ export const useDoacoesFisicasImproved = () => {
     setError(null);
 
     try {
+      console.log('Carregando doações com filtros:', filtros);
       const doacoesList = await doacoesFisicasService.listarDoacoes(filtros);
+      console.log('Doações carregadas:', doacoesList);
       setDoacoes(doacoesList);
       
       // Simular paginação básica
@@ -40,6 +42,7 @@ export const useDoacoesFisicasImproved = () => {
         pages: Math.ceil(doacoesList.length / (filtros?.limit || 10))
       });
     } catch (err) {
+      console.error('Erro ao carregar doações:', err);
       const errorMessage = 'Erro ao carregar doações';
       setError(errorMessage);
       toast({
@@ -67,7 +70,12 @@ export const useDoacoesFisicasImproved = () => {
 
     try {
       console.log('Hook: Criando doação com dados:', dadosDoacao);
-      await doacoesFisicasService.criarDoacao({ ...dadosDoacao, doador_id: user.id });
+      const novaDoacao = await doacoesFisicasService.criarDoacao({ 
+        ...dadosDoacao, 
+        doador_id: user.id 
+      });
+      
+      console.log('Hook: Doação criada:', novaDoacao);
       
       toast({
         title: "Sucesso",
@@ -116,11 +124,12 @@ export const useDoacoesFisicasImproved = () => {
       // Atualizar a lista local
       setDoacoes(prev => prev.map(doacao => 
         doacao.id === doacaoId 
-          ? { ...doacao, status: 'reservada' as const, reservado_por_id: user.id }
+          ? { ...doacao, status: 'reservada' as const, beneficiario_id: user.id }
           : doacao
       ));
       return true;
     } catch (err) {
+      console.error('Erro ao reservar doação:', err);
       toast({
         title: "Erro",
         description: "Erro ao reservar doação",
@@ -153,6 +162,7 @@ export const useDoacoesFisicasImproved = () => {
       ));
       return true;
     } catch (err) {
+      console.error('Erro ao confirmar entrega:', err);
       toast({
         title: "Erro",
         description: "Erro ao confirmar entrega",
