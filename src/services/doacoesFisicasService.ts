@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { validateData, doacaoFisicaSchema, statusDoacaoSchema } from '@/lib/validation';
 import { ErrorHandler } from '@/lib/errorHandler';
@@ -32,6 +31,8 @@ export interface DoacaoFisica {
     email: string;
   };
   localizacao?: string;
+  data_entrega?: string;
+  data_reserva?: string;
   created_at: string;
   updated_at: string;
 }
@@ -65,8 +66,9 @@ export const doacoesFisicasService = {
     const validation = validateData(doacaoFisicaSchema, dadosParaValidacao);
     
     if (!validation.success) {
-      console.error('Service: Erro de validação:', validation.error);
-      throw new Error(`Dados de doação inválidos: ${validation.error}`);
+      console.error('Service: Erro de validação:', validation);
+      const errorMessage = 'error' in validation ? validation.error : 'Dados de doação inválidos';
+      throw new Error(`Dados de doação inválidos: ${errorMessage}`);
     }
 
     // Preparar dados para inserção
