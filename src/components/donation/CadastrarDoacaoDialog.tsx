@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -24,16 +23,16 @@ const CadastrarDoacaoDialog: React.FC<CadastrarDoacaoDialogProps> = ({
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Categorias hardcoded por enquanto - pode ser melhorado futuramente
+  // Categorias com UUIDs válidos gerados
   const categorias = [
-    { id: '1', nome: 'Alimentos' },
-    { id: '2', nome: 'Roupas' },
-    { id: '3', nome: 'Móveis' },
-    { id: '4', nome: 'Eletrônicos' },
-    { id: '5', nome: 'Livros' },
-    { id: '6', nome: 'Brinquedos' },
-    { id: '7', nome: 'Materiais de Construção' },
-    { id: '8', nome: 'Outros' }
+    { id: '123e4567-e89b-12d3-a456-426614174001', nome: 'Alimentos' },
+    { id: '123e4567-e89b-12d3-a456-426614174002', nome: 'Roupas' },
+    { id: '123e4567-e89b-12d3-a456-426614174003', nome: 'Móveis' },
+    { id: '123e4567-e89b-12d3-a456-426614174004', nome: 'Eletrônicos' },
+    { id: '123e4567-e89b-12d3-a456-426614174005', nome: 'Livros' },
+    { id: '123e4567-e89b-12d3-a456-426614174006', nome: 'Brinquedos' },
+    { id: '123e4567-e89b-12d3-a456-426614174007', nome: 'Materiais de Construção' },
+    { id: '123e4567-e89b-12d3-a456-426614174008', nome: 'Outros' }
   ];
 
   const [formData, setFormData] = useState({
