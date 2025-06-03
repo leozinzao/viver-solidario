@@ -53,13 +53,18 @@ export function useDoacoesFisicas() {
     queryFn: async () => {
       console.log('Buscando minhas doações físicas...');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) {
+        console.log('Usuário não logado, retornando array vazio');
+        return [];
+      }
+
+      console.log('Usuário logado:', user.id);
 
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categorias_doacoes (
+          categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey (
             nome,
             icone,
             cor
@@ -72,7 +77,9 @@ export function useDoacoesFisicas() {
         console.error('Erro ao buscar minhas doações:', error);
         throw error;
       }
+      
       console.log('Minhas doações encontradas:', data);
+      console.log('Quantidade de doações:', data?.length || 0);
       return data as DoacaoFisica[];
     },
   });
@@ -103,15 +110,21 @@ export function useDoacoesFisicas() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
+      console.log('ID do usuário para doador_id:', user.id);
+
+      const dadosParaInserir = {
+        ...doacao,
+        doador_id: user.id, // GARANTIR que sempre seja preenchido
+        status: 'cadastrada',
+        telefone_doador: doacao.telefone,
+        email_doador: doacao.email,
+      };
+
+      console.log('Dados completos para inserção:', dadosParaInserir);
+
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
-        .insert([{
-          ...doacao,
-          doador_id: user.id,
-          status: 'cadastrada',
-          telefone_doador: doacao.telefone,
-          email_doador: doacao.email,
-        }])
+        .insert([dadosParaInserir])
         .select()
         .single();
 
@@ -119,10 +132,12 @@ export function useDoacoesFisicas() {
         console.error('Erro ao criar doação:', error);
         throw error;
       }
-      console.log('Doação criada:', data);
+      
+      console.log('Doação criada com sucesso:', data);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Doação criada, invalidando queries...');
       queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] });
       toast({
         title: "Sucesso",

@@ -21,8 +21,9 @@ export const validationService = {
     // Validar com schema se disponível
     const validation = validateData(doacaoFisicaSchema, dadosDoacao);
     if (!validation.success) {
-      console.error('Validation: Erro de schema:', validation.error);
-      throw new Error(`Dados inválidos: ${validation.error}`);
+      console.error('Validation: Erro de schema:', validation);
+      const errorMessage = 'error' in validation ? validation.error : 'Dados inválidos';
+      throw new Error(`Dados inválidos: ${errorMessage}`);
     }
 
     console.log('Validation: Dados básicos válidos');
