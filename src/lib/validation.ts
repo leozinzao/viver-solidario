@@ -8,7 +8,7 @@ export const doacaoFisicaSchema = z.object({
   categoria_id: z.string().min(1, 'Categoria é obrigatória'),
   quantidade: z.number().min(1, 'Quantidade deve ser maior que 0'),
   unidade: z.string().min(1, 'Unidade é obrigatória'),
-  endereco_coleta: z.string().min(5, 'Endereço de coleta é obrigatório').optional(),
+  endereco_coleta: z.string().optional(),
   observacoes: z.string().optional(),
 });
 

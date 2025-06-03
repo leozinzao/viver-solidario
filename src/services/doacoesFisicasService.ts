@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { validateData, doacaoFisicaSchema, statusDoacaoSchema } from '@/lib/validation';
 import { ErrorHandler } from '@/lib/errorHandler';
@@ -68,6 +69,15 @@ export const doacoesFisicasService = {
     if (!validation.success) {
       console.error('Service: Erro de validação:', validation);
       throw new Error(`Dados de doação inválidos: ${validation.error}`);
+    }
+
+    // Validações condicionais baseadas no tipo de entrega
+    if (dadosDoacao.tipo_entrega === 'retirada' && !dadosDoacao.endereco_coleta?.trim()) {
+      throw new Error('Endereço para retirada é obrigatório quando a ONG retira no seu endereço');
+    }
+    
+    if (dadosDoacao.tipo_entrega === 'entrega_doador' && !dadosDoacao.endereco_entrega?.trim()) {
+      throw new Error('Endereço de entrega é obrigatório quando você entrega na sede da ONG');
     }
 
     // Preparar dados para inserção
