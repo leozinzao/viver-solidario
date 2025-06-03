@@ -123,7 +123,7 @@ const DoacoesFisicasOtimizadas: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <FormularioDoacaoOtimizado
+            <FormularioDoacaoOptimizado
               onSubmit={handleSubmit}
               isSubmitting={submitting}
               onCancel={() => setShowForm(false)}
