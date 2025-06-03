@@ -37,7 +37,7 @@ export const validationService = {
         throw new Error('Endereço para retirada é obrigatório');
       }
       
-      // Validação básica de endereço (sem schema específico)
+      // Validação básica de endereço
       const endereco = dadosDoacao.endereco_coleta.trim();
       if (endereco.length < 10) {
         console.warn('Validation: Endereço muito curto, pode estar incompleto');
@@ -48,7 +48,7 @@ export const validationService = {
         throw new Error('Endereço de entrega é obrigatório');
       }
       
-      // Validação básica de endereço (sem schema específico)
+      // Validação básica de endereço
       const endereco = dadosDoacao.endereco_entrega.trim();
       if (endereco.length < 10) {
         console.warn('Validation: Endereço muito curto, pode estar incompleto');
