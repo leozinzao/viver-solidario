@@ -38,24 +38,24 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
   // Carregar categorias
   const carregarCategorias = useCallback(async () => {
     try {
-      console.log('Carregando categorias...');
+      console.log('Hook: Carregando categorias...');
       const categoriasData = await doacoesFisicasService.listarCategorias();
-      console.log('Categorias carregadas:', categoriasData);
+      console.log('Hook: Categorias carregadas:', categoriasData);
       setCategorias(categoriasData);
     } catch (err: any) {
-      console.error('Erro ao carregar categorias:', err);
+      console.error('Hook: Erro ao carregar categorias:', err);
     }
   }, []);
 
   // Carregar estatísticas
   const carregarEstatisticas = useCallback(async (doadorId?: string) => {
     try {
-      console.log('Carregando estatísticas para doador:', doadorId);
+      console.log('Hook: Carregando estatísticas para doador:', doadorId);
       const stats = await doacoesFisicasService.contarDoacoesPorStatus(doadorId);
-      console.log('Estatísticas carregadas:', stats);
+      console.log('Hook: Estatísticas carregadas:', stats);
       setEstatisticas(stats);
     } catch (err: any) {
-      console.error('Erro ao carregar estatísticas:', err);
+      console.error('Hook: Erro ao carregar estatísticas:', err);
     }
   }, []);
 
@@ -72,8 +72,12 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
 
     try {
       console.log('Hook: Carregando doações com filtros:', filtros);
+      console.log('Hook: Usuário atual:', user);
+      
       const doacoesList = await doacoesFisicasService.listarDoacoes(filtros);
-      console.log('Hook: Doações carregadas:', doacoesList);
+      console.log('Hook: Doações retornadas do serviço:', doacoesList);
+      console.log('Hook: Quantidade de doações:', doacoesList.length);
+      
       setDoacoes(doacoesList);
       
       setPagination(prev => ({
@@ -83,6 +87,8 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
         total: doacoesList.length,
         pages: Math.ceil(doacoesList.length / (filtros?.limit || 10))
       }));
+
+      console.log('Hook: Estado das doações atualizado');
     } catch (err: any) {
       console.error('Hook: Erro ao carregar doações:', err);
       const errorMessage = err?.message || 'Erro ao carregar doações';
@@ -95,7 +101,7 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, user]);
 
   // Criar nova doação
   const criarDoacao = useCallback(async (dadosDoacao: any) => {
@@ -151,7 +157,8 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
         variant: "default"
       });
       
-      // Recarregar dados
+      // Recarregar dados após criar
+      console.log('Hook: Recarregando dados após criação...');
       await Promise.all([
         carregarDoacoes({ doador_id: user.id }),
         carregarEstatisticas(user.id)
@@ -252,14 +259,20 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
   // Inicialização
   useEffect(() => {
     const inicializar = async () => {
-      console.log('Inicializando hook com usuário:', user);
+      console.log('Hook: Inicializando hook com usuário:', user);
       await carregarCategorias();
       
       if (user) {
+        console.log('Hook: Carregando doações do usuário:', user.id);
+        const filtros = props?.filtrosIniciais || { doador_id: user.id };
+        console.log('Hook: Filtros aplicados:', filtros);
+        
         await Promise.all([
-          carregarDoacoes(props?.filtrosIniciais || { doador_id: user.id }),
+          carregarDoacoes(filtros),
           carregarEstatisticas(user.id)
         ]);
+      } else {
+        console.log('Hook: Usuário não logado, não carregando doações');
       }
     };
 

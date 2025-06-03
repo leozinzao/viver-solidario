@@ -1,39 +1,68 @@
 
-import { validateData, doacaoFisicaSchema } from '@/lib/validation';
+import { validateData, doacaoFisicaSchema, enderecoSchema } from '@/lib/validation';
 
 export const validationService = {
   // Validar dados básicos da doação
-  validateDoacaoData(dadosDoacao: any) {
-    const dadosParaValidacao = {
-      titulo: dadosDoacao.titulo,
-      descricao: dadosDoacao.descricao,
-      categoria_id: dadosDoacao.categoria_id,
-      quantidade: dadosDoacao.quantidade,
-      unidade: dadosDoacao.unidade,
-      endereco_coleta: dadosDoacao.endereco_coleta,
-      observacoes: dadosDoacao.observacoes
-    };
+  validateDoacaoData(dadosDoacao: any): void {
+    console.log('Validation: Validando dados básicos:', dadosDoacao);
 
-    console.log('Service: Dados para validação:', dadosParaValidacao);
-
-    const validation = validateData(doacaoFisicaSchema, dadosParaValidacao);
-    
-    if (!validation.success) {
-      console.error('Service: Erro de validação:', validation);
-      throw new Error(`Dados de doação inválidos: ${validation.error}`);
+    if (!dadosDoacao.titulo?.trim()) {
+      throw new Error('Título é obrigatório');
     }
 
-    return validation.data;
+    if (!dadosDoacao.categoria_id) {
+      throw new Error('Categoria é obrigatória');
+    }
+
+    if (!dadosDoacao.quantidade || dadosDoacao.quantidade <= 0) {
+      throw new Error('Quantidade deve ser maior que zero');
+    }
+
+    // Validar com schema se disponível
+    const validation = validateData(doacaoFisicaSchema, dadosDoacao);
+    if (!validation.success) {
+      console.error('Validation: Erro de schema:', validation.error);
+      throw new Error(`Dados inválidos: ${validation.error}`);
+    }
+
+    console.log('Validation: Dados básicos válidos');
   },
 
-  // Validações condicionais baseadas no tipo de entrega
-  validateTipoEntrega(dadosDoacao: any) {
-    if (dadosDoacao.tipo_entrega === 'retirada' && !dadosDoacao.endereco_coleta?.trim()) {
-      throw new Error('Endereço para retirada é obrigatório quando a ONG retira no seu endereço');
+  // Validar tipo de entrega específico
+  validateTipoEntrega(dadosDoacao: any): void {
+    console.log('Validation: Validando tipo de entrega:', dadosDoacao.tipo_entrega);
+
+    if (dadosDoacao.tipo_entrega === 'retirada') {
+      if (!dadosDoacao.endereco_coleta?.trim()) {
+        throw new Error('Endereço para retirada é obrigatório');
+      }
+      
+      // Validar endereço se schema disponível
+      try {
+        const validation = validateData(enderecoSchema, { endereco: dadosDoacao.endereco_coleta });
+        if (!validation.success) {
+          console.warn('Validation: Endereço pode ter formato inválido:', validation.error);
+        }
+      } catch (err) {
+        console.log('Validation: Schema de endereço não disponível, pulando validação');
+      }
+    } 
+    else if (dadosDoacao.tipo_entrega === 'entrega_doador') {
+      if (!dadosDoacao.endereco_entrega?.trim()) {
+        throw new Error('Endereço de entrega é obrigatório');
+      }
+      
+      // Validar endereço se schema disponível  
+      try {
+        const validation = validateData(enderecoSchema, { endereco: dadosDoacao.endereco_entrega });
+        if (!validation.success) {
+          console.warn('Validation: Endereço pode ter formato inválido:', validation.error);
+        }
+      } catch (err) {
+        console.log('Validation: Schema de endereço não disponível, pulando validação');
+      }
     }
-    
-    if (dadosDoacao.tipo_entrega === 'entrega_doador' && !dadosDoacao.endereco_entrega?.trim()) {
-      throw new Error('Endereço de entrega é obrigatório quando você entrega na sede da ONG');
-    }
+
+    console.log('Validation: Tipo de entrega válido');
   }
 };
