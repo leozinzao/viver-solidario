@@ -4,19 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Plus, Search, Package, Clock, CheckCircle, TrendingUp } from 'lucide-react';
+import { Heart, Plus, Search, Package } from 'lucide-react';
 import { useDoacoesFisicasRefactored } from '@/hooks/useDoacoesFisicasRefactored';
 import DoacaoCard from './DoacaoCard';
 import CadastrarDoacaoDialog from './CadastrarDoacaoDialog';
+import EstatisticasDoacoes from './EstatisticasDoacoes';
+import { useCategoriasDoacoes } from '@/hooks/useCategoriasDoacoes';
 import { useAuth } from '@/context/AuthContext';
 
 const DoacoesFisicasRefactored: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
+  const { categorias } = useCategoriasDoacoes();
   const { 
     doacoes, 
-    categorias, 
     loading, 
-    estatisticas,
     carregarDoacoes 
   } = useDoacoesFisicasRefactored();
   
@@ -86,47 +87,7 @@ const DoacoesFisicasRefactored: React.FC = () => {
           </p>
           
           {/* Estatísticas Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
-                <div>
-                  <span className="text-sm font-medium text-blue-800 block">Total</span>
-                  <span className="text-lg font-bold text-blue-900">{estatisticas.total}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-green-600" />
-                <div>
-                  <span className="text-sm font-medium text-green-800 block">Disponível</span>
-                  <span className="text-lg font-bold text-green-900">{estatisticas.disponivel}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-yellow-600" />
-                <div>
-                  <span className="text-sm font-medium text-yellow-800 block">Reservada</span>
-                  <span className="text-lg font-bold text-yellow-900">{estatisticas.reservada}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600" />
-                <div>
-                  <span className="text-sm font-medium text-emerald-800 block">Entregue</span>
-                  <span className="text-lg font-bold text-emerald-900">{estatisticas.entregue}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <EstatisticasDoacoes />
           
           {/* Filtros */}
           <div className="flex flex-col gap-3">
