@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { doacoesFisicasService, DoacaoFisica, Categoria } from '@/services/doacoesFisicasService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
@@ -36,27 +36,31 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
   const { user } = useAuth();
 
   // Carregar categorias
-  const carregarCategorias = async () => {
+  const carregarCategorias = useCallback(async () => {
     try {
+      console.log('Carregando categorias...');
       const categoriasData = await doacoesFisicasService.listarCategorias();
+      console.log('Categorias carregadas:', categoriasData);
       setCategorias(categoriasData);
     } catch (err: any) {
       console.error('Erro ao carregar categorias:', err);
     }
-  };
+  }, []);
 
   // Carregar estatísticas
-  const carregarEstatisticas = async (doadorId?: string) => {
+  const carregarEstatisticas = useCallback(async (doadorId?: string) => {
     try {
+      console.log('Carregando estatísticas para doador:', doadorId);
       const stats = await doacoesFisicasService.contarDoacoesPorStatus(doadorId);
+      console.log('Estatísticas carregadas:', stats);
       setEstatisticas(stats);
     } catch (err: any) {
       console.error('Erro ao carregar estatísticas:', err);
     }
-  };
+  }, []);
 
   // Carregar doações com filtros
-  const carregarDoacoes = async (filtros?: {
+  const carregarDoacoes = useCallback(async (filtros?: {
     status?: string;
     categoria_id?: string;
     doador_id?: string;
@@ -91,10 +95,10 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   // Criar nova doação
-  const criarDoacao = async (dadosDoacao: any) => {
+  const criarDoacao = useCallback(async (dadosDoacao: any) => {
     if (!user) {
       toast({
         title: "Erro",
@@ -138,7 +142,8 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
 
       console.log('Hook: Dados preparados para envio:', dadosCompletos);
       
-      await doacoesFisicasService.criarDoacao(dadosCompletos);
+      const novaDoacao = await doacoesFisicasService.criarDoacao(dadosCompletos);
+      console.log('Hook: Doação criada com sucesso:', novaDoacao);
       
       toast({
         title: "Sucesso",
@@ -165,10 +170,10 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast, carregarDoacoes, carregarEstatisticas]);
 
   // Reservar doação
-  const reservarDoacao = async (doacaoId: string) => {
+  const reservarDoacao = useCallback(async (doacaoId: string) => {
     if (!user) {
       toast({
         title: "Erro",
@@ -208,10 +213,10 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
 
   // Confirmar entrega
-  const confirmarEntrega = async (doacaoId: string) => {
+  const confirmarEntrega = useCallback(async (doacaoId: string) => {
     setLoading(true);
 
     try {
@@ -242,11 +247,12 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
 
   // Inicialização
   useEffect(() => {
     const inicializar = async () => {
+      console.log('Inicializando hook com usuário:', user);
       await carregarCategorias();
       
       if (user) {
@@ -258,7 +264,7 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     };
 
     inicializar();
-  }, [user]);
+  }, [user, carregarCategorias, carregarDoacoes, carregarEstatisticas, props?.filtrosIniciais]);
 
   return {
     // Estados

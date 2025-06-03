@@ -1,6 +1,5 @@
 
 import { doacoesFisicasService } from './doacoesFisicasService';
-import { useCategoriasDoacoes } from '@/hooks/useCategoriasDoacoes';
 
 export const doacaoUnificadaService = {
   // Mapear dados do Brechó do Bem para o sistema unificado
@@ -11,13 +10,33 @@ export const doacaoUnificadaService = {
     descricao: string;
     foto?: File;
   }, doadorId: string) {
-    // Buscar categoria de "Roupas" ou criar uma genérica
-    const categoriaRoupas = '123e4567-e89b-12d3-a456-426614174002'; // ID fixo para roupas
+    console.log('Criando doação Brechó:', dadosBrecho);
+
+    // Buscar a categoria de roupas existente ou usar a primeira disponível
+    const categorias = await doacoesFisicasService.listarCategorias();
+    console.log('Categorias disponíveis:', categorias);
+    
+    // Procurar por categoria de roupas
+    let categoriaRoupas = categorias.find(cat => 
+      cat.nome.toLowerCase().includes('roupa') || 
+      cat.nome.toLowerCase().includes('vestuário') ||
+      cat.nome.toLowerCase().includes('têxtil')
+    );
+    
+    // Se não encontrar categoria específica, usar a primeira disponível
+    if (!categoriaRoupas && categorias.length > 0) {
+      categoriaRoupas = categorias[0];
+      console.log('Usando primeira categoria disponível:', categoriaRoupas);
+    }
+    
+    if (!categoriaRoupas) {
+      throw new Error('Nenhuma categoria encontrada. Verifique se existem categorias cadastradas.');
+    }
 
     const dadosUnificados = {
       titulo: `${dadosBrecho.tipoRoupa} - Tamanho ${dadosBrecho.tamanho}`,
       descricao: `${dadosBrecho.descricao}\nEstado: ${dadosBrecho.estado}`,
-      categoria_id: categoriaRoupas,
+      categoria_id: categoriaRoupas.id,
       quantidade: 1,
       unidade: 'unidade',
       tipo_entrega: 'entrega_doador',
@@ -26,6 +45,7 @@ export const doacaoUnificadaService = {
       doador_id: doadorId
     };
 
+    console.log('Dados unificados Brechó:', dadosUnificados);
     return doacoesFisicasService.criarDoacao(dadosUnificados);
   },
 
@@ -38,13 +58,34 @@ export const doacaoUnificadaService = {
     validade?: string;
     observacoes: string;
   }, doadorId: string) {
-    // Buscar categoria de "Alimentos" ou criar uma genérica
-    const categoriaAlimentos = '123e4567-e89b-12d3-a456-426614174001'; // ID fixo para alimentos
+    console.log('Criando doação Alimentos:', dadosAlimentos);
+
+    // Buscar a categoria de alimentos existente ou usar a primeira disponível
+    const categorias = await doacoesFisicasService.listarCategorias();
+    console.log('Categorias disponíveis:', categorias);
+    
+    // Procurar por categoria de alimentos
+    let categoriaAlimentos = categorias.find(cat => 
+      cat.nome.toLowerCase().includes('alimento') || 
+      cat.nome.toLowerCase().includes('comida') ||
+      cat.nome.toLowerCase().includes('cesta') ||
+      cat.nome.toLowerCase().includes('básica')
+    );
+    
+    // Se não encontrar categoria específica, usar a primeira disponível
+    if (!categoriaAlimentos && categorias.length > 0) {
+      categoriaAlimentos = categorias[0];
+      console.log('Usando primeira categoria disponível:', categoriaAlimentos);
+    }
+    
+    if (!categoriaAlimentos) {
+      throw new Error('Nenhuma categoria encontrada. Verifique se existem categorias cadastradas.');
+    }
 
     const dadosUnificados = {
       titulo: dadosAlimentos.nomeItem,
       descricao: `Tipo: ${dadosAlimentos.tipoItem}\n${dadosAlimentos.observacoes}${dadosAlimentos.validade ? `\nValidade: ${dadosAlimentos.validade}` : ''}`,
-      categoria_id: categoriaAlimentos,
+      categoria_id: categoriaAlimentos.id,
       quantidade: Number(dadosAlimentos.quantidade) || 1,
       unidade: dadosAlimentos.unidade || 'unidade',
       tipo_entrega: 'entrega_doador',
@@ -53,6 +94,7 @@ export const doacaoUnificadaService = {
       doador_id: doadorId
     };
 
+    console.log('Dados unificados Alimentos:', dadosUnificados);
     return doacoesFisicasService.criarDoacao(dadosUnificados);
   }
 };
