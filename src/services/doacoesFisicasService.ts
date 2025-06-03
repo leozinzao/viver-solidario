@@ -67,7 +67,7 @@ export const doacoesFisicasService = {
     
     if (!validation.success) {
       console.error('Service: Erro de validação:', validation);
-      const errorMessage = 'error' in validation ? validation.error : 'Dados de doação inválidos';
+      const errorMessage = !validation.success ? validation.error : 'Dados de doação inválidos';
       throw new Error(`Dados de doação inválidos: ${errorMessage}`);
     }
 
@@ -96,8 +96,8 @@ export const doacoesFisicasService = {
         .insert([dadosParaInserir])
         .select(`
           *,
-          categoria:categorias_doacoes(nome, cor, icone),
-          doador:doadores(nome, email)
+          categoria:categorias_doacoes(*),
+          doador:doacoes_fisicas_novas_doador_fkey(nome, email)
         `)
         .single();
 
@@ -129,9 +129,9 @@ export const doacoesFisicasService = {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(nome, cor, icone),
-          doador:doadores(nome, email),
-          reservado_por:doadores!beneficiario_id(nome, email)
+          categoria:categorias_doacoes(*),
+          doador:doacoes_fisicas_novas_doador_fkey(nome, email),
+          reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
         `)
         .order('created_at', { ascending: false });
 
@@ -175,9 +175,9 @@ export const doacoesFisicasService = {
       .from('doacoes_fisicas_novas')
       .select(`
         *,
-        categoria:categorias_doacoes(nome, cor, icone),
-        doador:doadores(nome, email),
-        reservado_por:doadores!beneficiario_id(nome, email)
+        categoria:categorias_doacoes(*),
+        doador:doacoes_fisicas_novas_doador_fkey(nome, email),
+        reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
       `)
       .eq('id', id)
       .single();
@@ -218,9 +218,9 @@ export const doacoesFisicasService = {
       .eq('id', id)
       .select(`
         *,
-        categoria:categorias_doacoes(nome, cor, icone),
-        doador:doadores(nome, email),
-        reservado_por:doadores!beneficiario_id(nome, email)
+        categoria:categorias_doacoes(*),
+        doador:doacoes_fisicas_novas_doador_fkey(nome, email),
+        reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
       `)
       .single();
 

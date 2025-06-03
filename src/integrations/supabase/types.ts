@@ -363,10 +363,31 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "doacoes_fisicas_novas_beneficiario_fkey"
+            columns: ["beneficiario_id"]
+            isOneToOne: false
+            referencedRelation: "doadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doacoes_fisicas_novas_categoria_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_doacoes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "doacoes_fisicas_novas_categoria_id_fkey"
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "categorias_doacoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doacoes_fisicas_novas_doador_fkey"
+            columns: ["doador_id"]
+            isOneToOne: false
+            referencedRelation: "doadores"
             referencedColumns: ["id"]
           },
         ]
