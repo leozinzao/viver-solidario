@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Plus, Gift } from 'lucide-react';
 import { useDoacoesFisicasOptimized } from '@/hooks/useDoacoesFisicasOptimized';
-import FormularioDoacaoOtimizado from './FormularioDoacaoOtimizado';
+import FormularioDoacaoOptimizado from './FormularioDoacaoOptimizado';
 import { useAuth } from '@/context/AuthContext';
 
 const DoacoesFisicasOtimizadas: React.FC = () => {
