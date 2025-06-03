@@ -1,5 +1,4 @@
 
-
 import { validateData, doacaoFisicaSchema } from '@/lib/validation';
 
 export const validationService = {
@@ -59,4 +58,3 @@ export const validationService = {
     console.log('Validation: Tipo de entrega válido');
   }
 };
-
