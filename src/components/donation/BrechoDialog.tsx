@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Upload } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Upload } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
+import { doacaoUnificadaService } from '@/services/doacaoUnificadaService';
 
 interface BrechoDialogProps {
   isOpen: boolean;
@@ -15,6 +17,10 @@ interface BrechoDialogProps {
 }
 
 const BrechoDialog: React.FC<BrechoDialogProps> = ({ isOpen, onOpenChange }) => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [tipoRoupa, setTipoRoupa] = useState('');
   const [tamanho, setTamanho] = useState('');
   const [estado, setEstado] = useState('');
@@ -32,8 +38,17 @@ const BrechoDialog: React.FC<BrechoDialogProps> = ({ isOpen, onOpenChange }) => 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para fazer uma doação.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (!tipoRoupa || !tamanho || !estado) {
       toast({
@@ -44,20 +59,40 @@ const BrechoDialog: React.FC<BrechoDialogProps> = ({ isOpen, onOpenChange }) => 
       return;
     }
 
-    // Aqui você pode implementar o envio dos dados
-    toast({
-      title: "Doação registrada",
-      description: "Obrigado pela sua doação ao Brechó do Bem!"
-    });
+    setIsSubmitting(true);
 
-    // Limpar formulário
-    setTipoRoupa('');
-    setTamanho('');
-    setEstado('');
-    setDescricao('');
-    setFoto(null);
-    setPreviewUrl('');
-    onOpenChange(false);
+    try {
+      await doacaoUnificadaService.criarDoacaoBrecho({
+        tipoRoupa,
+        tamanho,
+        estado,
+        descricao,
+        foto: foto || undefined
+      }, user.id);
+
+      toast({
+        title: "Doação registrada com sucesso!",
+        description: "Sua doação foi cadastrada no sistema de doações físicas."
+      });
+
+      // Limpar formulário
+      setTipoRoupa('');
+      setTamanho('');
+      setEstado('');
+      setDescricao('');
+      setFoto(null);
+      setPreviewUrl('');
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Erro ao registrar doação:', error);
+      toast({
+        title: "Erro ao registrar doação",
+        description: "Ocorreu um erro. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -171,11 +206,18 @@ const BrechoDialog: React.FC<BrechoDialogProps> = ({ isOpen, onOpenChange }) => 
             </div>
           </div>
 
+          <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+            <p className="text-sm text-yellow-800">
+              💛 Sua doação será registrada no sistema de doações físicas e você poderá acompanhar o status.
+            </p>
+          </div>
+
           <Button 
             type="submit" 
+            disabled={isSubmitting}
             className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
           >
-            Registrar Doação
+            {isSubmitting ? 'Registrando...' : 'Registrar Doação'}
           </Button>
         </form>
       </DialogContent>
