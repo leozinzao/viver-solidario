@@ -1,5 +1,5 @@
 
-import { validateData, doacaoFisicaSchema, enderecoSchema } from '@/lib/validation';
+import { validateData, doacaoFisicaSchema } from '@/lib/validation';
 
 export const validationService = {
   // Validar dados básicos da doação
@@ -37,14 +37,10 @@ export const validationService = {
         throw new Error('Endereço para retirada é obrigatório');
       }
       
-      // Validar endereço se schema disponível
-      try {
-        const validation = validateData(enderecoSchema, { endereco: dadosDoacao.endereco_coleta });
-        if (!validation.success) {
-          console.warn('Validation: Endereço pode ter formato inválido:', validation.error);
-        }
-      } catch (err) {
-        console.log('Validation: Schema de endereço não disponível, pulando validação');
+      // Validação básica de endereço (sem schema específico)
+      const endereco = dadosDoacao.endereco_coleta.trim();
+      if (endereco.length < 10) {
+        console.warn('Validation: Endereço muito curto, pode estar incompleto');
       }
     } 
     else if (dadosDoacao.tipo_entrega === 'entrega_doador') {
@@ -52,14 +48,10 @@ export const validationService = {
         throw new Error('Endereço de entrega é obrigatório');
       }
       
-      // Validar endereço se schema disponível  
-      try {
-        const validation = validateData(enderecoSchema, { endereco: dadosDoacao.endereco_entrega });
-        if (!validation.success) {
-          console.warn('Validation: Endereço pode ter formato inválido:', validation.error);
-        }
-      } catch (err) {
-        console.log('Validation: Schema de endereço não disponível, pulando validação');
+      // Validação básica de endereço (sem schema específico)
+      const endereco = dadosDoacao.endereco_entrega.trim();
+      if (endereco.length < 10) {
+        console.warn('Validation: Endereço muito curto, pode estar incompleto');
       }
     }
 
