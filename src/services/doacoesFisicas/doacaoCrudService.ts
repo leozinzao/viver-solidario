@@ -15,7 +15,7 @@ export const doacaoCrudService = {
         .insert([dadosParaInserir])
         .select(`
           *,
-          categoria:categorias_doacoes(*),
+          categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
           doador:doacoes_fisicas_novas_doador_fkey(nome, email)
         `)
         .single();
@@ -42,7 +42,7 @@ export const doacaoCrudService = {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(*),
+          categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
           doador:doacoes_fisicas_novas_doador_fkey(nome, email),
           reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
         `)
@@ -88,7 +88,7 @@ export const doacaoCrudService = {
       .from('doacoes_fisicas_novas')
       .select(`
         *,
-        categoria:categorias_doacoes(*),
+        categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
         doador:doacoes_fisicas_novas_doador_fkey(nome, email),
         reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
       `)
@@ -131,7 +131,7 @@ export const doacaoCrudService = {
       .eq('id', id)
       .select(`
         *,
-        categoria:categorias_doacoes(*),
+        categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
         doador:doacoes_fisicas_novas_doador_fkey(nome, email),
         reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
       `)
