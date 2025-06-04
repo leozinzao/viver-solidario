@@ -5,11 +5,11 @@ import LoginScreen from "@/screens/LoginScreen";
 import SignUpScreen from "@/screens/SignUpScreen";
 import HomeScreen from "@/screens/HomeScreen";
 import DonationsScreen from "@/screens/DonationsScreen";
+import DoacoesFisicasScreenStreamlined from "@/screens/DoacoesFisicasScreenStreamlined";
 import EventsScreen from "@/screens/EventsScreen";
 import VolunteerScreen from "@/screens/VolunteerScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 import AdminScreen from "@/screens/AdminScreen";
-import DoacoesFisicasScreenSimplificada from "@/screens/DoacoesFisicasScreenSimplificada";
 
 interface ScreenRendererProps {
   currentScreen: string;
@@ -28,7 +28,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onBackToWelcome,
   onLoginSuccess,
 }) => {
-  console.log('ScreenRenderer: Renderizando tela:', currentScreen);
+  console.log('🎬 ScreenRenderer: Renderizando tela:', currentScreen);
 
   switch (currentScreen) {
     case "welcome":
@@ -57,6 +57,9 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       return <HomeScreen />;
     case "donations":
       return <DonationsScreen />;
+    case "doacoes-fisicas":
+      console.log('🎯 ScreenRenderer: Renderizando DoacoesFisicasScreenStreamlined');
+      return <DoacoesFisicasScreenStreamlined />;
     case "events":
       return <EventsScreen />;
     case "volunteer":
@@ -65,10 +68,8 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       return <ProfileScreen />;
     case "admin":
       return <AdminScreen />;
-    case "doacoes-fisicas":
-      return <DoacoesFisicasScreenSimplificada />;
     default:
-      console.warn('ScreenRenderer: Tela não encontrada:', currentScreen);
+      console.log('❓ ScreenRenderer: Tela não encontrada, renderizando home. Tela solicitada:', currentScreen);
       return <HomeScreen />;
   }
 };

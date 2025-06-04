@@ -24,7 +24,7 @@ export const useDoacoesFisicas = () => {
       
       console.log('Hook: Buscando minhas doações físicas para usuário:', user.id);
       
-      // Corrigir relacionamento ambíguo especificando explicitamente
+      // Usar relacionamento específico para evitar ambiguidade
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`

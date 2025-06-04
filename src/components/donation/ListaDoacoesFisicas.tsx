@@ -13,38 +13,17 @@ import { useAuth } from '@/context/AuthContext';
 
 const ListaDoacoesFisicas: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { minhasDoacoes, isLoading, error } = useDoacoesFisicas();
+  const { minhasDoacoes, isLoading } = useDoacoesFisicas();
   const { categorias, loading: loadingCategorias } = useCategoriasDoacoes();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('todas');
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Debug logs melhorados
-  console.log('🔍 ListaDoacoesFisicas: Usuário autenticado:', isAuthenticated);
-  console.log('👤 ListaDoacoesFisicas: ID do usuário:', user?.id);
-  console.log('📦 ListaDoacoesFisicas: Doações recebidas:', minhasDoacoes);
-  console.log('📊 ListaDoacoesFisicas: Quantidade:', minhasDoacoes?.length || 0);
-  console.log('⚠️ ListaDoacoesFisicas: Erro:', error);
-  console.log('🔄 ListaDoacoesFisicas: Carregando:', isLoading);
-
-  // Se houver erro, mostrar mensagem
-  if (error) {
-    console.error('❌ ListaDoacoesFisicas: Erro detectado:', error);
-    return (
-      <Card className="flutter-card">
-        <CardContent className="p-6 text-center">
-          <Package className="h-12 w-12 text-red-300 mx-auto mb-3" />
-          <p className="text-red-500 mb-4">
-            Erro ao carregar suas doações: {error.message}
-          </p>
-          <Button onClick={() => window.location.reload()} variant="outline">
-            Tentar novamente
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Debug logs
+  console.log('ListaDoacoesFisicas: Usuário atual:', user?.id);
+  console.log('ListaDoacoesFisicas: Minhas doações recebidas:', minhasDoacoes);
+  console.log('ListaDoacoesFisicas: Quantidade de doações:', minhasDoacoes.length);
 
   const filteredDoacoes = minhasDoacoes.filter(doacao => {
     const matchesSearch = doacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,7 +33,7 @@ const ListaDoacoesFisicas: React.FC = () => {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  console.log('🔎 ListaDoacoesFisicas: Doações após filtro:', filteredDoacoes);
+  console.log('ListaDoacoesFisicas: Doações após filtro:', filteredDoacoes);
 
   const getStatusStats = () => {
     const stats = {
@@ -64,14 +43,14 @@ const ListaDoacoesFisicas: React.FC = () => {
       entregue: minhasDoacoes.filter(d => d.status === 'entregue').length,
       total: minhasDoacoes.length
     };
-    console.log('📈 ListaDoacoesFisicas: Estatísticas:', stats);
+    console.log('ListaDoacoesFisicas: Estatísticas calculadas:', stats);
     return stats;
   };
 
   const stats = getStatusStats();
 
   if (isLoading || loadingCategorias) {
-    console.log('⏳ ListaDoacoesFisicas: Carregando dados...');
+    console.log('ListaDoacoesFisicas: Carregando dados...');
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -101,15 +80,14 @@ const ListaDoacoesFisicas: React.FC = () => {
             Doe itens físicos para a ONG Viver e acompanhe o status das suas doações.
           </p>
           
-          {/* Debug info sempre visível para troubleshooting */}
-          <div className="bg-blue-50 p-3 rounded text-xs border border-blue-200">
-            <p className="font-semibold text-blue-800">Debug Info:</p>
-            <p>👤 Usuário: {user?.id || 'Não logado'}</p>
-            <p>📦 Total doações: {minhasDoacoes?.length || 0}</p>
-            <p>🔄 Carregando: {isLoading ? 'Sim' : 'Não'}</p>
-            <p>⚠️ Erro: {error ? 'Sim' : 'Não'}</p>
-            <p>🔍 Após filtros: {filteredDoacoes?.length || 0}</p>
-          </div>
+          {/* Debug info para desenvolvimento */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-gray-100 p-2 rounded text-xs">
+              <p>DEBUG - Usuário: {user?.id}</p>
+              <p>DEBUG - Total doações: {minhasDoacoes.length}</p>
+              <p>DEBUG - Após filtros: {filteredDoacoes.length}</p>
+            </div>
+          )}
           
           {/* Estatísticas */}
           <div className="grid grid-cols-2 gap-3">
