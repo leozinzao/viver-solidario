@@ -18,7 +18,7 @@ const ViverSolidarioApp: React.FC = () => {
     handleLoginSuccess 
   } = useNavigation();
 
-  const isAdminUser = user ? hasPermission(user, Permission.ADMIN_ACCESS) : false;
+  const isAdminUser = user ? hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL) : false;
 
   console.log('🚀 ViverSolidarioApp: Renderizando app principal');
   console.log('🔐 ViverSolidarioApp: Autenticado:', isAuthenticated);
