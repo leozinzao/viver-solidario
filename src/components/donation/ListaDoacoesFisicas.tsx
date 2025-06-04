@@ -20,6 +20,11 @@ const ListaDoacoesFisicas: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('todos');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Debug logs
+  console.log('ListaDoacoesFisicas: Usuário atual:', user?.id);
+  console.log('ListaDoacoesFisicas: Minhas doações recebidas:', minhasDoacoes);
+  console.log('ListaDoacoesFisicas: Quantidade de doações:', minhasDoacoes.length);
+
   const filteredDoacoes = minhasDoacoes.filter(doacao => {
     const matchesSearch = doacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          doacao.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -27,6 +32,8 @@ const ListaDoacoesFisicas: React.FC = () => {
     const matchesStatus = selectedStatus === 'todos' || doacao.status === selectedStatus;
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  console.log('ListaDoacoesFisicas: Doações após filtro:', filteredDoacoes);
 
   const getStatusStats = () => {
     const stats = {
@@ -36,12 +43,14 @@ const ListaDoacoesFisicas: React.FC = () => {
       entregue: minhasDoacoes.filter(d => d.status === 'entregue').length,
       total: minhasDoacoes.length
     };
+    console.log('ListaDoacoesFisicas: Estatísticas calculadas:', stats);
     return stats;
   };
 
   const stats = getStatusStats();
 
   if (isLoading || loadingCategorias) {
+    console.log('ListaDoacoesFisicas: Carregando dados...');
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -70,6 +79,15 @@ const ListaDoacoesFisicas: React.FC = () => {
           <p className="text-sm text-gray-700">
             Doe itens físicos para a ONG Viver e acompanhe o status das suas doações.
           </p>
+          
+          {/* Debug info para desenvolvimento */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-gray-100 p-2 rounded text-xs">
+              <p>DEBUG - Usuário: {user?.id}</p>
+              <p>DEBUG - Total doações: {minhasDoacoes.length}</p>
+              <p>DEBUG - Após filtros: {filteredDoacoes.length}</p>
+            </div>
+          )}
           
           {/* Estatísticas */}
           <div className="grid grid-cols-2 gap-3">

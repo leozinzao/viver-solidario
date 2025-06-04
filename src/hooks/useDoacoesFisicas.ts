@@ -17,25 +17,40 @@ export const useDoacoesFisicas = () => {
   } = useQuery({
     queryKey: ['minhas-doacoes-fisicas', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        console.log('Hook: Usuário não logado, retornando array vazio');
+        return [];
+      }
       
-      console.log('Buscando minhas doações físicas...');
+      console.log('Hook: Buscando minhas doações físicas para usuário:', user.id);
       
+      // Usar relacionamento específico para evitar ambiguidade
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(*)
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*)
         `)
         .eq('doador_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar minhas doações:', error);
+        console.error('Hook: Erro ao buscar minhas doações:', error);
         throw error;
       }
 
-      console.log('Minhas doações carregadas:', data);
+      console.log('Hook: Minhas doações encontradas:', data);
+      console.log('Hook: Quantidade de doações:', data?.length || 0);
+      
+      // Log detalhado dos doador_id para debug
+      if (data && data.length > 0) {
+        data.forEach((doacao, index) => {
+          console.log(`Hook: Doação ${index + 1} - ID: ${doacao.id}, doador_id: ${doacao.doador_id}, título: ${doacao.titulo}`);
+        });
+      } else {
+        console.log('Hook: Nenhuma doação encontrada para o usuário:', user.id);
+      }
+
       return data || [];
     },
     enabled: !!user?.id
@@ -49,24 +64,24 @@ export const useDoacoesFisicas = () => {
   } = useQuery({
     queryKey: ['doacoes-fisicas'],
     queryFn: async () => {
-      console.log('Buscando todas as doações físicas...');
+      console.log('Hook: Buscando todas as doações físicas...');
       
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(*),
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
           doador:doadores(nome, email),
           reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
         `)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar todas as doações:', error);
+        console.error('Hook: Erro ao buscar todas as doações:', error);
         throw error;
       }
 
-      console.log('Todas as doações carregadas:', data);
+      console.log('Hook: Todas as doações carregadas:', data?.length || 0);
       return data || [];
     }
   });
@@ -74,7 +89,12 @@ export const useDoacoesFisicas = () => {
   // Mutation para reservar doação
   const reservarDoacaoMutation = useMutation({
     mutationFn: async (doacaoId: string) => {
-      if (!user?.id) throw new Error('Usuário não autenticado');
+      if (!user?.id) {
+        console.error('Hook: Tentativa de reservar sem usuário logado');
+        throw new Error('Usuário não autenticado');
+      }
+
+      console.log('Hook: Reservando doação:', doacaoId, 'para usuário:', user.id);
 
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
@@ -86,16 +106,22 @@ export const useDoacoesFisicas = () => {
         .eq('id', doacaoId)
         .select(`
           *,
-          categoria:categorias_doacoes(*),
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
           doador:doadores(nome, email),
           reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
         `)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Hook: Erro ao reservar doação:', error);
+        throw error;
+      }
+
+      console.log('Hook: Doação reservada com sucesso:', data);
       return data;
     },
     onSuccess: () => {
+      console.log('Hook: Invalidando queries após reserva');
       queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] });
       queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] });
       toast({
@@ -105,6 +131,7 @@ export const useDoacoesFisicas = () => {
       });
     },
     onError: (error: any) => {
+      console.error('Hook: Erro na mutation de reserva:', error);
       toast({
         title: "Erro ao reservar doação",
         description: error.message || "Tente novamente.",
