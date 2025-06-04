@@ -67,8 +67,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
 
   return (
     <>
-      <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border border-border rounded-t-xl shadow-lg z-50">
-        <ul className="flex justify-around items-center p-3">
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-border z-50">
+        <ul className="flex justify-around items-center p-2">
           {navItems.map((item) => (
             item.subItems ? (
               <li key={item.id} className="relative">
@@ -77,8 +77,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
                     <Button 
                       variant="ghost" 
                       className={cn(
-                        "flex flex-col items-center gap-1 h-auto p-2",
-                        isSubItemActive(item) ? "text-viver-yellow" : "text-muted-foreground"
+                        "flex flex-col items-center gap-1",
+                        isSubItemActive(item) ? "text-primary" : "text-muted-foreground"
                       )}
                     >
                       <item.icon className="h-5 w-5" />
@@ -112,8 +112,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
                   variant="ghost"
                   onClick={() => handleNavigation(item.id)}
                   className={cn(
-                    "flex flex-col items-center gap-1 h-auto p-2",
-                    currentScreen === item.id ? "text-viver-yellow" : "text-muted-foreground"
+                    "flex flex-col items-center gap-1",
+                    currentScreen === item.id ? "text-primary" : "text-muted-foreground"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
