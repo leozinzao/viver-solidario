@@ -51,14 +51,14 @@ export function useDoacoesFisicas() {
   const { data: minhasDoacoes = [], isLoading: isLoadingDoacoes } = useQuery({
     queryKey: ['minhas-doacoes-fisicas'],
     queryFn: async () => {
-      console.log('Buscando minhas doações físicas...');
+      console.log('useDoacoesFisicas: Buscando minhas doações físicas...');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('Usuário não logado, retornando array vazio');
+        console.log('useDoacoesFisicas: Usuário não logado, retornando array vazio');
         return [];
       }
 
-      console.log('Usuário logado:', user.id);
+      console.log('useDoacoesFisicas: Usuário logado com ID:', user.id);
 
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
@@ -74,12 +74,27 @@ export function useDoacoesFisicas() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar minhas doações:', error);
+        console.error('useDoacoesFisicas: Erro ao buscar minhas doações:', error);
         throw error;
       }
       
-      console.log('Minhas doações encontradas:', data);
-      console.log('Quantidade de doações:', data?.length || 0);
+      console.log('useDoacoesFisicas: Minhas doações encontradas:', data);
+      console.log('useDoacoesFisicas: Quantidade de doações retornadas:', data?.length || 0);
+      
+      // Debug adicional: verificar se todas as doações têm o doador_id correto
+      if (data && data.length > 0) {
+        const doacoesSemDoadorId = data.filter(d => !d.doador_id);
+        const doacoesComOutroDoadorId = data.filter(d => d.doador_id && d.doador_id !== user.id);
+        
+        if (doacoesSemDoadorId.length > 0) {
+          console.warn('useDoacoesFisicas: Encontradas doações sem doador_id:', doacoesSemDoadorId);
+        }
+        
+        if (doacoesComOutroDoadorId.length > 0) {
+          console.warn('useDoacoesFisicas: Encontradas doações com doador_id diferente:', doacoesComOutroDoadorId);
+        }
+      }
+      
       return data as DoacaoFisica[];
     },
   });
@@ -88,17 +103,17 @@ export function useDoacoesFisicas() {
   const { data: categorias = [], isLoading: isLoadingCategorias } = useQuery({
     queryKey: ['categorias-doacoes'],
     queryFn: async () => {
-      console.log('Buscando categorias...');
+      console.log('useDoacoesFisicas: Buscando categorias...');
       const { data, error } = await supabase
         .from('categorias_doacoes')
         .select('*')
         .order('nome');
 
       if (error) {
-        console.error('Erro ao buscar categorias:', error);
+        console.error('useDoacoesFisicas: Erro ao buscar categorias:', error);
         throw error;
       }
-      console.log('Categorias encontradas:', data);
+      console.log('useDoacoesFisicas: Categorias encontradas:', data);
       return data as CategoriaDoacao[];
     },
   });
@@ -106,11 +121,14 @@ export function useDoacoesFisicas() {
   // Criar nova doação
   const createDoacao = useMutation({
     mutationFn: async (doacao: Partial<DoacaoFisica> & { telefone?: string; email?: string }) => {
-      console.log('Criando doação:', doacao);
+      console.log('useDoacoesFisicas: Iniciando criação de doação:', doacao);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
+      if (!user) {
+        console.error('useDoacoesFisicas: Usuário não autenticado');
+        throw new Error('Usuário não autenticado');
+      }
 
-      console.log('ID do usuário para doador_id:', user.id);
+      console.log('useDoacoesFisicas: ID do usuário para doador_id:', user.id);
 
       const dadosParaInserir = {
         ...doacao,
@@ -120,7 +138,7 @@ export function useDoacoesFisicas() {
         email_doador: doacao.email,
       };
 
-      console.log('Dados completos para inserção:', dadosParaInserir);
+      console.log('useDoacoesFisicas: Dados completos para inserção:', dadosParaInserir);
 
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
@@ -129,15 +147,16 @@ export function useDoacoesFisicas() {
         .single();
 
       if (error) {
-        console.error('Erro ao criar doação:', error);
+        console.error('useDoacoesFisicas: Erro ao criar doação:', error);
         throw error;
       }
       
-      console.log('Doação criada com sucesso:', data);
+      console.log('useDoacoesFisicas: Doação criada com sucesso:', data);
       return data;
     },
     onSuccess: (data) => {
-      console.log('Doação criada, invalidando queries...');
+      console.log('useDoacoesFisicas: Doação criada, invalidando queries...');
+      // Invalidar imediatamente para forçar re-fetch
       queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] });
       toast({
         title: "Sucesso",
@@ -145,7 +164,7 @@ export function useDoacoesFisicas() {
       });
     },
     onError: (error: Error) => {
-      console.error('Erro na mutação de criação:', error);
+      console.error('useDoacoesFisicas: Erro na mutação de criação:', error);
       toast({
         title: "Erro",
         description: `Não foi possível cadastrar a doação: ${error.message}`,

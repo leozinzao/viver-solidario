@@ -16,7 +16,7 @@ interface FormularioDoacaoOtimizadoProps {
   onCancel: () => void;
 }
 
-const ENDERECO_ONG = "Rua Bernardo Sayão, 319 - Jd. Petrópolis - Londrina/PR";
+const ENDERECO_ONG = "📍 Rua Bernardo Sayão, 319 - Jd. Petrópolis - Londrina/PR";
 
 const FormularioDoacaoOtimizado: React.FC<FormularioDoacaoOtimizadoProps> = ({
   onSubmit,
@@ -42,18 +42,24 @@ const FormularioDoacaoOtimizado: React.FC<FormularioDoacaoOtimizadoProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Formulario: Dados do formulário antes da validação:', formData);
+    
     if (!formData.titulo || !formData.categoria_id) {
+      console.error('Formulario: Campos obrigatórios não preenchidos');
       return;
     }
 
     // Validar campos obrigatórios baseado no tipo de entrega
     if (formData.tipo_entrega === 'retirada' && !formData.endereco_coleta) {
+      console.error('Formulario: Endereço de coleta obrigatório para retirada');
       return;
     }
 
+    console.log('Formulario: Enviando dados para criação:', formData);
     const sucesso = await onSubmit(formData);
     
     if (sucesso) {
+      console.log('Formulario: Doação criada com sucesso, resetando formulário');
       // Reset form
       setFormData({
         titulo: '',
@@ -68,10 +74,13 @@ const FormularioDoacaoOtimizado: React.FC<FormularioDoacaoOtimizadoProps> = ({
         observacoes: '',
         observacoes_entrega: '',
       });
+    } else {
+      console.error('Formulario: Falha ao criar doação');
     }
   };
 
   const handleTipoEntregaChange = (value: string) => {
+    console.log('Formulario: Mudando tipo de entrega para:', value);
     setFormData({ 
       ...formData, 
       tipo_entrega: value,
@@ -302,4 +311,4 @@ const FormularioDoacaoOtimizado: React.FC<FormularioDoacaoOtimizadoProps> = ({
   );
 };
 
-export default FormularioDoacaoOtimizado;
+export default FormularioDoacaoOptimizado;

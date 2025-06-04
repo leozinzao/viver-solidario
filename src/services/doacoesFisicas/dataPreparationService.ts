@@ -1,21 +1,43 @@
 
 export const dataPreparationService = {
-  // Preparar dados para inserção
-  prepareDataForInsertion(dadosDoacao: any) {
-    return {
-      titulo: dadosDoacao.titulo,
-      descricao: dadosDoacao.descricao || null,
-      categoria_id: dadosDoacao.categoria_id,
-      quantidade: Number(dadosDoacao.quantidade),
-      unidade: dadosDoacao.unidade,
-      endereco_coleta: dadosDoacao.endereco_coleta || null,
+  // Preparar dados para inserção na tabela
+  prepareDataForInsertion(dadosDoacao: any): any {
+    console.log('DataPrep: Preparando dados para inserção:', dadosDoacao);
+
+    // Garantir que campos obrigatórios estão presentes
+    const dadosPreparados = {
+      // Campos obrigatórios
+      titulo: dadosDoacao.titulo?.trim() || '',
+      quantidade: Number(dadosDoacao.quantidade) || 1,
+      unidade: dadosDoacao.unidade || 'unidade',
+      status: 'cadastrada', // Status inicial sempre
+      doador_id: dadosDoacao.doador_id, // DEVE vir preenchido
+
+      // Campos opcionais
+      descricao: dadosDoacao.descricao?.trim() || null,
+      categoria_id: dadosDoacao.categoria_id || null,
+      localizacao: dadosDoacao.localizacao?.trim() || null,
+      endereco_coleta: dadosDoacao.endereco_coleta?.trim() || null,
       tipo_entrega: dadosDoacao.tipo_entrega || 'retirada',
-      endereco_entrega: dadosDoacao.endereco_entrega || null,
-      observacoes: dadosDoacao.observacoes || null,
-      observacoes_entrega: dadosDoacao.observacoes_entrega || null,
-      doador_id: dadosDoacao.doador_id,
-      localizacao: dadosDoacao.localizacao || null,
-      status: 'disponivel'
+      endereco_entrega: dadosDoacao.endereco_entrega?.trim() || null,
+      observacoes: dadosDoacao.observacoes?.trim() || null,
+      observacoes_entrega: dadosDoacao.observacoes_entrega?.trim() || null,
+      telefone_doador: dadosDoacao.telefone || null,
+      email_doador: dadosDoacao.email || null,
+
+      // Timestamps
+      data_disponivel: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
+
+    console.log('DataPrep: Dados preparados:', dadosPreparados);
+
+    // Validar se doador_id foi preenchido
+    if (!dadosPreparados.doador_id) {
+      throw new Error('ID do doador é obrigatório para criar uma doação');
+    }
+
+    return dadosPreparados;
   }
 };

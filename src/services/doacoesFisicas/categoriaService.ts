@@ -1,20 +1,28 @@
 
 import { supabase } from '@/lib/supabase';
-import { ErrorHandler } from '@/lib/errorHandler';
 import type { Categoria } from '@/types/doacoesFisicas';
 
 export const categoriaService = {
-  // Listar categorias de doações
+  // Listar todas as categorias de doações
   async listarCategorias(): Promise<Categoria[]> {
-    const { data, error } = await supabase
-      .from('categorias_doacoes')
-      .select('id, nome, descricao, cor, icone')
-      .order('nome');
+    console.log('Categoria: Carregando categorias de doações...');
 
-    if (error) {
-      throw ErrorHandler.handleApiError(error);
+    try {
+      const { data, error } = await supabase
+        .from('categorias_doacoes')
+        .select('*')
+        .order('nome');
+
+      if (error) {
+        console.error('Categoria: Erro ao carregar categorias:', error);
+        throw new Error(`Erro ao carregar categorias: ${error.message}`);
+      }
+
+      console.log('Categoria: Categorias carregadas:', data);
+      return data || [];
+    } catch (err) {
+      console.error('Categoria: Erro na execução:', err);
+      throw err;
     }
-
-    return data || [];
   }
 };
