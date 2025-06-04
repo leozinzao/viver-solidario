@@ -1,35 +1,40 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ViverSolidarioApp from "./components/ViverSolidarioApp";
-import AuthPage from "./pages/Auth";
-import SignUp from "./pages/SignUp";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import NotFound from "./pages/NotFound";
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { NavigationProvider } from '@/context/NavigationContext';
+import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { Toaster } from '@/components/ui/toaster';
+import ViverSolidarioApp from '@/components/ViverSolidarioApp';
+import '@/App.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ViverSolidarioApp />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/politica" element={<PrivacyPolicy />} />
-          <Route path="/termos" element={<TermsOfService />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light" storageKey="viver-theme">
+        <AuthProvider>
+          <NavigationProvider>
+            <div className="min-h-screen bg-gray-50">
+              {/* Container móvel centralizado */}
+              <div className="mx-auto max-w-sm min-h-screen bg-white shadow-xl relative overflow-hidden">
+                <ViverSolidarioApp />
+              </div>
+            </div>
+            <Toaster />
+          </NavigationProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

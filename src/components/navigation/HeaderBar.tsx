@@ -3,7 +3,6 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { LogIn, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { Permission, hasPermission } from "@/lib/permissions";
 
 interface HeaderBarProps {
   isAuthenticated: boolean;
@@ -19,16 +18,16 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
   onAdminNavigate 
 }) => {
   return (
-    <div className="w-full h-14 bg-white dark:bg-background border-b flex items-center justify-between px-4">
+    <div className="w-full h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-50">
       <div className="flex items-center">
         {/* Logo da ONG Viver */}
         <div className="flex items-center">
           <img 
             src="/lovable-uploads/644dc858-b963-4312-a22e-38983c64e833.png" 
             alt="ONG Viver" 
-            className="h-9 w-auto" 
+            className="h-8 w-auto" 
           />
-          <span className="ml-2 font-medium text-lg hidden sm:block">ONG Viver</span>
+          <span className="ml-2 font-semibold text-lg text-viver-yellow">ONG Viver</span>
         </div>
       </div>
       
@@ -41,7 +40,7 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
             className="flex items-center gap-1 text-viver-yellow border-viver-yellow hover:bg-viver-yellow/10"
           >
             <LogIn className="h-4 w-4" />
-            <span>Entrar</span>
+            <span className="hidden sm:inline">Entrar</span>
           </Button>
         )}
         
@@ -52,8 +51,8 @@ const HeaderBar: React.FC<HeaderBarProps> = ({
             size="sm" 
             className="flex items-center gap-1"
           >
-            <Settings className="h-4 w-4 mr-1" />
-            <span>Admin</span>
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Admin</span>
           </Button>
         )}
       </div>

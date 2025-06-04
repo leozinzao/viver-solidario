@@ -80,27 +80,28 @@
     @apply border-border;
   }
   html {
-    @apply font-poppins;
+    @apply font-sans;
   }
   body {
     @apply bg-background text-foreground;
   }
 }
 
-.flutter-app {
-  @apply max-w-md mx-auto h-[100dvh] flex flex-col overflow-hidden relative shadow-xl;
+/* Estilos específicos para mobile */
+.mobile-container {
+  @apply max-w-sm mx-auto min-h-screen bg-white shadow-xl relative overflow-hidden;
 }
 
-.flutter-screen {
+.mobile-screen {
   @apply flex-1 overflow-y-auto;
 }
 
-.flutter-card {
-  @apply bg-card shadow-md rounded-lg p-4 transition-all duration-300 hover:shadow-lg;
+.mobile-card {
+  @apply bg-card shadow-sm rounded-lg p-3 transition-all duration-300 hover:shadow-md;
 }
 
-.flutter-bottom-nav {
-  @apply flex justify-around items-center py-3 bg-card border-t border-border fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 h-16;
+.mobile-bottom-nav {
+  @apply flex justify-around items-center py-2 bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-sm mx-auto z-50;
 }
 
 .nav-item {
@@ -126,4 +127,34 @@
 /* Transition classes */
 .page-transition {
   transition: all 0.3s ease-in-out;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Scrollbar customization for mobile */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
