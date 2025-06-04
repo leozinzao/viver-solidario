@@ -13,7 +13,6 @@ export const useDoacoesFisicasStreamlined = () => {
 
   const criarDoacao = useCallback(async (dadosDoacao: any) => {
     if (!user?.id) {
-      console.error('Hook Streamlined: Tentativa de criar doação sem usuário logado');
       toast({
         title: "Erro de autenticação",
         description: "Você precisa estar logado para fazer uma doação",
@@ -23,38 +22,27 @@ export const useDoacoesFisicasStreamlined = () => {
     }
 
     setIsSubmitting(true);
-    console.log('🚀 Hook Streamlined: Iniciando criação de doação para usuário:', user.id);
-    console.log('📝 Hook Streamlined: Dados recebidos:', dadosDoacao);
+    console.log('🚀 Hook Streamlined: Iniciando criação de doação');
 
     try {
-      // Preparar dados mínimos e essenciais - GARANTINDO que doador_id sempre seja preenchido
+      // Preparar dados mínimos e essenciais
       const dadosCompletos = {
-        titulo: dadosDoacao.titulo?.trim() || '',
+        titulo: dadosDoacao.titulo.trim(),
         descricao: dadosDoacao.descricao?.trim() || '',
         categoria_id: dadosDoacao.categoria_id,
-        quantidade: Number(dadosDoacao.quantidade) || 1,
+        quantidade: Number(dadosDoacao.quantidade),
         unidade: dadosDoacao.unidade || 'unidade',
         localizacao: dadosDoacao.localizacao?.trim() || '',
         endereco_coleta: dadosDoacao.endereco_coleta?.trim() || '',
-        tipo_entrega: dadosDoacao.tipo_entrega || 'retirada',
+        tipo_entrega: dadosDoacao.tipo_entrega,
         endereco_entrega: dadosDoacao.endereco_entrega?.trim() || '',
         observacoes: dadosDoacao.observacoes?.trim() || '',
         observacoes_entrega: dadosDoacao.observacoes_entrega?.trim() || '',
-        doador_id: user.id, // <- ESSENCIAL! Sempre garantir que está preenchido
+        doador_id: user.id,
         status: 'cadastrada'
       };
 
-      // Validação essencial
-      if (!dadosCompletos.titulo) {
-        throw new Error('Título da doação é obrigatório');
-      }
-      
-      if (!dadosCompletos.categoria_id) {
-        throw new Error('Categoria é obrigatória');
-      }
-
-      console.log('📝 Hook Streamlined: Dados preparados (com doador_id garantido):', dadosCompletos);
-      console.log('🔍 Hook Streamlined: Confirmando doador_id:', dadosCompletos.doador_id);
+      console.log('📝 Hook Streamlined: Dados preparados:', dadosCompletos);
 
       // Inserção com select específico para evitar erro de relacionamento
       const { data, error } = await supabase
@@ -72,11 +60,9 @@ export const useDoacoesFisicasStreamlined = () => {
         throw new Error(error.message);
       }
 
-      console.log('✅ Hook Streamlined: Doação criada com sucesso:', data);
-      console.log('🔍 Hook Streamlined: Verificando doador_id salvo:', data.doador_id);
+      console.log('✅ Hook Streamlined: Doação criada:', data);
 
       // Invalidar queries específicas para atualização imediata
-      console.log('🔄 Hook Streamlined: Invalidando queries...');
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] }),
         queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] }),
