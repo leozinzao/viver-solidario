@@ -1,45 +1,71 @@
 
-import React from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useNavigation } from '@/context/NavigationContext';
-import ScreenRenderer from '@/components/screens/ScreenRenderer';
-import NavigationBar from '@/components/navigation/NavigationBar';
-import HeaderBar from '@/components/navigation/HeaderBar';
-import { hasPermission, Permission } from '@/lib/permissions';
+import React, { useEffect, useState } from "react";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { NavigationProvider, useNavigation } from "@/context/NavigationContext";
+import NavigationBar from "@/components/navigation/NavigationBar";
+import ScreenRenderer from "@/components/screens/ScreenRenderer";
+import PermissionDialog from "@/components/permissions/PermissionDialog";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
+import OfflineIndicator from "@/components/pwa/OfflineIndicator";
+import { usePWA } from "@/hooks/usePWA";
 
-const ViverSolidarioApp: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+const AppContent: React.FC = () => {
   const { 
     currentScreen, 
+    navigateToScreen, 
     handleEnterApp, 
     handleGoToLogin, 
     handleGoToSignUp, 
     handleBackToWelcome, 
-    handleLoginSuccess 
+    handleLoginSuccess, 
+    showPermissionDenied, 
+    setShowPermissionDenied 
   } = useNavigation();
+  
+  const { isAuthenticated } = useAuth();
+  const { isInstallable, isInstalled } = usePWA();
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  
+  console.log('ViverSolidarioApp: Current screen:', currentScreen, 'Authenticated:', isAuthenticated);
+  
+  // Efeito para redirecionar usuário autenticado automaticamente
+  useEffect(() => {
+    if (isAuthenticated && (currentScreen === 'welcome' || currentScreen === 'login' || currentScreen === 'signup')) {
+      console.log('ViverSolidarioApp: Usuário autenticado detectado, redirecionando para home');
+      navigateToScreen('home');
+    }
+  }, [isAuthenticated, currentScreen, navigateToScreen]);
 
-  const isAdminUser = user ? hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL) : false;
+  // Mostrar prompt de instalação após um tempo
+  useEffect(() => {
+    if (isInstallable && !isInstalled && isAuthenticated) {
+      const timer = setTimeout(() => {
+        setShowInstallPrompt(true);
+      }, 30000); // 30 segundos
 
-  console.log('🚀 ViverSolidarioApp: Renderizando app principal');
-  console.log('🔐 ViverSolidarioApp: Autenticado:', isAuthenticated);
-  console.log('📱 ViverSolidarioApp: Tela atual:', currentScreen);
-  console.log('👤 ViverSolidarioApp: É admin:', isAdminUser);
-
-  const showNavigation = isAuthenticated && 
-    !['welcome', 'login', 'signup'].includes(currentScreen);
+      return () => clearTimeout(timer);
+    }
+  }, [isInstallable, isInstalled, isAuthenticated]);
+  
+  // Telas públicas que mostram navegação mesmo para usuários não autenticados
+  const publicScreensWithNavigation = ["home", "events", "donations", "volunteer"];
+  
+  // Telas de autenticação que não mostram navegação
+  const authScreens = ["welcome", "login", "signup"];
+  
+  // Determinar se deve mostrar navegação
+  const shouldShowNavigation = 
+    (isAuthenticated || publicScreensWithNavigation.includes(currentScreen)) && 
+    !authScreens.includes(currentScreen);
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-white relative">
-      {/* Header fixo no topo */}
-      <HeaderBar 
-        isAuthenticated={isAuthenticated}
-        isAdminUser={isAdminUser}
-        onLogin={handleGoToLogin}
-        onAdminNavigate={() => {}} // Implementar se necessário
-      />
-
-      {/* Conteúdo principal com scroll */}
-      <div className="flex-1 overflow-y-auto pb-16">
+    <div className="flutter-app border border-border bg-white min-h-screen">
+      {/* Indicador de status offline */}
+      <OfflineIndicator />
+      
+      {/* Conteúdo da tela */}
+      <div className={`flutter-screen ${shouldShowNavigation ? 'pb-20' : ''}`}>
         <ScreenRenderer
           currentScreen={currentScreen}
           onEnterApp={handleEnterApp}
@@ -50,14 +76,39 @@ const ViverSolidarioApp: React.FC = () => {
         />
       </div>
 
-      {/* Navegação inferior fixa */}
-      {showNavigation && (
-        <NavigationBar 
+      {/* Barra de Navegação Inferior */}
+      {shouldShowNavigation && (
+        <NavigationBar
           currentScreen={currentScreen}
-          onNavigate={() => {}} // A navegação é gerenciada pelo contexto
+          onNavigate={navigateToScreen}
         />
       )}
+      
+      {/* Prompt de instalação PWA */}
+      {showInstallPrompt && isInstallable && !isInstalled && (
+        <InstallPrompt onDismiss={() => setShowInstallPrompt(false)} />
+      )}
+      
+      {/* Diálogo de Permissão Negada */}
+      <PermissionDialog
+        open={showPermissionDenied}
+        onOpenChange={setShowPermissionDenied}
+      />
     </div>
+  );
+};
+
+const ViverSolidarioApp: React.FC = () => {
+  console.log('ViverSolidarioApp: Iniciando aplicação...');
+  
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <NavigationProvider>
+          <AppContent />
+        </NavigationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
