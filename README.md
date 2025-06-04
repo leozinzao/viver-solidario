@@ -2,7 +2,7 @@
 
 Aplicação web/mobile inspirada na ONG Viver — desenvolvida para divulgar eventos, campanhas de doação (financeira e física), oportunidades de voluntariado e facilitar a gestão interna da ONG.
 
-🎥 [Clique aqui para ver a demonstração do projeto no Google Drive](https://drive.google.com/file/d/1Gk96aUQ6a6g4gfAsgwyc0Il2ZUtBjBzX/view?usp=drive_link)
+🎥 [Clique aqui para ver a demonstração do projeto no Google Drive]([https://drive.google.com/file/d/1Gk96aUQ6a6g4gfAsgwyc0Il2ZUtBjBzX/view?usp=drive_link](https://drive.google.com/drive/u/0/folders/1wH5g9WqVU6XCyS0yxyqVmzMOAhmWn70p))
 
 ---
 
