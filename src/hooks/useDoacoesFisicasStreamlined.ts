@@ -25,7 +25,7 @@ export const useDoacoesFisicasStreamlined = () => {
     console.log('🚀 Hook Streamlined: Iniciando criação de doação');
 
     try {
-      // Preparar dados mínimos e essenciais
+      // Preparar dados com status padronizado
       const dadosCompletos = {
         titulo: dadosDoacao.titulo.trim(),
         descricao: dadosDoacao.descricao?.trim() || '',
@@ -39,19 +39,19 @@ export const useDoacoesFisicasStreamlined = () => {
         observacoes: dadosDoacao.observacoes?.trim() || '',
         observacoes_entrega: dadosDoacao.observacoes_entrega?.trim() || '',
         doador_id: user.id,
-        status: 'cadastrada'
+        status: 'disponivel' // Status padronizado
       };
 
       console.log('📝 Hook Streamlined: Dados preparados:', dadosCompletos);
 
-      // Inserção com select específico para evitar erro de relacionamento
+      // Inserção com relacionamentos corretos
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .insert([dadosCompletos])
         .select(`
           *,
-          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(nome, cor, icone),
-          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email)
+          categoria:categorias_doacoes(*),
+          doador:doadores(nome, email)
         `)
         .single();
 

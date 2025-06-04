@@ -30,10 +30,10 @@ const ListaDoacoesFisicas: React.FC = () => {
 
   const getStatusStats = () => {
     const stats = {
-      cadastrada: minhasDoacoes.filter(d => d.status === 'cadastrada').length,
       disponivel: minhasDoacoes.filter(d => d.status === 'disponivel').length,
       reservada: minhasDoacoes.filter(d => d.status === 'reservada').length,
       entregue: minhasDoacoes.filter(d => d.status === 'entregue').length,
+      cancelada: minhasDoacoes.filter(d => d.status === 'cancelada').length,
       total: minhasDoacoes.length
     };
     return stats;
@@ -77,7 +77,7 @@ const ListaDoacoesFisicas: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-600" />
                 <span className="text-sm font-medium text-yellow-800">
-                  {stats.cadastrada + stats.disponivel + stats.reservada} Em andamento
+                  {stats.disponivel + stats.reservada} Em andamento
                 </span>
               </div>
             </div>
@@ -127,7 +127,6 @@ const ListaDoacoesFisicas: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os status</SelectItem>
-                    <SelectItem value="cadastrada">Cadastrada</SelectItem>
                     <SelectItem value="disponivel">Disponível</SelectItem>
                     <SelectItem value="reservada">Reservada</SelectItem>
                     <SelectItem value="entregue">Entregue</SelectItem>

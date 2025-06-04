@@ -116,7 +116,9 @@ export const useDoacoesFisicas = () => {
   return {
     minhasDoacoes,
     todasDoacoes,
+    categorias: [], // Adicionado para compatibilidade
     isLoading: isLoadingMinhas || isLoadingTodas,
+    loading: isLoadingMinhas || isLoadingTodas, // Adicionado para compatibilidade
     error: errorMinhas || errorTodas,
     reservarDoacao: reservarDoacaoMutation.mutate,
     isReservando: reservarDoacaoMutation.isPending

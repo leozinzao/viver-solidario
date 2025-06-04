@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DoacaoFisica } from '@/types/doacoesFisicas';
+import type { DoacaoFisica } from '@/types/doacoesFisicas';
 import { 
   Clock, 
   CheckCircle, 
@@ -22,13 +22,6 @@ interface MinhasDoacoesCardProps {
 const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'cadastrada':
-        return {
-          label: 'Cadastrada',
-          color: 'bg-blue-100 text-blue-800 border-blue-200',
-          icon: Clock,
-          description: 'Aguardando análise da ONG Viver'
-        };
       case 'disponivel':
         return {
           label: 'Disponível',
