@@ -25,8 +25,7 @@ export const useDoacoesFisicas = () => {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
-          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email)
+          categoria:categorias_doacoes(*)
         `)
         .eq('doador_id', user.id)
         .order('created_at', { ascending: false });
@@ -56,8 +55,8 @@ export const useDoacoesFisicas = () => {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
-          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email),
+          categoria:categorias_doacoes(*),
+          doador:doadores(nome, email),
           reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
         `)
         .order('created_at', { ascending: false });
@@ -87,8 +86,8 @@ export const useDoacoesFisicas = () => {
         .eq('id', doacaoId)
         .select(`
           *,
-          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
-          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email),
+          categoria:categorias_doacoes(*),
+          doador:doadores(nome, email),
           reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
         `)
         .single();

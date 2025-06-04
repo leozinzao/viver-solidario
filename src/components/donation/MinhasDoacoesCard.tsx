@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DoacaoFisica } from '@/hooks/useDoacoesFisicas';
+import { DoacaoFisica } from '@/types/doacoesFisicas';
 import { 
   Clock, 
   CheckCircle, 
@@ -29,19 +29,26 @@ const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
           icon: Clock,
           description: 'Aguardando análise da ONG Viver'
         };
-      case 'aceita':
+      case 'disponivel':
         return {
-          label: 'Aceita',
+          label: 'Disponível',
+          color: 'bg-green-100 text-green-800 border-green-200',
+          icon: Heart,
+          description: 'Disponível para reserva'
+        };
+      case 'reservada':
+        return {
+          label: 'Reservada',
           color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
           icon: Heart,
-          description: 'Aceita pela ONG - aguardando retirada'
+          description: 'Reservada - aguardando retirada'
         };
-      case 'recebida':
+      case 'entregue':
         return {
-          label: 'Recebida',
+          label: 'Entregue',
           color: 'bg-green-100 text-green-800 border-green-200',
           icon: CheckCircle,
-          description: 'Doação recebida pela ONG Viver'
+          description: 'Doação entregue com sucesso'
         };
       case 'cancelada':
         return {
@@ -98,11 +105,11 @@ const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
             </span>
           </div>
 
-          {doacao.data_aceita && (
+          {doacao.data_reserva && (
             <div className="flex items-center gap-2">
               <Heart className="h-4 w-4 text-viver-yellow" />
               <span>
-                Aceita em {format(new Date(doacao.data_aceita), 'dd/MM/yyyy', { locale: ptBR })}
+                Reservada em {format(new Date(doacao.data_reserva), 'dd/MM/yyyy', { locale: ptBR })}
               </span>
             </div>
           )}
@@ -111,7 +118,7 @@ const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-500" />
               <span>
-                Recebida em {format(new Date(doacao.data_entrega), 'dd/MM/yyyy', { locale: ptBR })}
+                Entregue em {format(new Date(doacao.data_entrega), 'dd/MM/yyyy', { locale: ptBR })}
               </span>
             </div>
           )}
@@ -121,10 +128,10 @@ const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
           {statusConfig.description}
         </div>
 
-        {doacao.observacoes_ong && (
+        {doacao.observacoes && (
           <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
-            <p className="text-sm text-blue-800 font-medium mb-1">Observações da ONG:</p>
-            <p className="text-sm text-blue-700">{doacao.observacoes_ong}</p>
+            <p className="text-sm text-blue-800 font-medium mb-1">Observações:</p>
+            <p className="text-sm text-blue-700">{doacao.observacoes}</p>
           </div>
         )}
       </CardContent>
