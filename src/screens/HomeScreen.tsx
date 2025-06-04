@@ -1,107 +1,230 @@
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, Calendar, Users, Gift } from "lucide-react";
-import { useNavigation } from "@/context/NavigationContext";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigation } from '@/context/NavigationContext';
+import { 
+  Calendar as CalendarIcon, 
+  Heart, 
+  DollarSign, 
+  Handshake,
+  LogIn,
+  Users,
+  TrendingUp,
+  ExternalLink,
+  ArrowRight,
+  MapPin,
+  Phone,
+  Package
+} from "lucide-react";
 
 const HomeScreen: React.FC = () => {
+  const { isAuthenticated, user } = useAuth();
   const { navigateToScreen } = useNavigation();
 
-  const handleNavigateToPhysicalDonations = () => {
-    console.log('🎯 HomeScreen: Navegando para doações físicas');
-    navigateToScreen('doacoes-fisicas');
+  const handleLoginClick = () => {
+    navigateToScreen('login');
   };
 
+  const stats = [
+    { label: 'Famílias Assistidas', value: '150+', icon: Users, color: 'text-viver-yellow' },
+    { label: 'Voluntários Ativos', value: '80+', icon: Handshake, color: 'text-viver-yellow' },
+    { label: 'Doações Recebidas', value: 'R$ 45.000', icon: DollarSign, color: 'text-viver-yellow' },
+    { label: 'Impacto Social', value: '95%', icon: TrendingUp, color: 'text-viver-yellow' },
+  ];
+
+  const quickActions = [
+    {
+      title: 'Eventos',
+      description: 'Veja nossos próximos eventos',
+      icon: CalendarIcon,
+      action: () => navigateToScreen('events'),
+      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
+    },
+    {
+      title: 'Doações',
+      description: 'Faça uma doação hoje',
+      icon: Heart,
+      action: () => navigateToScreen('donations'),
+      color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
+    },
+    {
+      title: 'Doações Físicas',
+      description: 'Doe itens físicos ou encontre doações',
+      icon: Package,
+      action: () => navigateToScreen('doacoes-fisicas'),
+      color: 'bg-viver-yellow/10 hover:bg-viver-yellow/20 border-viver-yellow/30'
+    },
+    {
+      title: 'Voluntariado',
+      description: 'Seja um voluntário',
+      icon: Handshake,
+      action: () => navigateToScreen('volunteer'),
+      color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
+    }
+  ];
+
   return (
-    <div className="flutter-screen bg-background p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-viver-yellow">
-        ONG Viver
-      </h1>
-      
-      <div className="grid gap-6 mb-8">
-        {/* Hero Card */}
-        <Card className="bg-gradient-to-r from-viver-yellow/10 to-yellow-50 border-viver-yellow/20">
-          <CardContent className="p-6 text-center">
-            <Heart className="h-12 w-12 text-viver-yellow mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Transformando Vidas</h2>
-            <p className="text-gray-600 mb-4">
-              Sua doação faz a diferença na vida de famílias em situação de vulnerabilidade social
-            </p>
-            <Button
-              onClick={handleNavigateToPhysicalDonations}
-              className="bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium"
-            >
-              <Gift className="h-4 w-4 mr-2" />
-              Fazer Doação Física
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="flutter-card hover:shadow-lg transition-shadow cursor-pointer" 
-                onClick={() => navigateToScreen('donations')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center text-lg">
-                <Heart className="mr-2 h-5 w-5 text-viver-yellow" />
-                Como Apoiar
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Descubra todas as formas de contribuir com nossa causa
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="flutter-card hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigateToScreen('events')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center text-lg">
-                <Calendar className="mr-2 h-5 w-5 text-viver-yellow" />
-                Eventos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Participe dos nossos eventos e campanhas
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="flutter-card hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigateToScreen('volunteer')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center text-lg">
-                <Users className="mr-2 h-5 w-5 text-viver-yellow" />
-                Voluntariado
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Doe seu tempo e ajude diretamente nossa comunidade
-              </p>
-            </CardContent>
-          </Card>
+    <div className="flutter-screen bg-gradient-to-b from-viver-yellow/5 to-white p-4 min-h-screen relative">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6 animate-fade-in relative z-20 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-16 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-lg backdrop-blur-xl relative z-30">
+            <img 
+              src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
+              alt="Logo Viver Solidário" 
+              className="h-12 w-12 object-contain"
+            />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-viver-yellow drop-shadow-md">Viver Solidário</h1>
+            {isAuthenticated && user && (
+              <p className="text-sm text-muted-foreground">Bem-vindo, {user.name}!</p>
+            )}
+          </div>
         </div>
-
-        {/* Test Button - Remover após teste */}
-        <Card className="bg-green-50 border-green-200">
-          <CardContent className="p-4 text-center">
-            <h3 className="font-semibold text-green-800 mb-2">🧪 Teste do Novo Layout</h3>
-            <p className="text-sm text-green-700 mb-3">
-              Clique no botão abaixo para testar o novo layout streamlined de doações físicas
-            </p>
-            <Button
-              onClick={handleNavigateToPhysicalDonations}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              ✨ Testar Novo Layout de Doações
-            </Button>
-          </CardContent>
-        </Card>
+        
+        {!isAuthenticated && (
+          <Button 
+            onClick={handleLoginClick}
+            className="bg-viver-yellow hover:bg-viver-yellow/90 text-black shadow-md transition-all hover:scale-105 flex items-center gap-2 relative z-30" 
+            size="lg"
+          >
+            <LogIn className="h-5 w-5" />
+            Entrar
+          </Button>
+        )}
       </div>
+      
+      {/* Hero Banner com Informações da Instituição */}
+      <div className="rounded-2xl overflow-hidden mb-8 relative shadow-xl animate-fade-in z-10">
+        <div className="bg-gradient-to-br from-viver-yellow/20 via-viver-yellow-medium/10 to-viver-yellow/30 p-8 relative z-20">
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                Apoio à criança e adolescente com câncer
+              </h2>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Há mais de 20 anos, o Viver Solidário trabalha oferecendo apoio integral às famílias que enfrentam o câncer infantojuvenil, proporcionando assistência social, psicológica e material.
+              </p>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-viver-yellow" />
+                  <span>Rua Bernardo Sayão, 319 - Jd. Petrópolis, Londrina/PR</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-viver-yellow" />
+                  <span>(43) 3025-2050</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <img 
+                src="/lovable-uploads/faca4f99-20c6-4b35-bcc4-bf561ee25dc9.png" 
+                alt="Logo Viver Solidário"
+                className="h-32 object-contain opacity-80"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Estatísticas */}
+      <div className="grid grid-cols-2 gap-4 mb-8 relative z-20">
+        {stats.map((stat, index) => (
+          <Card key={stat.label} className="flutter-card bg-white/90 backdrop-blur-sm animate-scale-in hover:scale-105 transition-all duration-200 shadow-lg relative z-30">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 rounded-full bg-viver-yellow/20 flex items-center justify-center mb-3 mx-auto shadow-sm">
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+              <h3 className="font-bold text-xl text-viver-yellow">{stat.value}</h3>
+              <p className="text-xs text-muted-foreground leading-tight">{stat.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Ações Rápidas */}
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 relative z-20">Como Participar</h2>
+      <div className="grid gap-4 mb-8 relative z-20">
+        {quickActions.map((action, index) => (
+          <Card 
+            key={action.title}
+            className={`flutter-card transition-all duration-200 hover:scale-105 cursor-pointer ${action.color} border animate-enter bg-white/90 backdrop-blur-sm shadow-lg relative z-30`}
+            onClick={action.action}
+            style={{animationDelay: `${index * 100}ms`}}
+          >
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-viver-yellow/20 flex items-center justify-center shadow-sm">
+                  <action.icon className="h-6 w-6 text-viver-yellow" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">{action.title}</h3>
+                  <p className="text-sm text-gray-600">{action.description}</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-viver-yellow" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Destaques Recentes */}
+      <Card className="flutter-card bg-white/90 backdrop-blur-sm mb-8 animate-fade-in shadow-lg relative z-30">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-gray-800 font-semibold flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-viver-yellow" />
+            Últimas Notícias
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="border-l-4 border-l-viver-yellow pl-4">
+            <h4 className="font-medium text-sm mb-1">Nova Parceria Firmada</h4>
+            <p className="text-xs text-muted-foreground mb-2">O Viver Solidário firma parceria com hospital local para ampliar atendimentos especializados.</p>
+            <span className="text-xs text-viver-yellow font-medium">há 3 dias</span>
+          </div>
+          <div className="border-l-4 border-l-viver-yellow-medium pl-4">
+            <h4 className="font-medium text-sm mb-1">Campanha de Inverno 2025</h4>
+            <p className="text-xs text-muted-foreground mb-2">Arrecadação de agasalhos já atingiu 60% da meta estabelecida.</p>
+            <span className="text-xs text-viver-yellow-medium font-medium">há 1 semana</span>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Links Institucionais */}
+      <div className="grid grid-cols-2 gap-4 mb-8 relative z-20">
+        <Button 
+          variant="outline"
+          className="h-auto p-4 border-viver-yellow hover:bg-viver-yellow/10 transition-all hover:scale-105 bg-white/90 backdrop-blur-sm shadow-lg relative z-30"
+          onClick={() => window.open("https://www.ongviver.org.br", "_blank")}
+        >
+          <div className="text-center">
+            <ExternalLink className="h-5 w-5 mx-auto mb-1 text-viver-yellow" />
+            <span className="text-sm font-medium text-viver-yellow">Site Oficial</span>
+          </div>
+        </Button>
+        <Button 
+          variant="outline"
+          className="h-auto p-4 border-viver-yellow-medium hover:bg-viver-yellow-medium/10 transition-all hover:scale-105 bg-white/90 backdrop-blur-sm shadow-lg relative z-30"
+          onClick={() => window.open("https://www.instagram.com/ongviver", "_blank")}
+        >
+          <div className="text-center">
+            <Heart className="h-5 w-5 mx-auto mb-1 text-viver-yellow-medium" />
+            <span className="text-sm font-medium text-viver-yellow-medium">Instagram</span>
+          </div>
+        </Button>
+      </div>
+      
+      {/* CTA principal */}
+      <Button 
+        className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black text-lg py-6 shadow-lg animate-fade-in transition-all hover:scale-105 relative z-30"
+        onClick={() => navigateToScreen('events')}
+      >
+        <CalendarIcon className="h-6 w-6 mr-2" />
+        Conheça Nossos Eventos
+      </Button>
     </div>
   );
 };
