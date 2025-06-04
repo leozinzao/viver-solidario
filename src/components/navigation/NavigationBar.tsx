@@ -56,14 +56,16 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
 
   const handleNavigation = (id: string) => {
     console.log('🧭 NavigationBar: Navegando para:', id);
+    console.log('🧭 NavigationBar: Tela atual antes da navegação:', currentScreen);
     
-    // Se for doações físicas, navegar diretamente para a tela streamlined
-    if (id === 'doacoes-fisicas') {
-      console.log('🎯 Navegando para tela streamlined de doações físicas');
-    }
-    
+    // Forçar navegação mesmo se for a mesma tela
     navigateToScreen(id);
     setIsMenuOpen(false);
+    
+    // Log adicional para debug
+    setTimeout(() => {
+      console.log('🧭 NavigationBar: Tela após navegação:', currentScreen);
+    }, 100);
   };
 
   // Verificar se a tela atual está em um submenu

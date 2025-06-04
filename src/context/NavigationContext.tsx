@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useCallback, useContext } from 'react';
 
 interface NavigationContextProps {
@@ -18,35 +19,48 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [currentScreen, setCurrentScreen] = useState<string>('welcome');
   const [showPermissionDenied, setShowPermissionDenied] = useState(false);
 
-  console.log('NavigationContext: Current screen:', currentScreen);
+  console.log('🧭 NavigationContext: Current screen:', currentScreen);
 
   const navigateToScreen = useCallback((screen: string) => {
-    console.log('NavigationContext: Navegando para:', screen);
+    console.log('🧭 NavigationContext: Solicitação de navegação para:', screen);
+    console.log('🧭 NavigationContext: Tela atual antes da navegação:', currentScreen);
+    console.log('🧭 NavigationContext: Timestamp:', new Date().toISOString());
+    
+    if (screen === 'doacoes-fisicas') {
+      console.log('🎯 NavigationContext: NAVEGAÇÃO PARA DOAÇÕES FÍSICAS DETECTADA!');
+      console.log('🎯 NavigationContext: Essa navegação deve levar ao componente streamlined');
+    }
+    
     setCurrentScreen(screen);
-  }, []);
+    
+    // Log adicional após mudança de estado
+    setTimeout(() => {
+      console.log('🧭 NavigationContext: Navegação concluída. Nova tela:', screen);
+    }, 10);
+  }, [currentScreen]);
 
   const handleEnterApp = useCallback(() => {
-    console.log('NavigationContext: Entrando no app');
+    console.log('🧭 NavigationContext: Entrando no app');
     setCurrentScreen('home');
   }, []);
 
   const handleGoToLogin = useCallback(() => {
-    console.log('NavigationContext: Indo para login');
+    console.log('🧭 NavigationContext: Indo para login');
     setCurrentScreen('login');
   }, []);
 
   const handleGoToSignUp = useCallback(() => {
-    console.log('NavigationContext: Indo para signup');
+    console.log('🧭 NavigationContext: Indo para signup');
     setCurrentScreen('signup');
   }, []);
 
   const handleBackToWelcome = useCallback(() => {
-    console.log('NavigationContext: Voltando para welcome');
+    console.log('🧭 NavigationContext: Voltando para welcome');
     setCurrentScreen('welcome');
   }, []);
 
   const handleLoginSuccess = useCallback(() => {
-    console.log('NavigationContext: Login bem-sucedido, indo para home');
+    console.log('🧭 NavigationContext: Login bem-sucedido, indo para home');
     setCurrentScreen('home');
   }, []);
 
