@@ -1,3 +1,4 @@
+
 import React from "react";
 import WelcomeScreen from "@/screens/WelcomeScreen";
 import LoginScreen from "@/screens/LoginScreen";
@@ -34,8 +35,8 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       return (
         <WelcomeScreen
           onEnterApp={onEnterApp}
-          onGoToLogin={onGoToLogin}
-          onGoToSignUp={onGoToSignUp}
+          onLogin={onGoToLogin}
+          onSignUp={onGoToSignUp}
         />
       );
     case "login":
@@ -43,7 +44,6 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         <LoginScreen
           onLoginSuccess={onLoginSuccess}
           onBackToWelcome={onBackToWelcome}
-          onGoToSignUp={onGoToSignUp}
         />
       );
     case "signup":
@@ -51,7 +51,6 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         <SignUpScreen
           onSignUpSuccess={onLoginSuccess}
           onBackToWelcome={onBackToWelcome}
-          onGoToLogin={onGoToLogin}
         />
       );
     case "home":
