@@ -55,7 +55,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
   ];
 
   const handleNavigation = (id: string) => {
-    console.log('NavigationBar: Navegando para:', id);
+    console.log('🧭 NavigationBar: Navegando para:', id);
+    
+    // Se for doações físicas, navegar diretamente para a tela streamlined
+    if (id === 'doacoes-fisicas') {
+      console.log('🎯 Navegando para tela streamlined de doações físicas');
+    }
+    
     navigateToScreen(id);
     setIsMenuOpen(false);
   };
