@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Plus, Gift, Truck, CheckCircle, Users, ArrowRight } from 'lucide-react';
@@ -12,33 +12,22 @@ const DoacoesFisicasStreamlined: React.FC = () => {
   const { criarDoacao, isSubmitting } = useDoacoesFisicasStreamlined();
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    console.log('🎯 DoacoesFisicasStreamlined: Componente MONTADO!');
-    console.log('🎯 DoacoesFisicasStreamlined: Timestamp:', new Date().toISOString());
-    console.log('🔐 DoacoesFisicasStreamlined: Usuário autenticado:', isAuthenticated);
-    console.log('📝 DoacoesFisicasStreamlined: Mostrar formulário:', showForm);
-    
-    return () => {
-      console.log('🎯 DoacoesFisicasStreamlined: Componente DESMONTADO');
-    };
-  }, []);
-
-  useEffect(() => {
-    console.log('🎯 DoacoesFisicasStreamlined: Estado showForm mudou para:', showForm);
-  }, [showForm]);
+  console.log('🎯 DoacoesFisicasStreamlined: Componente renderizado');
+  console.log('🔐 Usuário autenticado:', isAuthenticated);
+  console.log('📝 Mostrar formulário:', showForm);
 
   const handleSubmit = async (dadosDoacao: any): Promise<boolean> => {
-    console.log('📤 DoacoesFisicasStreamlined: Enviando doação:', dadosDoacao);
+    console.log('📤 Enviando doação:', dadosDoacao);
     const sucesso = await criarDoacao(dadosDoacao);
     if (sucesso) {
-      console.log('✅ DoacoesFisicasStreamlined: Doação criada com sucesso, ocultando formulário');
+      console.log('✅ Doação criada com sucesso, ocultando formulário');
       setShowForm(false);
     }
     return sucesso;
   };
 
   if (!isAuthenticated) {
-    console.log('🚫 DoacoesFisicasStreamlined: Usuário não autenticado, mostrando tela de login');
+    console.log('🚫 Usuário não autenticado, mostrando tela de login');
     return (
       <Card className="max-w-md mx-auto">
         <CardContent className="p-8 text-center space-y-4">
@@ -60,21 +49,13 @@ const DoacoesFisicasStreamlined: React.FC = () => {
     );
   }
 
-  console.log('✨ DoacoesFisicasStreamlined: Renderizando interface principal de doações físicas');
+  console.log('✨ Renderizando interface principal de doações físicas');
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header com indicador visual de qual tela está sendo renderizada */}
-      <div className="bg-green-100 border-2 border-green-400 p-4 rounded-lg text-center">
-        <div className="text-lg font-bold text-green-800 mb-2">
-          ✅ TELA NOVA: DoacoesFisicasStreamlined carregada com sucesso!
-        </div>
-        <div className="text-sm text-green-700">
-          📅 {new Date().toLocaleString()} | 🆔 Componente: DoacoesFisicasStreamlined
-        </div>
-        <div className="text-xs text-green-600 mt-1">
-          Se você está vendo esta mensagem, o novo layout está funcionando! 🎉
-        </div>
+      <div className="bg-green-100 border border-green-300 p-2 rounded text-center text-sm text-green-800">
+        ✅ TELA NOVA: DoacoesFisicasStreamlined carregada com sucesso!
       </div>
 
       {!showForm ? (
@@ -93,7 +74,7 @@ const DoacoesFisicasStreamlined: React.FC = () => {
             <CardContent className="text-center">
               <Button
                 onClick={() => {
-                  console.log('🎯 DoacoesFisicasStreamlined: Botão clicado - Mostrar formulário');
+                  console.log('🎯 Botão clicado: Mostrar formulário');
                   setShowForm(true);
                 }}
                 className="bg-viver-yellow hover:bg-viver-yellow/90 text-black text-lg px-8 py-4 h-auto font-medium"
@@ -210,7 +191,7 @@ const DoacoesFisicasStreamlined: React.FC = () => {
         </>
       ) : (
         <>
-          {console.log('📝 DoacoesFisicasStreamlined: Renderizando formulário de doação')}
+          {console.log('📝 Renderizando formulário de doação')}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -223,7 +204,7 @@ const DoacoesFisicasStreamlined: React.FC = () => {
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
                 onCancel={() => {
-                  console.log('❌ DoacoesFisicasStreamlined: Cancelando formulário');
+                  console.log('❌ Cancelando formulário');
                   setShowForm(false);
                 }}
               />
