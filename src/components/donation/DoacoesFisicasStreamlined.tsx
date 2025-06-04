@@ -53,6 +53,11 @@ const DoacoesFisicasStreamlined: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header com indicador visual de qual tela está sendo renderizada */}
+      <div className="bg-green-100 border border-green-300 p-2 rounded text-center text-sm text-green-800">
+        ✅ TELA NOVA: DoacoesFisicasStreamlined carregada com sucesso!
+      </div>
+
       {!showForm ? (
         <>
           {/* Header Principal */}

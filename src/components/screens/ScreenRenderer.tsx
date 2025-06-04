@@ -28,7 +28,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onBackToWelcome,
   onLoginSuccess,
 }) => {
-  console.log('ScreenRenderer: Renderizando tela:', currentScreen);
+  console.log('🎬 ScreenRenderer: Renderizando tela:', currentScreen);
 
   switch (currentScreen) {
     case "welcome":
@@ -58,7 +58,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
     case "donations":
       return <DonationsScreen />;
     case "doacoes-fisicas":
-      console.log('ScreenRenderer: Renderizando DoacoesFisicasScreenStreamlined');
+      console.log('🎯 ScreenRenderer: Renderizando DoacoesFisicasScreenStreamlined');
       return <DoacoesFisicasScreenStreamlined />;
     case "events":
       return <EventsScreen />;
@@ -69,7 +69,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
     case "admin":
       return <AdminScreen />;
     default:
-      console.log('ScreenRenderer: Tela não encontrada, renderizando home');
+      console.log('❓ ScreenRenderer: Tela não encontrada, renderizando home. Tela solicitada:', currentScreen);
       return <HomeScreen />;
   }
 };

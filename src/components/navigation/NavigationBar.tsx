@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Home, Calendar, Users, User, Heart } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -59,59 +60,71 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
     setIsMenuOpen(false);
   };
 
+  // Verificar se a tela atual está em um submenu
+  const isSubItemActive = (item: NavItem) => {
+    return item.subItems?.some(subItem => subItem.id === currentScreen) || item.id === currentScreen;
+  };
+
   return (
-    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-      <SheetTrigger asChild>
-        <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-border z-50">
-          <ul className="flex justify-around items-center p-2">
-            {navItems.map((item) => (
-              item.subItems ? (
-                <li key={item.id} className="relative">
-                  <Button variant="ghost" onClick={() => setIsMenuOpen(true)} className="flex flex-col items-center gap-1">
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-xs">{item.label}</span>
-                  </Button>
-                </li>
-              ) : (
-                <li key={item.id}>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleNavigation(item.id)}
-                    className={cn(
-                      "flex flex-col items-center gap-1",
-                      currentScreen === item.id ? "text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span className="text-xs">{item.label}</span>
-                  </Button>
-                </li>
-              )
-            ))}
-          </ul>
-        </nav>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-auto pb-4">
-        <div className="grid gap-4">
+    <>
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-border z-50">
+        <ul className="flex justify-around items-center p-2">
           {navItems.map((item) => (
-            item.subItems && (
-              <div key={item.id} className="grid gap-2">
-                {item.subItems.map((subItem) => (
-                  <Button
-                    key={subItem.id}
-                    variant="ghost"
-                    className="justify-start"
-                    onClick={() => handleNavigation(subItem.id)}
-                  >
-                    {subItem.label}
-                  </Button>
-                ))}
-              </div>
+            item.subItems ? (
+              <li key={item.id} className="relative">
+                <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className={cn(
+                        "flex flex-col items-center gap-1",
+                        isSubItemActive(item) ? "text-primary" : "text-muted-foreground"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="text-xs">{item.label}</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-auto pb-4">
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        {item.subItems.map((subItem) => (
+                          <Button
+                            key={subItem.id}
+                            variant="ghost"
+                            className={cn(
+                              "justify-start",
+                              currentScreen === subItem.id ? "bg-accent" : ""
+                            )}
+                            onClick={() => handleNavigation(subItem.id)}
+                          >
+                            {subItem.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </li>
+            ) : (
+              <li key={item.id}>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleNavigation(item.id)}
+                  className={cn(
+                    "flex flex-col items-center gap-1",
+                    currentScreen === item.id ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-xs">{item.label}</span>
+                </Button>
+              </li>
             )
           ))}
-        </div>
-      </SheetContent>
-    </Sheet>
+        </ul>
+      </nav>
+    </>
   );
 };
 
