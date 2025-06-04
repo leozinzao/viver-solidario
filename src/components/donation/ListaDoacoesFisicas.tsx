@@ -6,15 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Heart, Plus, Search, Package, Clock, CheckCircle } from 'lucide-react';
 import { useDoacoesFisicas } from '@/hooks/useDoacoesFisicas';
-import { useCategoriasDoacoes } from '@/hooks/useCategoriasDoacoes';
 import MinhasDoacoesCard from './MinhasDoacoesCard';
 import CadastrarDoacaoDialog from './CadastrarDoacaoDialog';
 import { useAuth } from '@/context/AuthContext';
 
 const ListaDoacoesFisicas: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { minhasDoacoes, isLoading } = useDoacoesFisicas();
-  const { categorias, loading: loadingCategorias } = useCategoriasDoacoes();
+  const { minhasDoacoes, categorias, loading } = useDoacoesFisicas();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('todas');
   const [selectedStatus, setSelectedStatus] = useState('todos');
@@ -31,9 +29,8 @@ const ListaDoacoesFisicas: React.FC = () => {
   const getStatusStats = () => {
     const stats = {
       cadastrada: minhasDoacoes.filter(d => d.status === 'cadastrada').length,
-      disponivel: minhasDoacoes.filter(d => d.status === 'disponivel').length,
-      reservada: minhasDoacoes.filter(d => d.status === 'reservada').length,
-      entregue: minhasDoacoes.filter(d => d.status === 'entregue').length,
+      aceita: minhasDoacoes.filter(d => d.status === 'aceita').length,
+      recebida: minhasDoacoes.filter(d => d.status === 'recebida').length,
       total: minhasDoacoes.length
     };
     return stats;
@@ -41,7 +38,7 @@ const ListaDoacoesFisicas: React.FC = () => {
 
   const stats = getStatusStats();
 
-  if (isLoading || loadingCategorias) {
+  if (loading) {
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -77,7 +74,7 @@ const ListaDoacoesFisicas: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-600" />
                 <span className="text-sm font-medium text-yellow-800">
-                  {stats.cadastrada + stats.disponivel + stats.reservada} Em andamento
+                  {stats.cadastrada + stats.aceita} Em andamento
                 </span>
               </div>
             </div>
@@ -85,7 +82,7 @@ const ListaDoacoesFisicas: React.FC = () => {
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-green-800">
-                  {stats.entregue} Entregues
+                  {stats.recebida} Recebidas
                 </span>
               </div>
             </div>
@@ -128,9 +125,8 @@ const ListaDoacoesFisicas: React.FC = () => {
                   <SelectContent>
                     <SelectItem value="todos">Todos os status</SelectItem>
                     <SelectItem value="cadastrada">Cadastrada</SelectItem>
-                    <SelectItem value="disponivel">Disponível</SelectItem>
-                    <SelectItem value="reservada">Reservada</SelectItem>
-                    <SelectItem value="entregue">Entregue</SelectItem>
+                    <SelectItem value="aceita">Aceita</SelectItem>
+                    <SelectItem value="recebida">Recebida</SelectItem>
                     <SelectItem value="cancelada">Cancelada</SelectItem>
                   </SelectContent>
                 </Select>

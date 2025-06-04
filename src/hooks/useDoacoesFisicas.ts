@@ -1,124 +1,184 @@
 
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
-export const useDoacoesFisicas = () => {
-  const { user } = useAuth();
+export interface DoacaoFisica {
+  id: string;
+  doador_id?: string;
+  categoria_id?: string;
+  titulo: string;
+  descricao?: string;
+  quantidade: number;
+  unidade: string;
+  localizacao?: string;
+  endereco_coleta?: string;
+  status: 'cadastrada' | 'aceita' | 'recebida' | 'cancelada';
+  data_disponivel?: string;
+  data_aceita?: string;
+  data_entrega?: string;
+  fotos?: string[];
+  observacoes?: string;
+  observacoes_ong?: string;
+  telefone_doador?: string;
+  email_doador?: string;
+  responsavel_ong_id?: string;
+  created_at: string;
+  updated_at: string;
+  categorias_doacoes?: {
+    nome: string;
+    icone: string;
+    cor: string;
+  };
+}
+
+export interface CategoriaDoacao {
+  id: string;
+  nome: string;
+  descricao?: string;
+  icone?: string;
+  cor?: string;
+}
+
+export function useDoacoesFisicas() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Query para buscar minhas doações físicas
-  const {
-    data: minhasDoacoes = [],
-    isLoading: isLoadingMinhas,
-    error: errorMinhas
-  } = useQuery({
-    queryKey: ['minhas-doacoes-fisicas', user?.id],
+  // Buscar doações do usuário atual
+  const { data: minhasDoacoes = [], isLoading: isLoadingDoacoes } = useQuery({
+    queryKey: ['minhas-doacoes-fisicas'],
     queryFn: async () => {
-      if (!user?.id) return [];
-      
-      console.log('Buscando minhas doações físicas...');
-      
+      console.log('useDoacoesFisicas: Buscando minhas doações físicas...');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('useDoacoesFisicas: Usuário não logado, retornando array vazio');
+        return [];
+      }
+
+      console.log('useDoacoesFisicas: Usuário logado com ID:', user.id);
+
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:categorias_doacoes(*)
+          categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey (
+            nome,
+            icone,
+            cor
+          )
         `)
         .eq('doador_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar minhas doações:', error);
+        console.error('useDoacoesFisicas: Erro ao buscar minhas doações:', error);
         throw error;
       }
-
-      console.log('Minhas doações carregadas:', data);
-      return data || [];
+      
+      console.log('useDoacoesFisicas: Minhas doações encontradas:', data);
+      console.log('useDoacoesFisicas: Quantidade de doações retornadas:', data?.length || 0);
+      
+      // Debug adicional: verificar se todas as doações têm o doador_id correto
+      if (data && data.length > 0) {
+        const doacoesSemDoadorId = data.filter(d => !d.doador_id);
+        const doacoesComOutroDoadorId = data.filter(d => d.doador_id && d.doador_id !== user.id);
+        
+        if (doacoesSemDoadorId.length > 0) {
+          console.warn('useDoacoesFisicas: Encontradas doações sem doador_id:', doacoesSemDoadorId);
+        }
+        
+        if (doacoesComOutroDoadorId.length > 0) {
+          console.warn('useDoacoesFisicas: Encontradas doações com doador_id diferente:', doacoesComOutroDoadorId);
+        }
+      }
+      
+      return data as DoacaoFisica[];
     },
-    enabled: !!user?.id
   });
 
-  // Query para buscar todas as doações físicas
-  const {
-    data: todasDoacoes = [],
-    isLoading: isLoadingTodas,
-    error: errorTodas
-  } = useQuery({
-    queryKey: ['doacoes-fisicas'],
+  // Buscar categorias
+  const { data: categorias = [], isLoading: isLoadingCategorias } = useQuery({
+    queryKey: ['categorias-doacoes'],
     queryFn: async () => {
-      console.log('Buscando todas as doações físicas...');
-      
+      console.log('useDoacoesFisicas: Buscando categorias...');
       const { data, error } = await supabase
-        .from('doacoes_fisicas_novas')
-        .select(`
-          *,
-          categoria:categorias_doacoes(*),
-          doador:doadores(nome, email),
-          reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
-        `)
-        .order('created_at', { ascending: false });
+        .from('categorias_doacoes')
+        .select('*')
+        .order('nome');
 
       if (error) {
-        console.error('Erro ao buscar todas as doações:', error);
+        console.error('useDoacoesFisicas: Erro ao buscar categorias:', error);
         throw error;
       }
-
-      console.log('Todas as doações carregadas:', data);
-      return data || [];
-    }
+      console.log('useDoacoesFisicas: Categorias encontradas:', data);
+      return data as CategoriaDoacao[];
+    },
   });
 
-  // Mutation para reservar doação
-  const reservarDoacaoMutation = useMutation({
-    mutationFn: async (doacaoId: string) => {
-      if (!user?.id) throw new Error('Usuário não autenticado');
+  // Criar nova doação
+  const createDoacao = useMutation({
+    mutationFn: async (doacao: Partial<DoacaoFisica> & { telefone?: string; email?: string }) => {
+      console.log('useDoacoesFisicas: Iniciando criação de doação:', doacao);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('useDoacoesFisicas: Usuário não autenticado');
+        throw new Error('Usuário não autenticado');
+      }
+
+      console.log('useDoacoesFisicas: ID do usuário para doador_id:', user.id);
+
+      const dadosParaInserir = {
+        ...doacao,
+        doador_id: user.id, // GARANTIR que sempre seja preenchido
+        status: 'cadastrada',
+        telefone_doador: doacao.telefone,
+        email_doador: doacao.email,
+      };
+
+      console.log('useDoacoesFisicas: Dados completos para inserção:', dadosParaInserir);
 
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
-        .update({
-          status: 'reservada',
-          beneficiario_id: user.id,
-          data_reserva: new Date().toISOString()
-        })
-        .eq('id', doacaoId)
-        .select(`
-          *,
-          categoria:categorias_doacoes(*),
-          doador:doadores(nome, email),
-          reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
-        `)
+        .insert([dadosParaInserir])
+        .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('useDoacoesFisicas: Erro ao criar doação:', error);
+        throw error;
+      }
+      
+      console.log('useDoacoesFisicas: Doação criada com sucesso:', data);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doacoes-fisicas'] });
+    onSuccess: (data) => {
+      console.log('useDoacoesFisicas: Doação criada, invalidando queries...');
+      // Invalidar imediatamente para forçar re-fetch
       queryClient.invalidateQueries({ queryKey: ['minhas-doacoes-fisicas'] });
       toast({
-        title: "Doação reservada!",
-        description: "A doação foi reservada para você.",
-        variant: "default"
+        title: "Sucesso",
+        description: "Doação cadastrada com sucesso! A ONG Viver analisará sua doação em breve.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
+      console.error('useDoacoesFisicas: Erro na mutação de criação:', error);
       toast({
-        title: "Erro ao reservar doação",
-        description: error.message || "Tente novamente.",
-        variant: "destructive"
+        title: "Erro",
+        description: `Não foi possível cadastrar a doação: ${error.message}`,
+        variant: "destructive",
       });
-    }
+    },
   });
 
   return {
     minhasDoacoes,
-    todasDoacoes,
-    isLoading: isLoadingMinhas || isLoadingTodas,
-    error: errorMinhas || errorTodas,
-    reservarDoacao: reservarDoacaoMutation.mutate,
-    isReservando: reservarDoacaoMutation.isPending
+    categorias,
+    loading: loading || isLoadingDoacoes || isLoadingCategorias,
+    error,
+    createDoacao: createDoacao.mutate,
+    isCreating: createDoacao.isPending,
   };
-};
+}

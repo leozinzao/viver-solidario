@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Package, User } from 'lucide-react';
-import { DoacaoFisica } from '@/types/doacoesFisicas';
+import { DoacaoFisica } from '@/hooks/useDoacoesFisicas';
 
 interface DoacaoFisicaCardProps {
   doacao: DoacaoFisica;
@@ -56,9 +56,9 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
                 <Badge className={getStatusColor(doacao.status)}>
                   {getStatusText(doacao.status)}
                 </Badge>
-                {doacao.categoria && (
-                  <Badge variant="outline" style={{ borderColor: doacao.categoria.cor }}>
-                    {doacao.categoria.nome}
+                {doacao.categorias_doacoes && (
+                  <Badge variant="outline" style={{ borderColor: doacao.categorias_doacoes.cor }}>
+                    {doacao.categorias_doacoes.nome}
                   </Badge>
                 )}
               </div>
@@ -85,10 +85,10 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
             </div>
           )}
           
-          {doacao.created_at && (
+          {doacao.data_disponivel && (
             <div className="flex items-center gap-2 col-span-2">
               <Calendar className="h-4 w-4 text-viver-yellow" />
-              <span>Cadastrada em {formatDate(doacao.created_at)}</span>
+              <span>Disponível desde {formatDate(doacao.data_disponivel)}</span>
             </div>
           )}
         </div>
@@ -99,7 +99,7 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
           </div>
         )}
         
-        {doacao.status === 'disponivel' && (
+        {doacao.status === 'cadastrada' && (
           <Button
             className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
             onClick={() => onReservar(doacao.id)}
