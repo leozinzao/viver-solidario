@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="viver-theme">
+      <ThemeProvider>
         <AuthProvider>
           <NavigationProvider>
             <div className="min-h-screen bg-gray-50">

@@ -18,7 +18,7 @@ const ViverSolidarioApp: React.FC = () => {
     handleLoginSuccess 
   } = useNavigation();
 
-  const isAdminUser = user ? hasPermission(user, Permission.ADMIN_ACCESS) : false;
+  const isAdminUser = user ? hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL) : false;
 
   console.log('🚀 ViverSolidarioApp: Renderizando app principal');
   console.log('🔐 ViverSolidarioApp: Autenticado:', isAuthenticated);
@@ -39,7 +39,7 @@ const ViverSolidarioApp: React.FC = () => {
       />
 
       {/* Conteúdo principal com scroll */}
-      <div className="flex-1 overflow-y-auto pb-16">
+      <div className="flex-1 overflow-y-auto pb-16 pt-2">
         <ScreenRenderer
           currentScreen={currentScreen}
           onEnterApp={handleEnterApp}
