@@ -1,7 +1,16 @@
+import React, { useState } from 'react';
+import { Home, Calendar, Users, User, Heart } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { useNavigation } from '@/context/NavigationContext';
+import { cn } from '@/lib/utils';
 
-import React from "react";
-import { Home, Calendar, Heart, Handshake, User, Settings } from "@/components/icons";
-import { useAuth } from "@/context/AuthContext";
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  subItems?: { id: string; label: string; }[];
+}
 
 interface NavigationBarProps {
   currentScreen: string;
@@ -9,60 +18,100 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate }) => {
-  const { isAuthenticated } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { navigateToScreen } = useNavigation();
+
+  const navItems = [
+    { 
+      id: 'home', 
+      label: 'Início', 
+      icon: Home 
+    },
+    { 
+      id: 'donations', 
+      label: 'Doações', 
+      icon: Heart,
+      subItems: [
+        { id: 'donations', label: 'Como Apoiar' },
+        { id: 'doacoes-fisicas', label: 'Doações Físicas' }
+      ]
+    },
+    { 
+      id: 'events', 
+      label: 'Eventos', 
+      icon: Calendar 
+    },
+    { 
+      id: 'volunteer', 
+      label: 'Voluntário', 
+      icon: Users 
+    },
+    { 
+      id: 'profile', 
+      label: 'Perfil', 
+      icon: User 
+    }
+  ];
+
+  const handleNavigation = (id: string) => {
+    console.log('NavigationBar: Navegando para:', id);
+    navigateToScreen(id);
+    setIsMenuOpen(false);
+  };
 
   return (
-    <div className="flutter-bottom-nav">
-      <button
-        className={`nav-item ${currentScreen === "home" ? "text-viver-yellow" : "text-muted-foreground"}`}
-        onClick={() => onNavigate("home")}
-      >
-        <Home className="h-6 w-6 mb-1" />
-        <span>Início</span>
-      </button>
-
-      <button
-        className={`nav-item ${currentScreen === "events" ? "text-viver-yellow" : "text-muted-foreground"}`}
-        onClick={() => onNavigate("events")}
-      >
-        <Calendar className="h-6 w-6 mb-1" />
-        <span>Eventos</span>
-      </button>
-
-      <button
-        className={`nav-item ${currentScreen === "donations" ? "text-viver-yellow" : "text-muted-foreground"}`}
-        onClick={() => onNavigate("donations")}
-      >
-        <Heart className="h-6 w-6 mb-1" />
-        <span>Doações</span>
-      </button>
-
-      <button
-        className={`nav-item ${currentScreen === "volunteer" ? "text-viver-yellow" : "text-muted-foreground"}`}
-        onClick={() => onNavigate("volunteer")}
-      >
-        <Handshake className="h-6 w-6 mb-1" />
-        <span>Voluntariado</span>
-      </button>
-
-      {/* Show profile for authenticated users, admin for admin users */}
-      <button
-        className={`nav-item ${["profile", "admin"].includes(currentScreen) ? "text-viver-yellow" : "text-muted-foreground"}`}
-        onClick={() => onNavigate(isAuthenticated ? "profile" : "login")}
-      >
-        {isAuthenticated ? (
-          <>
-            <User className="h-6 w-6 mb-1" />
-            <span>Perfil</span>
-          </>
-        ) : (
-          <>
-            <User className="h-6 w-6 mb-1" />
-            <span>Login</span>
-          </>
-        )}
-      </button>
-    </div>
+    <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      <SheetTrigger asChild>
+        <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-border z-50">
+          <ul className="flex justify-around items-center p-2">
+            {navItems.map((item) => (
+              item.subItems ? (
+                <li key={item.id} className="relative">
+                  <Button variant="ghost" onClick={() => setIsMenuOpen(true)} className="flex flex-col items-center gap-1">
+                    <item.icon className="h-5 w-5" />
+                    <span className="text-xs">{item.label}</span>
+                  </Button>
+                </li>
+              ) : (
+                <li key={item.id}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavigation(item.id)}
+                    className={cn(
+                      "flex flex-col items-center gap-1",
+                      currentScreen === item.id ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="text-xs">{item.label}</span>
+                  </Button>
+                </li>
+              )
+            ))}
+          </ul>
+        </nav>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-auto pb-4">
+        <div className="grid gap-4">
+          {navItems.map((item) => (
+            item.subItems && (
+              <div key={item.id} className="grid gap-2">
+                {item.subItems.map((subItem) => (
+                  <Button
+                    key={subItem.id}
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => handleNavigation(subItem.id)}
+                  >
+                    {subItem.label}
+                  </Button>
+                ))}
+              </div>
+            )
+          ))}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

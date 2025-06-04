@@ -12,15 +12,22 @@ const DoacoesFisicasStreamlined: React.FC = () => {
   const { criarDoacao, isSubmitting } = useDoacoesFisicasStreamlined();
   const [showForm, setShowForm] = useState(false);
 
+  console.log('🎯 DoacoesFisicasStreamlined: Componente renderizado');
+  console.log('🔐 Usuário autenticado:', isAuthenticated);
+  console.log('📝 Mostrar formulário:', showForm);
+
   const handleSubmit = async (dadosDoacao: any): Promise<boolean> => {
+    console.log('📤 Enviando doação:', dadosDoacao);
     const sucesso = await criarDoacao(dadosDoacao);
     if (sucesso) {
+      console.log('✅ Doação criada com sucesso, ocultando formulário');
       setShowForm(false);
     }
     return sucesso;
   };
 
   if (!isAuthenticated) {
+    console.log('🚫 Usuário não autenticado, mostrando tela de login');
     return (
       <Card className="max-w-md mx-auto">
         <CardContent className="p-8 text-center space-y-4">
@@ -42,6 +49,8 @@ const DoacoesFisicasStreamlined: React.FC = () => {
     );
   }
 
+  console.log('✨ Renderizando interface principal de doações físicas');
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {!showForm ? (
@@ -59,7 +68,10 @@ const DoacoesFisicasStreamlined: React.FC = () => {
             </CardHeader>
             <CardContent className="text-center">
               <Button
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  console.log('🎯 Botão clicado: Mostrar formulário');
+                  setShowForm(true);
+                }}
                 className="bg-viver-yellow hover:bg-viver-yellow/90 text-black text-lg px-8 py-4 h-auto font-medium"
                 size="lg"
               >
@@ -173,21 +185,27 @@ const DoacoesFisicasStreamlined: React.FC = () => {
           </Card>
         </>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-viver-yellow" />
-              Nova Doação Física
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FormularioStreamlined
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-              onCancel={() => setShowForm(false)}
-            />
-          </CardContent>
-        </Card>
+        <>
+          {console.log('📝 Renderizando formulário de doação')}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-viver-yellow" />
+                Nova Doação Física
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormularioStreamlined
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                onCancel={() => {
+                  console.log('❌ Cancelando formulário');
+                  setShowForm(false);
+                }}
+              />
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   );
