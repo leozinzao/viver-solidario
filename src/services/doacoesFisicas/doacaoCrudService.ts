@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { ErrorHandler } from '@/lib/errorHandler';
 import { validateData, statusDoacaoSchema } from '@/lib/validation';
@@ -15,8 +14,8 @@ export const doacaoCrudService = {
         .insert([dadosParaInserir])
         .select(`
           *,
-          categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
-          doador:doacoes_fisicas_novas_doador_fkey(nome, email)
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
+          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email)
         `)
         .single();
 
@@ -42,9 +41,9 @@ export const doacaoCrudService = {
         .from('doacoes_fisicas_novas')
         .select(`
           *,
-          categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
-          doador:doacoes_fisicas_novas_doador_fkey(nome, email),
-          reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
+          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email),
+          reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
         `)
         .order('created_at', { ascending: false });
 
@@ -88,9 +87,9 @@ export const doacaoCrudService = {
       .from('doacoes_fisicas_novas')
       .select(`
         *,
-        categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
-        doador:doacoes_fisicas_novas_doador_fkey(nome, email),
-        reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
+        categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
+        doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email),
+        reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
       `)
       .eq('id', id)
       .single();
@@ -131,9 +130,9 @@ export const doacaoCrudService = {
       .eq('id', id)
       .select(`
         *,
-        categoria:doacoes_fisicas_novas_categoria_id_fkey(*),
-        doador:doacoes_fisicas_novas_doador_fkey(nome, email),
-        reservado_por:doacoes_fisicas_novas_beneficiario_fkey(nome, email)
+        categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(*),
+        doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email),
+        reservado_por:doadores!doacoes_fisicas_novas_beneficiario_id_fkey(nome, email)
       `)
       .single();
 

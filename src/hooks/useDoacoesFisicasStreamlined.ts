@@ -38,20 +38,20 @@ export const useDoacoesFisicasStreamlined = () => {
         endereco_entrega: dadosDoacao.endereco_entrega?.trim() || '',
         observacoes: dadosDoacao.observacoes?.trim() || '',
         observacoes_entrega: dadosDoacao.observacoes_entrega?.trim() || '',
-        doador_id: user.id, // GARANTIR sempre o ID correto
+        doador_id: user.id,
         status: 'cadastrada'
       };
 
       console.log('📝 Hook Streamlined: Dados preparados:', dadosCompletos);
 
-      // Inserção direta e eficiente
+      // Inserção com select específico para evitar erro de relacionamento
       const { data, error } = await supabase
         .from('doacoes_fisicas_novas')
         .insert([dadosCompletos])
         .select(`
           *,
-          categoria:categorias_doacoes(nome, cor, icone),
-          doador:doadores(nome, email)
+          categoria:categorias_doacoes!doacoes_fisicas_novas_categoria_id_fkey(nome, cor, icone),
+          doador:doadores!doacoes_fisicas_novas_doador_id_fkey(nome, email)
         `)
         .single();
 
