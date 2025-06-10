@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,9 +27,9 @@ const ListaDoacoesFisicas: React.FC = () => {
 
   const getStatusStats = () => {
     const stats = {
-      cadastrada: minhasDoacoes.filter(d => d.status === 'cadastrada').length,
-      aceita: minhasDoacoes.filter(d => d.status === 'aceita').length,
-      recebida: minhasDoacoes.filter(d => d.status === 'recebida').length,
+      disponivel: minhasDoacoes.filter(d => d.status === 'disponivel').length,
+      reservada: minhasDoacoes.filter(d => d.status === 'reservada').length,
+      entregue: minhasDoacoes.filter(d => d.status === 'entregue').length,
       total: minhasDoacoes.length
     };
     return stats;
@@ -74,7 +73,7 @@ const ListaDoacoesFisicas: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-600" />
                 <span className="text-sm font-medium text-yellow-800">
-                  {stats.cadastrada + stats.aceita} Em andamento
+                  {stats.disponivel + stats.reservada} Em andamento
                 </span>
               </div>
             </div>
@@ -82,7 +81,7 @@ const ListaDoacoesFisicas: React.FC = () => {
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-green-800">
-                  {stats.recebida} Recebidas
+                  {stats.entregue} Entregues
                 </span>
               </div>
             </div>
@@ -124,9 +123,9 @@ const ListaDoacoesFisicas: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os status</SelectItem>
-                    <SelectItem value="cadastrada">Cadastrada</SelectItem>
-                    <SelectItem value="aceita">Aceita</SelectItem>
-                    <SelectItem value="recebida">Recebida</SelectItem>
+                    <SelectItem value="disponivel">Disponível</SelectItem>
+                    <SelectItem value="reservada">Reservada</SelectItem>
+                    <SelectItem value="entregue">Entregue</SelectItem>
                     <SelectItem value="cancelada">Cancelada</SelectItem>
                   </SelectContent>
                 </Select>

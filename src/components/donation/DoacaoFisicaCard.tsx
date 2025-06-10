@@ -24,9 +24,9 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'cadastrada': return 'bg-blue-100 text-blue-800';
-      case 'aceita': return 'bg-yellow-100 text-yellow-800';
-      case 'recebida': return 'bg-green-100 text-green-800';
+      case 'disponivel': return 'bg-blue-100 text-blue-800';
+      case 'reservada': return 'bg-yellow-100 text-yellow-800';
+      case 'entregue': return 'bg-green-100 text-green-800';
       case 'cancelada': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -34,9 +34,9 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'cadastrada': return 'Cadastrada';
-      case 'aceita': return 'Aceita';
-      case 'recebida': return 'Recebida';
+      case 'disponivel': return 'Disponível';
+      case 'reservada': return 'Reservada';
+      case 'entregue': return 'Entregue';
       case 'cancelada': return 'Cancelada';
       default: return status;
     }
@@ -99,7 +99,7 @@ const DoacaoFisicaCard: React.FC<DoacaoFisicaCardProps> = ({
           </div>
         )}
         
-        {doacao.status === 'cadastrada' && (
+        {doacao.status === 'disponivel' && (
           <Button
             className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black"
             onClick={() => onReservar(doacao.id)}
