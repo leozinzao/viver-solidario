@@ -12,17 +12,6 @@ export const doacaoFisicaSchema = z.object({
   observacoes: z.string().optional(),
 });
 
-// Schema para validação de endereços
-export const enderecoSchema = z.object({
-  logradouro: z.string().min(5, 'Logradouro deve ter pelo menos 5 caracteres'),
-  numero: z.string().optional(),
-  complemento: z.string().optional(),
-  bairro: z.string().min(2, 'Bairro deve ter pelo menos 2 caracteres'),
-  cidade: z.string().min(2, 'Cidade deve ter pelo menos 2 caracteres'),
-  estado: z.string().min(2, 'Estado deve ter pelo menos 2 caracteres'),
-  cep: z.string().regex(/^\d{5}-?\d{3}$/, 'CEP deve ter formato válido (ex: 12345-678)')
-});
-
 // Schema para atualização de status de doação
 export const statusDoacaoSchema = z.object({
   status: z.enum(['disponivel', 'reservada', 'entregue', 'cancelada'], {
