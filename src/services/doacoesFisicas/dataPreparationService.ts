@@ -10,7 +10,7 @@ export const dataPreparationService = {
       titulo: dadosDoacao.titulo?.trim() || '',
       quantidade: Number(dadosDoacao.quantidade) || 1,
       unidade: dadosDoacao.unidade || 'unidade',
-      status: 'cadastrada', // Status inicial sempre
+      status: 'disponivel', // Status inicial correto
       doador_id: dadosDoacao.doador_id, // DEVE vir preenchido
 
       // Campos opcionais

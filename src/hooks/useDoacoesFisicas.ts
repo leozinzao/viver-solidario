@@ -14,7 +14,7 @@ export interface DoacaoFisica {
   unidade: string;
   localizacao?: string;
   endereco_coleta?: string;
-  status: 'cadastrada' | 'aceita' | 'recebida' | 'cancelada';
+  status: 'disponivel' | 'reservada' | 'entregue' | 'cancelada';
   data_disponivel?: string;
   data_aceita?: string;
   data_entrega?: string;
@@ -117,7 +117,7 @@ export function useDoacoesFisicas() {
       const dadosParaInserir = {
         ...doacao,
         doador_id: user.id, // GARANTIR que sempre seja preenchido
-        status: 'cadastrada',
+        status: 'disponivel', // Status inicial correto
       };
 
       console.log('useDoacoesFisicas: Dados completos para inserção:', dadosParaInserir);
