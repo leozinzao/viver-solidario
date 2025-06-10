@@ -21,8 +21,6 @@ export interface DoacaoFisica {
   fotos?: string[];
   observacoes?: string;
   observacoes_ong?: string;
-  telefone_doador?: string;
-  email_doador?: string;
   responsavel_ong_id?: string;
   created_at: string;
   updated_at: string;
@@ -81,20 +79,6 @@ export function useDoacoesFisicas() {
       console.log('useDoacoesFisicas: Minhas doações encontradas:', data);
       console.log('useDoacoesFisicas: Quantidade de doações retornadas:', data?.length || 0);
       
-      // Debug adicional: verificar se todas as doações têm o doador_id correto
-      if (data && data.length > 0) {
-        const doacoesSemDoadorId = data.filter(d => !d.doador_id);
-        const doacoesComOutroDoadorId = data.filter(d => d.doador_id && d.doador_id !== user.id);
-        
-        if (doacoesSemDoadorId.length > 0) {
-          console.warn('useDoacoesFisicas: Encontradas doações sem doador_id:', doacoesSemDoadorId);
-        }
-        
-        if (doacoesComOutroDoadorId.length > 0) {
-          console.warn('useDoacoesFisicas: Encontradas doações com doador_id diferente:', doacoesComOutroDoadorId);
-        }
-      }
-      
       return data as DoacaoFisica[];
     },
   });
@@ -120,7 +104,7 @@ export function useDoacoesFisicas() {
 
   // Criar nova doação
   const createDoacao = useMutation({
-    mutationFn: async (doacao: Partial<DoacaoFisica> & { telefone?: string; email?: string }) => {
+    mutationFn: async (doacao: Partial<DoacaoFisica>) => {
       console.log('useDoacoesFisicas: Iniciando criação de doação:', doacao);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -134,8 +118,6 @@ export function useDoacoesFisicas() {
         ...doacao,
         doador_id: user.id, // GARANTIR que sempre seja preenchido
         status: 'cadastrada',
-        telefone_doador: doacao.telefone,
-        email_doador: doacao.email,
       };
 
       console.log('useDoacoesFisicas: Dados completos para inserção:', dadosParaInserir);

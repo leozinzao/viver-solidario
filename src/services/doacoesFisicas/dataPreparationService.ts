@@ -22,8 +22,6 @@ export const dataPreparationService = {
       endereco_entrega: dadosDoacao.endereco_entrega?.trim() || null,
       observacoes: dadosDoacao.observacoes?.trim() || null,
       observacoes_entrega: dadosDoacao.observacoes_entrega?.trim() || null,
-      telefone_doador: dadosDoacao.telefone || null,
-      email_doador: dadosDoacao.email || null,
 
       // Timestamps
       data_disponivel: new Date().toISOString(),
