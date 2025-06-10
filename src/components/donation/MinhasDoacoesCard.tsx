@@ -98,11 +98,11 @@ const MinhasDoacoesCard: React.FC<MinhasDoacoesCardProps> = ({ doacao }) => {
             </span>
           </div>
 
-          {doacao.data_reserva && (
+          {doacao.data_aceita && (
             <div className="flex items-center gap-2">
               <Heart className="h-4 w-4 text-viver-yellow" />
               <span>
-                Reservada em {format(new Date(doacao.data_reserva), 'dd/MM/yyyy', { locale: ptBR })}
+                Aceita em {format(new Date(doacao.data_aceita), 'dd/MM/yyyy', { locale: ptBR })}
               </span>
             </div>
           )}
