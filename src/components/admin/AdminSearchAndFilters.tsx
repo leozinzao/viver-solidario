@@ -68,46 +68,47 @@ const AdminSearchAndFilters: React.FC<AdminSearchAndFiltersProps> = ({
   const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
   return (
-    <div className="space-y-4 mb-6">
+    <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
       {/* Barra de pesquisa principal */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 relative">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Buscar por nome, email, doação, evento..."
+                placeholder="Buscar..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 onClick={onToggleFilters}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-xs sm:text-sm"
+                size="sm"
               >
-                <Filter className="h-4 w-4" />
-                Filtros
+                <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Filtros</span>
                 {hasActiveFilters && (
-                  <span className="ml-1 bg-viver-yellow text-black text-xs px-2 py-1 rounded-full">
+                  <span className="bg-viver-yellow text-black text-xs px-1.5 py-0.5 rounded-full">
                     {Object.values(filters).filter(v => v !== '').length}
                   </span>
                 )}
               </Button>
               
               {onRefresh && (
-                <Button variant="outline" onClick={onRefresh}>
-                  <RefreshCw className="h-4 w-4" />
+                <Button variant="outline" size="sm">
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               )}
               
               {onExport && (
-                <Button variant="outline" onClick={onExport}>
-                  <Download className="h-4 w-4" />
-                  Exportar
+                <Button variant="outline" size="sm" className="hidden sm:flex">
+                  <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="text-xs">Exportar</span>
                 </Button>
               )}
             </div>
@@ -118,28 +119,28 @@ const AdminSearchAndFilters: React.FC<AdminSearchAndFiltersProps> = ({
       {/* Filtros avançados */}
       {showFilters && (
         <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="font-semibold text-gray-900">Filtros Avançados</h4>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex justify-between items-center mb-3 sm:mb-4">
+              <h4 className="font-semibold text-gray-900 text-sm sm:text-base">Filtros</h4>
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
-                  <X className="h-4 w-4 mr-1" />
-                  Limpar
+                  <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                  <span className="text-xs">Limpar</span>
                 </Button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2 block">
                   Status
                 </label>
                 <Select
                   value={filters.status}
                   onValueChange={(value) => handleFilterChange('status', value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos os status" />
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Todos</SelectItem>
@@ -152,15 +153,15 @@ const AdminSearchAndFilters: React.FC<AdminSearchAndFiltersProps> = ({
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2 block">
                   Período
                 </label>
                 <Select
                   value={filters.dateRange}
                   onValueChange={(value) => handleFilterChange('dateRange', value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos os períodos" />
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Todos</SelectItem>
@@ -172,16 +173,16 @@ const AdminSearchAndFilters: React.FC<AdminSearchAndFiltersProps> = ({
                 </Select>
               </div>
 
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+              <div className="sm:col-span-2 lg:col-span-1">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2 block">
                   Categoria
                 </label>
                 <Select
                   value={filters.category}
                   onValueChange={(value) => handleFilterChange('category', value)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas as categorias" />
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Todas" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Todas</SelectItem>
@@ -193,9 +194,9 @@ const AdminSearchAndFilters: React.FC<AdminSearchAndFiltersProps> = ({
                 </Select>
               </div>
 
-              <div className="flex items-end">
-                <Button variant="default" className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black">
-                  <Search className="h-4 w-4 mr-2" />
+              <div className="flex items-end sm:col-span-2 lg:col-span-1">
+                <Button variant="default" className="w-full bg-viver-yellow hover:bg-viver-yellow/90 text-black text-xs sm:text-sm" size="sm">
+                  <Search className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Aplicar
                 </Button>
               </div>
