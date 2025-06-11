@@ -16,7 +16,8 @@ import {
   ArrowRight,
   MapPin,
   Phone,
-  Package
+  Package,
+  Presentation
 } from "lucide-react";
 
 const HomeScreen: React.FC = () => {
@@ -62,6 +63,13 @@ const HomeScreen: React.FC = () => {
       icon: Handshake,
       action: () => navigateToScreen('volunteer'),
       color: 'bg-viver-yellow-medium/10 hover:bg-viver-yellow-medium/20 border-viver-yellow-medium/30'
+    },
+    {
+      title: 'Apresentação TCC',
+      description: 'Veja a apresentação sobre o app',
+      icon: Presentation,
+      action: () => navigateToScreen('presentation'),
+      color: 'bg-purple-100 hover:bg-purple-200 border-purple-300'
     }
   ];
 

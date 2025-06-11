@@ -15,6 +15,7 @@ import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
 import AdminScreen from "@/screens/AdminScreen";
 import HistoricoAcoesScreen from "@/screens/HistoricoAcoesScreen";
 import ConfiguracoesScreen from "@/screens/ConfiguracoesScreen";
+import PresentationScreen from "@/screens/PresentationScreen";
 
 type ScreenType =
   | "welcome"
@@ -29,7 +30,8 @@ type ScreenType =
   | "impact"
   | "admin"
   | "historico-acoes"
-  | "configuracoes";
+  | "configuracoes"
+  | "presentation";
 
 interface ScreenRendererProps {
   currentScreen: ScreenType;
@@ -131,6 +133,9 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
       return <AdminScreen />;
+
+    case "presentation":
+      return <PresentationScreen />;
 
     default:
       return <PlaceholderScreen title="Página não encontrada" />;
