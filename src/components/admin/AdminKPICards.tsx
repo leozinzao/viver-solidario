@@ -20,6 +20,7 @@ interface KPICardProps {
   bgColor: string;
   change?: string;
   trend?: 'up' | 'down' | 'neutral';
+  description?: string;
 }
 
 const KPICard: React.FC<KPICardProps> = ({ 
@@ -29,26 +30,30 @@ const KPICard: React.FC<KPICardProps> = ({
   color, 
   bgColor, 
   change, 
-  trend 
+  trend,
+  description 
 }) => (
-  <Card className={`${bgColor} border-l-4 ${color.replace('text-', 'border-l-')}`}>
-    <CardContent className="p-3 sm:p-6">
-      <div className="flex items-center justify-between">
+  <Card className={`${bgColor} border-l-4 ${color.replace('text-', 'border-l-')} hover:shadow-md transition-shadow`}>
+    <CardContent className="p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{title}</p>
-          <p className={`text-xl sm:text-3xl font-bold ${color} truncate`}>{value}</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+          <p className={`text-2xl sm:text-3xl font-bold ${color} mb-1`}>{value}</p>
+          {description && (
+            <p className="text-xs text-gray-500">{description}</p>
+          )}
           {change && (
-            <div className="flex items-center mt-1">
-              <TrendingUp className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${
+            <div className="flex items-center mt-2">
+              <TrendingUp className={`h-4 w-4 mr-1 ${
                 trend === 'up' ? 'text-green-500' : 
                 trend === 'down' ? 'text-red-500' : 'text-gray-500'
               }`} />
-              <span className="text-xs sm:text-sm text-gray-600 truncate">{change}</span>
+              <span className="text-sm text-gray-600">{change}</span>
             </div>
           )}
         </div>
-        <div className={`p-2 sm:p-3 rounded-full ${bgColor} ml-2`}>
-          <Icon className={`h-5 w-5 sm:h-8 sm:w-8 ${color}`} />
+        <div className={`p-3 rounded-full ${bgColor}`}>
+          <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${color}`} />
         </div>
       </div>
     </CardContent>
@@ -60,13 +65,13 @@ const AdminKPICards: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="animate-pulse">
-            <CardContent className="p-3 sm:p-6">
-              <div className="h-3 sm:h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-6 sm:h-8 bg-gray-200 rounded mb-2"></div>
-              <div className="h-2 sm:h-3 bg-gray-200 rounded w-1/2"></div>
+            <CardContent className="p-4 sm:p-6">
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
             </CardContent>
           </Card>
         ))}
@@ -76,45 +81,49 @@ const AdminKPICards: React.FC = () => {
 
   const kpis = [
     {
-      title: "Total",
+      title: "Total de Doações",
       value: stats.total || 0,
       icon: Package,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      change: "+12%",
-      trend: "up" as const
+      change: "+12% este mês",
+      trend: "up" as const,
+      description: "Todas as doações registradas"
     },
     {
-      title: "Pendentes",
+      title: "Aguardando Aprovação",
       value: stats.cadastrada || 0,
       icon: Clock,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
       change: "Requer atenção",
-      trend: "neutral" as const
+      trend: "neutral" as const,
+      description: "Doações pendentes"
     },
     {
-      title: "Finalizadas",
+      title: "Doações Aprovadas",
       value: stats.recebida || 0,
       icon: CheckCircle,
       color: "text-green-600",
       bgColor: "bg-green-50",
-      change: "+8%",
-      trend: "up" as const
+      change: "+8% esta semana",
+      trend: "up" as const,
+      description: "Doações finalizadas"
     },
     {
-      title: "Usuários",
+      title: "Usuários Ativos",
       value: "156",
       icon: Users,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      change: "+5 novos",
-      trend: "up" as const
+      change: "+5 novos usuários",
+      trend: "up" as const,
+      description: "Doadores e voluntários"
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {kpis.map((kpi, index) => (
         <KPICard key={index} {...kpi} />
       ))}

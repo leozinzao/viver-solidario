@@ -10,7 +10,8 @@ import {
   CheckCircle, 
   X,
   Eye,
-  EyeOff
+  EyeOff,
+  ExternalLink
 } from 'lucide-react';
 
 interface AdminNotification {
@@ -29,8 +30,8 @@ const AdminNotifications: React.FC = () => {
     {
       id: '1',
       type: 'warning',
-      title: 'Doações Pendentes',
-      message: '3 doações aguardando aprovação há mais de 24 horas',
+      title: 'Doações Pendentes de Aprovação',
+      message: '3 doações estão aguardando aprovação há mais de 24 horas',
       timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
       read: false,
       actionRequired: true,
@@ -39,8 +40,8 @@ const AdminNotifications: React.FC = () => {
     {
       id: '2',
       type: 'info',
-      title: 'Novo Voluntário',
-      message: 'Maria Silva se cadastrou como voluntária',
+      title: 'Novo Voluntário Cadastrado',
+      message: 'Maria Silva se cadastrou como voluntária na plataforma',
       timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
       read: false,
       actionRequired: false
@@ -48,8 +49,8 @@ const AdminNotifications: React.FC = () => {
     {
       id: '3',
       type: 'success',
-      title: 'Meta Atingida',
-      message: 'Meta de doações do mês foi atingida!',
+      title: 'Meta Mensal Atingida',
+      message: 'Parabéns! Meta de doações do mês foi atingida com sucesso',
       timestamp: new Date(Date.now() - 30 * 60 * 1000),
       read: true,
       actionRequired: false
@@ -82,13 +83,13 @@ const AdminNotifications: React.FC = () => {
   const getIcon = (type: AdminNotification['type']) => {
     switch (type) {
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
+        return <AlertTriangle className="h-5 w-5 text-orange-500" />;
       case 'error':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
       case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       default:
-        return <Info className="h-4 w-4 text-blue-500" />;
+        return <Info className="h-5 w-5 text-blue-500" />;
     }
   };
 
@@ -99,11 +100,12 @@ const AdminNotifications: React.FC = () => {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     
     if (minutes < 60) {
-      return `${minutes}m atrás`;
+      return `${minutes} minutos atrás`;
     } else if (hours < 24) {
-      return `${hours}h atrás`;
+      return `${hours} horas atrás`;
     } else {
-      return timestamp.toLocaleDateString();
+      const days = Math.floor(hours / 24);
+      return `${days} dias atrás`;
     }
   };
 
@@ -111,27 +113,30 @@ const AdminNotifications: React.FC = () => {
 
   return (
     <Card className="mb-6">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-viver-yellow" />
-            <CardTitle className="text-lg">Notificações</CardTitle>
+          <div className="flex items-center gap-3">
+            <Bell className="h-6 w-6 text-viver-yellow" />
+            <div>
+              <CardTitle className="text-xl">Central de Notificações</CardTitle>
+              <p className="text-sm text-gray-600 mt-1">Acompanhe atividades importantes</p>
+            </div>
             {unreadCount > 0 && (
-              <Badge variant="destructive" className="bg-red-500">
-                {unreadCount}
+              <Badge variant="destructive" className="bg-red-500 text-white">
+                {unreadCount} nova{unreadCount !== 1 ? 's' : ''}
               </Badge>
             )}
             {urgentCount > 0 && (
-              <Badge variant="outline" className="border-orange-500 text-orange-700">
-                {urgentCount} urgente(s)
+              <Badge variant="outline" className="border-orange-500 text-orange-700 bg-orange-50">
+                {urgentCount} urgente{urgentCount !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
           
           <div className="flex gap-2">
             {unreadCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-                <Eye className="h-4 w-4 mr-1" />
+              <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-sm">
+                <Eye className="h-4 w-4 mr-2" />
                 Marcar todas como lidas
               </Button>
             )}
@@ -139,6 +144,7 @@ const AdminNotifications: React.FC = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => setShowAll(!showAll)}
+              className="text-sm"
             >
               {showAll ? 'Mostrar menos' : `Ver todas (${notifications.length})`}
             </Button>
@@ -146,44 +152,54 @@ const AdminNotifications: React.FC = () => {
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {displayedNotifications.map((notification) => (
           <div
             key={notification.id}
-            className={`p-3 rounded-lg border transition-all ${
+            className={`p-4 rounded-lg border-l-4 transition-all ${
               notification.read 
-                ? 'bg-gray-50 border-gray-200' 
+                ? 'bg-gray-50 border-l-gray-300' 
                 : notification.actionRequired
-                ? 'bg-orange-50 border-orange-200'
-                : 'bg-blue-50 border-blue-200'
+                ? 'bg-orange-50 border-l-orange-400'
+                : 'bg-blue-50 border-l-blue-400'
             }`}
           >
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5">
+            <div className="flex items-start gap-4">
+              <div className="mt-1">
                 {getIcon(notification.type)}
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h4 className={`font-medium text-sm ${
-                      notification.read ? 'text-gray-700' : 'text-gray-900'
-                    }`}>
-                      {notification.title}
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className={`font-semibold ${
+                        notification.read ? 'text-gray-700' : 'text-gray-900'
+                      }`}>
+                        {notification.title}
+                      </h4>
                       {notification.actionRequired && (
-                        <Badge variant="outline" className="ml-2 text-xs border-orange-500 text-orange-700">
+                        <Badge variant="outline" className="text-xs border-orange-500 text-orange-700 bg-orange-100">
                           Ação necessária
                         </Badge>
                       )}
-                    </h4>
-                    <p className={`text-sm mt-1 ${
+                    </div>
+                    <p className={`text-sm mb-2 leading-relaxed ${
                       notification.read ? 'text-gray-500' : 'text-gray-700'
                     }`}>
                       {notification.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {getTimeString(notification.timestamp)}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-400">
+                        {getTimeString(notification.timestamp)}
+                      </p>
+                      {notification.link && (
+                        <Button variant="ghost" size="sm" className="text-xs h-6 px-2">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Ver detalhes
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="flex gap-1">
@@ -192,18 +208,20 @@ const AdminNotifications: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => markAsRead(notification.id)}
-                        className="h-6 w-6 p-0"
+                        className="h-8 w-8 p-0"
+                        title="Marcar como lida"
                       >
-                        <EyeOff className="h-3 w-3" />
+                        <EyeOff className="h-4 w-4" />
                       </Button>
                     )}
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeNotification(notification.id)}
-                      className="h-6 w-6 p-0 text-gray-400 hover:text-red-500"
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                      title="Remover notificação"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -213,9 +231,10 @@ const AdminNotifications: React.FC = () => {
         ))}
         
         {notifications.length === 0 && (
-          <div className="text-center py-6 text-gray-500">
-            <Bell className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-            <p>Nenhuma notificação no momento</p>
+          <div className="text-center py-8 text-gray-500">
+            <Bell className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+            <h3 className="font-medium text-gray-700 mb-1">Nenhuma notificação</h3>
+            <p className="text-sm">Você está em dia com todas as atividades!</p>
           </div>
         )}
       </CardContent>
