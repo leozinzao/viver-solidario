@@ -89,10 +89,7 @@ const AdminBulkActions: React.FC<AdminBulkActionsProps> = ({
           <div className="flex items-center gap-3">
             <div className="relative">
               <Checkbox
-                checked={allSelected}
-                ref={(el) => {
-                  if (el) el.indeterminate = someSelected;
-                }}
+                checked={allSelected ? true : someSelected ? "indeterminate" : false}
                 onCheckedChange={() => {
                   if (allSelected || someSelected) {
                     onClearSelection();
