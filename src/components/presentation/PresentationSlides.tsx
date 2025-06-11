@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -519,7 +518,8 @@ const PresentationSlides: React.FC = () => {
                   <p className="text-gray-700">Estudo de caso prático de desenvolvimento web</p>
                 </div>
               </div>
-            </Card>
+            </CardContent>
+          </Card>
           
           <div className="text-center p-8 bg-viver-yellow/20 rounded-lg">
             <h4 className="text-2xl font-bold text-viver-yellow mb-4">Obrigado!</h4>
