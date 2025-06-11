@@ -45,11 +45,11 @@ const KPICard: React.FC<KPICardProps> = ({
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>
-        <Card className={`${bgColor} min-h-[150px] border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex`}>
-          <CardContent className="p-4 flex flex-col justify-between h-full w-full">
+        <Card className={`${bgColor} min-h-[160px] border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex-1`}>
+          <CardContent className="p-5 flex flex-col justify-between h-full">
             {/* Header com ícone e título */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2.5 rounded-xl ${bgColor} border ${color.replace('text-', 'border-')} shadow-sm`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`p-3 rounded-xl ${bgColor} border ${color.replace('text-', 'border-')} shadow-sm flex-shrink-0`}>
                 <Icon className={`h-5 w-5 ${color}`} />
               </div>
               <div className="flex-1 min-w-0">
@@ -60,8 +60,8 @@ const KPICard: React.FC<KPICardProps> = ({
             </div>
             
             {/* Valor principal */}
-            <div className="flex-1 flex flex-col justify-center mb-3">
-              <p className={`text-3xl font-bold ${color} leading-none mb-1 truncate`}>
+            <div className="flex-1 flex flex-col justify-center mb-4">
+              <p className={`text-2xl lg:text-3xl font-bold ${color} leading-none mb-2 truncate`}>
                 {value}
               </p>
               {description && (
@@ -73,15 +73,15 @@ const KPICard: React.FC<KPICardProps> = ({
             
             {/* Indicador de mudança */}
             {change && (
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                 {trend === TREND_UP && (
-                  <TrendingUp className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                  <TrendingUp className="h-4 w-4 text-green-500 flex-shrink-0" />
                 )}
                 {trend === TREND_DOWN && (
-                  <TrendingDown className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+                  <TrendingDown className="h-4 w-4 text-red-500 flex-shrink-0" />
                 )}
                 {trend === TREND_NEUTRAL && (
-                  <AlertTriangle className="h-3.5 w-3.5 text-orange-500 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-orange-500 flex-shrink-0" />
                 )}
                 <span className={`text-xs font-medium truncate ${
                   trend === TREND_UP ? 'text-green-600' : 
@@ -108,20 +108,20 @@ const AdminKPICards: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 items-stretch">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="min-h-[150px] border-0 shadow-sm flex">
-            <CardContent className="p-4 flex flex-col justify-between h-full w-full animate-pulse">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-9 w-9 bg-gray-200 rounded-xl"></div>
+          <Card key={i} className="min-h-[160px] border-0 shadow-sm flex-1">
+            <CardContent className="p-5 flex flex-col justify-between h-full animate-pulse">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-11 w-11 bg-gray-200 rounded-xl flex-shrink-0"></div>
                 <div className="h-3 bg-gray-200 rounded w-20"></div>
               </div>
-              <div className="flex-1 flex flex-col justify-center mb-3">
+              <div className="flex-1 flex flex-col justify-center mb-4">
                 <div className="h-8 bg-gray-200 rounded mb-2 w-16"></div>
                 <div className="h-2 bg-gray-200 rounded w-24"></div>
               </div>
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                <div className="h-3 w-3 bg-gray-200 rounded"></div>
+              <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                <div className="h-4 w-4 bg-gray-200 rounded flex-shrink-0"></div>
                 <div className="h-2 bg-gray-200 rounded w-16"></div>
               </div>
             </CardContent>
@@ -179,7 +179,7 @@ const AdminKPICards: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 items-stretch">
+    <div className="flex flex-col sm:flex-row gap-4 mb-6">
       {kpis.map((kpi, index) => (
         <KPICard key={index} {...kpi} />
       ))}
