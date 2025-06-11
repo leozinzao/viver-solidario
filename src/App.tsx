@@ -11,7 +11,6 @@ import SignUp from "./pages/SignUp";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
-import AdminPanelPage from "./pages/AdminPanelPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,7 +30,6 @@ const App = () => (
             <Route path="/" element={<ViverSolidarioApp />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/admin" element={<AdminPanelPage />} />
             <Route path="/politica" element={<PrivacyPolicy />} />
             <Route path="/termos" element={<TermsOfService />} />
             <Route path="*" element={<NotFound />} />

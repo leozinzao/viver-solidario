@@ -26,7 +26,6 @@ interface NavigationContextType {
   handleLoginSuccess: () => void;
   showPermissionDenied: boolean;
   setShowPermissionDenied: (show: boolean) => void;
-  navigateToAdminPanel: () => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
@@ -54,11 +53,6 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const handleGoToSignUp = () => navigateToScreen("signup");
   const handleBackToWelcome = () => navigateToScreen("welcome");
   const handleLoginSuccess = () => navigateToScreen("home");
-  
-  // Função para navegar ao painel admin (página web externa)
-  const navigateToAdminPanel = () => {
-    window.location.href = '/admin';
-  };
 
   return (
     <NavigationContext.Provider value={{
@@ -70,8 +64,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       handleBackToWelcome,
       handleLoginSuccess,
       showPermissionDenied,
-      setShowPermissionDenied,
-      navigateToAdminPanel
+      setShowPermissionDenied
     }}>
       {children}
     </NavigationContext.Provider>
