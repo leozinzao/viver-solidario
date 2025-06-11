@@ -1,6 +1,6 @@
-
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigation } from "@/context/NavigationContext";
 
 // Import real screen components
 import WelcomeScreen from "@/screens/WelcomeScreen";
@@ -59,6 +59,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onLoginSuccess,
 }) => {
   const { isAuthenticated } = useAuth();
+  const { navigateToAdminPanel } = useNavigation();
 
   // Render screens based on current screen
   switch (currentScreen) {
@@ -130,7 +131,9 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       if (!isAuthenticated) {
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
-      return <AdminScreen />;
+      // Redirecionar para a página web do painel admin
+      navigateToAdminPanel();
+      return <PlaceholderScreen title="Redirecionando para o Painel Administrativo..." />;
 
     default:
       return <PlaceholderScreen title="Página não encontrada" />;

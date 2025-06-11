@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,7 @@ import {
   Heart,
   Home
 } from 'lucide-react';
+import AdminNavigation from '@/components/admin/AdminNavigation';
 
 const AdminScreen: React.FC = () => {
   const { user, checkAdminAccess } = useAuth();
@@ -36,6 +36,9 @@ const AdminScreen: React.FC = () => {
     dateRange: '',
     category: ''
   });
+
+  // Detectar se está sendo usado como página web
+  const isWebPage = window.location.pathname === '/admin';
 
   useEffect(() => {
     const verifyAccess = async () => {
@@ -87,6 +90,7 @@ const AdminScreen: React.FC = () => {
   if (isChecking) {
     return (
       <div className="min-h-screen p-4 bg-gray-50">
+        {isWebPage && <AdminNavigation />}
         <div className="flex items-center justify-center min-h-[200px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viver-yellow mx-auto mb-4"></div>
@@ -101,6 +105,7 @@ const AdminScreen: React.FC = () => {
   if (!user || hasAccess === false) {
     return (
       <div className="min-h-screen p-4 bg-gray-50">
+        {isWebPage && <AdminNavigation />}
         <div className="max-w-2xl mx-auto mt-8">
           <Alert variant="destructive" className="mb-4">
             <ShieldAlert className="h-5 w-5" />
@@ -136,6 +141,7 @@ const AdminScreen: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 p-4">
+      {isWebPage && <AdminNavigation />}
       {/* Container principal com largura máxima aumentada */}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header melhorado */}
