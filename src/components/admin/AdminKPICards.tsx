@@ -106,7 +106,7 @@ const AdminKPICards: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col gap-4 mb-6 w-full">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="w-full border-0 shadow-sm">
             <CardContent className="p-5 flex items-center gap-4 animate-pulse">
@@ -175,7 +175,7 @@ const AdminKPICards: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4 mb-6">
+    <div className="flex flex-col gap-4 mb-6 w-full">
       {kpis.map((kpi, index) => (
         <KPICard key={index} {...kpi} />
       ))}
