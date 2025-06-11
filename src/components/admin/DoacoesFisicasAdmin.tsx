@@ -114,7 +114,7 @@ const DoacoesFisicasAdmin: React.FC = () => {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardContent className="p-4">
@@ -130,12 +130,14 @@ const DoacoesFisicasAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Dashboard com Estatísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-500" />
+      {/* Dashboard com Estatísticas - Layout horizontal */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                <AlertCircle className="h-6 w-6 text-blue-500" />
+              </div>
               <div>
                 <p className="text-2xl font-bold text-blue-600">{stats.cadastrada || 0}</p>
                 <p className="text-sm text-gray-600">Aguardando</p>
@@ -144,10 +146,12 @@ const DoacoesFisicasAdmin: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-yellow-500" />
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
+                <Heart className="h-6 w-6 text-yellow-500" />
+              </div>
               <div>
                 <p className="text-2xl font-bold text-yellow-600">{stats.aceita || 0}</p>
                 <p className="text-sm text-gray-600">Aceitas</p>
@@ -156,10 +160,12 @@ const DoacoesFisicasAdmin: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-500" />
+              </div>
               <div>
                 <p className="text-2xl font-bold text-green-600">{stats.recebida || 0}</p>
                 <p className="text-sm text-gray-600">Recebidas</p>
@@ -168,10 +174,12 @@ const DoacoesFisicasAdmin: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-gray-500" />
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                <Package className="h-6 w-6 text-gray-500" />
+              </div>
               <div>
                 <p className="text-2xl font-bold text-gray-600">{stats.total || 0}</p>
                 <p className="text-sm text-gray-600">Total</p>
@@ -181,17 +189,17 @@ const DoacoesFisicasAdmin: React.FC = () => {
         </Card>
       </div>
 
-      {/* Filtros e Busca */}
+      {/* Filtros e Busca - Layout horizontal */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-3 text-lg">
             <Filter className="h-5 w-5" />
             Filtros e Busca
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+        <CardContent>
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            <div className="flex-1 w-full">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
@@ -203,37 +211,39 @@ const DoacoesFisicasAdmin: React.FC = () => {
               </div>
             </div>
             
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todas as categorias</SelectItem>
-                {categorias.map((categoria) => (
-                  <SelectItem key={categoria.id} value={categoria.id}>
-                    {categoria.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-4 w-full lg:w-auto">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full lg:w-48">
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas as categorias</SelectItem>
+                  {categorias.map((categoria) => (
+                    <SelectItem key={categoria.id} value={categoria.id}>
+                      {categoria.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todos os status</SelectItem>
-                <SelectItem value="cadastrada">Cadastrada</SelectItem>
-                <SelectItem value="aceita">Aceita</SelectItem>
-                <SelectItem value="recebida">Recebida</SelectItem>
-                <SelectItem value="cancelada">Cancelada</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full lg:w-48">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todos os status</SelectItem>
+                  <SelectItem value="cadastrada">Cadastrada</SelectItem>
+                  <SelectItem value="aceita">Aceita</SelectItem>
+                  <SelectItem value="recebida">Recebida</SelectItem>
+                  <SelectItem value="cancelada">Cancelada</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Button variant="outline" className="w-full md:w-auto">
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
-            </Button>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Exportar
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -264,16 +274,21 @@ const DoacoesFisicasAdmin: React.FC = () => {
                   return (
                     <TableRow key={doacao.id}>
                       <TableCell>
-                        <div>
-                          <p className="font-medium">{doacao.titulo}</p>
-                          <p className="text-sm text-gray-600">
-                            {doacao.quantidade} {doacao.unidade}
-                          </p>
-                          {doacao.categorias_doacoes && (
-                            <p className="text-xs text-gray-500">
-                              {doacao.categorias_doacoes.nome}
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                            <Package className="h-5 w-5 text-gray-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{doacao.titulo}</p>
+                            <p className="text-sm text-gray-600">
+                              {doacao.quantidade} {doacao.unidade}
                             </p>
-                          )}
+                            {doacao.categorias_doacoes && (
+                              <p className="text-xs text-gray-500">
+                                {doacao.categorias_doacoes.nome}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </TableCell>
                       
