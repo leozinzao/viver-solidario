@@ -157,8 +157,8 @@ const DoacoesFisicasAdmin: React.FC = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* Skeleton dos indicadores */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Skeleton dos indicadores - agora em grid horizontal para telas médias+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardContent className="p-6">
@@ -189,88 +189,88 @@ const DoacoesFisicasAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Indicadores - Layout melhorado */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Indicadores - Grid horizontal em telas médias e maiores */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
+          <CardContent className="p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Pendentes</p>
-                <p className="text-3xl font-bold text-orange-600">{stats.cadastrada || 0}</p>
+                <p className="text-2xl lg:text-3xl font-bold text-orange-600">{stats.cadastrada || 0}</p>
                 <p className="text-xs text-gray-500 mt-1">Aguardando aprovação</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Clock className="h-6 w-6 text-orange-600" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                <Clock className="h-5 w-5 lg:h-6 lg:w-6 text-orange-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
+          <CardContent className="p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Aprovadas</p>
-                <p className="text-3xl font-bold text-blue-600">{stats.aceita || 0}</p>
+                <p className="text-2xl lg:text-3xl font-bold text-blue-600">{stats.aceita || 0}</p>
                 <p className="text-xs text-gray-500 mt-1">Aceitas pela ONG</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Heart className="h-6 w-6 text-blue-600" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <Heart className="h-5 w-5 lg:h-6 lg:w-6 text-blue-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
+          <CardContent className="p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Recebidas</p>
-                <p className="text-3xl font-bold text-green-600">{stats.recebida || 0}</p>
+                <p className="text-2xl lg:text-3xl font-bold text-green-600">{stats.recebida || 0}</p>
                 <p className="text-xs text-gray-500 mt-1">Finalizadas</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-600" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 lg:h-6 lg:w-6 text-green-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
+          <CardContent className="p-4 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">Total</p>
-                <p className="text-3xl font-bold text-purple-600">{stats.total || 0}</p>
+                <p className="text-2xl lg:text-3xl font-bold text-purple-600">{stats.total || 0}</p>
                 <p className="text-xs text-gray-500 mt-1">Todas as doações</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <Package className="h-6 w-6 text-purple-600" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                <Package className="h-5 w-5 lg:h-6 lg:w-6 text-purple-600" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filtros e Busca - Layout melhorado */}
+      {/* Filtros e Busca - Layout horizontal melhorado */}
       <Card className="border-0 shadow-md">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Filter className="h-5 w-5 text-viver-yellow" />
               Filtros e Busca
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Exportar
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" className="flex items-center gap-2 w-fit">
+              <Download className="h-4 w-4" />
+              Exportar
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div className="md:col-span-5">
+          {/* Container de filtros em linha horizontal */}
+          <div className="flex flex-col lg:flex-row gap-4 items-end">
+            {/* Busca - ocupa mais espaço */}
+            <div className="flex-1 lg:flex-[2]">
               <label className="text-sm font-medium text-gray-700 mb-2 block">
                 Buscar doações
               </label>
@@ -285,47 +285,51 @@ const DoacoesFisicasAdmin: React.FC = () => {
               </div>
             </div>
             
-            <div className="md:col-span-3">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Categoria
-              </label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todas">Todas as categorias</SelectItem>
-                  {categorias.map((categoria) => (
-                    <SelectItem key={categoria.id} value={categoria.id}>
-                      {categoria.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Filtros lado a lado */}
+            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto lg:flex-1">
+              <div className="flex-1 lg:min-w-[160px]">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Categoria
+                </label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas as categorias</SelectItem>
+                    {categorias.map((categoria) => (
+                      <SelectItem key={categoria.id} value={categoria.id}>
+                        {categoria.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1 lg:min-w-[140px]">
+                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Status
+                </label>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todos os status</SelectItem>
+                    <SelectItem value="cadastrada">Pendentes</SelectItem>
+                    <SelectItem value="aceita">Aprovadas</SelectItem>
+                    <SelectItem value="recebida">Recebidas</SelectItem>
+                    <SelectItem value="cancelada">Canceladas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="md:col-span-3">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Status
-              </label>
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todas">Todos os status</SelectItem>
-                  <SelectItem value="cadastrada">Pendentes</SelectItem>
-                  <SelectItem value="aceita">Aprovadas</SelectItem>
-                  <SelectItem value="recebida">Recebidas</SelectItem>
-                  <SelectItem value="cancelada">Canceladas</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="md:col-span-1">
+            {/* Botão Limpar */}
+            <div className="w-full sm:w-auto">
               <Button 
                 variant="outline" 
-                className="w-full"
+                className="w-full sm:w-auto"
                 onClick={() => {
                   setSearchTerm('');
                   setSelectedCategory('todas');
@@ -339,33 +343,39 @@ const DoacoesFisicasAdmin: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Lista de Doações - Layout melhorado */}
+      {/* Lista de Doações - Título com mais destaque */}
       <Card className="border-0 shadow-md">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-viver-yellow" />
-              Gerenciar Doações Físicas
-            </CardTitle>
-            <div className="bg-gray-100 px-3 py-1 rounded-full">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-xl lg:text-2xl mb-2">
+                <Package className="h-6 w-6 text-viver-yellow" />
+                Gerenciar Doações Físicas
+              </CardTitle>
+              <p className="text-gray-600 text-sm">
+                Controle completo das doações físicas recebidas pela ONG
+              </p>
+            </div>
+            <div className="bg-gray-100 px-4 py-2 rounded-full">
               <span className="text-sm font-medium text-gray-700">
                 {filteredDoacoes.length} doações encontradas
               </span>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
+          {/* Tabela com scroll horizontal quando necessário */}
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold">Tipo</TableHead>
-                  <TableHead className="font-semibold">Doação</TableHead>
-                  <TableHead className="font-semibold">Doador</TableHead>
-                  <TableHead className="font-semibold">Local</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
-                  <TableHead className="font-semibold">Data</TableHead>
-                  <TableHead className="font-semibold">Ações</TableHead>
+                  <TableHead className="font-semibold min-w-[80px]">Tipo</TableHead>
+                  <TableHead className="font-semibold min-w-[200px]">Doação</TableHead>
+                  <TableHead className="font-semibold min-w-[180px]">Doador</TableHead>
+                  <TableHead className="font-semibold min-w-[160px]">Local</TableHead>
+                  <TableHead className="font-semibold min-w-[120px]">Status</TableHead>
+                  <TableHead className="font-semibold min-w-[100px]">Data</TableHead>
+                  <TableHead className="font-semibold min-w-[140px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -376,7 +386,7 @@ const DoacoesFisicasAdmin: React.FC = () => {
                   
                   return (
                     <TableRow key={doacao.id} className="hover:bg-gray-50 transition-colors">
-                      <TableCell>
+                      <TableCell className="p-3">
                         <div className="flex items-center justify-center">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                             doacao.categorias_doacoes?.cor ? 
@@ -392,10 +402,10 @@ const DoacoesFisicasAdmin: React.FC = () => {
                         </div>
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="p-3">
                         <div className="space-y-1">
-                          <p className="font-medium text-gray-900">{doacao.titulo}</p>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <p className="font-medium text-gray-900 text-sm">{doacao.titulo}</p>
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
                             <span className="font-medium">{doacao.quantidade} {doacao.unidade}</span>
                             {doacao.categorias_doacoes && (
                               <>
@@ -409,19 +419,19 @@ const DoacoesFisicasAdmin: React.FC = () => {
                         </div>
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="p-3">
                         <div className="space-y-1">
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-gray-900 text-sm">
                             {doacao.doadores?.nome || 'Não informado'}
                           </p>
                           {doacao.telefone_doador && (
-                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
                               <Phone className="h-3 w-3" />
                               <span className="truncate">{doacao.telefone_doador}</span>
                             </div>
                           )}
                           {doacao.email_doador && (
-                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
                               <Mail className="h-3 w-3" />
                               <span className="truncate">{doacao.email_doador}</span>
                             </div>
@@ -429,8 +439,8 @@ const DoacoesFisicasAdmin: React.FC = () => {
                         </div>
                       </TableCell>
                       
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <TableCell className="p-3">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <span className="truncate">
                             {doacao.localizacao || doacao.endereco_coleta || 'Não informado'}
@@ -438,9 +448,9 @@ const DoacoesFisicasAdmin: React.FC = () => {
                         </div>
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="p-3">
                         <Badge 
-                          className={`${statusConfig.color} border flex items-center gap-2 w-fit px-3 py-1`}
+                          className={`${statusConfig.color} border flex items-center gap-2 w-fit px-2 py-1 text-xs`}
                         >
                           <div className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`}></div>
                           <StatusIcon className="h-3 w-3" />
@@ -448,14 +458,14 @@ const DoacoesFisicasAdmin: React.FC = () => {
                         </Badge>
                       </TableCell>
                       
-                      <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <TableCell className="p-3">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <Calendar className="h-3 w-3" />
                           {format(new Date(doacao.created_at), 'dd/MM/yy', { locale: ptBR })}
                         </div>
                       </TableCell>
                       
-                      <TableCell>
+                      <TableCell className="p-3">
                         <div className="flex items-center gap-1">
                           <Button
                             size="sm"
@@ -539,12 +549,12 @@ const DoacoesFisicasAdmin: React.FC = () => {
           </div>
           
           {filteredDoacoes.length === 0 && (
-            <div className="text-center py-12">
+            <div className="text-center py-12 px-6">
               <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 Nenhuma doação encontrada
               </h3>
-              <p className="text-gray-500 max-w-md mx-auto">
+              <p className="text-gray-500 max-w-md mx-auto text-sm">
                 {searchTerm || selectedCategory !== 'todas' || selectedStatus !== 'todas' 
                   ? 'Tente ajustar os filtros para encontrar mais doações.'
                   : 'Ainda não há doações físicas cadastradas no sistema.'
