@@ -10,7 +10,9 @@ import {
   MessageSquare,
   Gift,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Bell,
+  Activity
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -90,106 +92,99 @@ const KPICard: React.FC<KPICardProps> = ({
 );
 
 const DashboardKPICards: React.FC = () => {
-  // Buscar usuários ativos (voluntários + doadores)
-  const { data: totalUsuarios = 0 } = useQuery({
-    queryKey: ['dashboard-usuarios'],
+  // Buscar total de voluntários
+  const { data: totalVoluntarios = 0 } = useQuery({
+    queryKey: ['dashboard-voluntarios'],
     queryFn: async () => {
-      const [voluntarios, doadores] = await Promise.all([
-        supabase.from('voluntarios').select('id', { count: 'exact', head: true }),
-        supabase.from('doadores').select('id', { count: 'exact', head: true })
-      ]);
+      const { count } = await supabase
+        .from('voluntarios')
+        .select('id', { count: 'exact', head: true });
       
-      const countVoluntarios = voluntarios.count || 0;
-      const countDoadores = doadores.count || 0;
-      
-      return countVoluntarios + countDoadores;
+      return count || 0;
     },
   });
 
-  // Buscar eventos
-  const { data: totalEventos = 0 } = useQuery({
-    queryKey: ['dashboard-eventos'],
+  // Buscar total de doadores
+  const { data: totalDoadores = 0 } = useQuery({
+    queryKey: ['dashboard-doadores'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('doadores')
+        .select('id', { count: 'exact', head: true });
+      
+      return count || 0;
+    },
+  });
+
+  // Buscar eventos ativos/futuros
+  const { data: eventosAtivos = 0 } = useQuery({
+    queryKey: ['dashboard-eventos-ativos'],
     queryFn: async () => {
       const { count } = await supabase
         .from('eventos')
-        .select('id', { count: 'exact', head: true });
+        .select('id', { count: 'exact', head: true })
+        .gte('data_inicio', new Date().toISOString().split('T')[0]);
       
       return count || 0;
     },
   });
 
-  // Buscar notificações como proxy para depoimentos/mensagens
-  const { data: totalNotificacoes = 0 } = useQuery({
-    queryKey: ['dashboard-notificacoes'],
+  // Buscar atividades voluntárias cadastradas
+  const { data: atividadesVoluntarias = 0 } = useQuery({
+    queryKey: ['dashboard-atividades'],
     queryFn: async () => {
       const { count } = await supabase
-        .from('notificacoes_doacoes')
+        .from('atividades_voluntarias')
         .select('id', { count: 'exact', head: true });
       
       return count || 0;
-    },
-  });
-
-  // Calcular doações totais para impacto
-  const { data: impactoTotal = 0 } = useQuery({
-    queryKey: ['dashboard-impacto'],
-    queryFn: async () => {
-      const [doacoesFisicas, doacoesFinanceiras] = await Promise.all([
-        supabase.from('doacoes_fisicas_novas').select('id', { count: 'exact', head: true }),
-        supabase.from('doacoes').select('id', { count: 'exact', head: true })
-      ]);
-      
-      const countFisicas = doacoesFisicas.count || 0;
-      const countFinanceiras = doacoesFinanceiras.count || 0;
-      
-      return countFisicas + countFinanceiras;
     },
   });
 
   const dashboardKpis = [
     {
-      title: "Usuários Cadastrados",
-      value: totalUsuarios,
+      title: "Voluntários",
+      value: totalVoluntarios,
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      change: "Total no sistema",
+      change: "Ativos no sistema",
       trend: "up" as const,
-      description: "Voluntários e doadores",
-      tooltip: "Número total de usuários cadastrados no sistema (voluntários + doadores)."
+      description: "Voluntários cadastrados",
+      tooltip: "Número total de voluntários cadastrados e ativos no sistema da ONG."
     },
     {
-      title: "Eventos Cadastrados",
-      value: totalEventos,
+      title: "Doadores",
+      value: totalDoadores,
+      icon: Gift,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      change: "Registrados",
+      trend: "up" as const,
+      description: "Doadores no sistema",
+      tooltip: "Pessoas que já fizeram ou se cadastraram para fazer doações para a ONG."
+    },
+    {
+      title: "Eventos Ativos",
+      value: eventosAtivos,
       icon: Calendar,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      change: "Eventos ativos",
-      trend: "up" as const,
-      description: "Total de eventos",
-      tooltip: "Total de eventos cadastrados no sistema da ONG."
+      change: "Programados",
+      trend: "neutral" as const,
+      description: "Eventos futuros",
+      tooltip: "Eventos programados ou em andamento no sistema."
     },
     {
-      title: "Notificações",
-      value: totalNotificacoes,
-      icon: MessageSquare,
+      title: "Atividades",
+      value: atividadesVoluntarias,
+      icon: Activity,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
-      change: "Sistema ativo",
+      change: "Disponíveis",
       trend: "up" as const,
-      description: "Comunicações do sistema",
-      tooltip: "Notificações enviadas pelo sistema para comunicação com usuários."
-    },
-    {
-      title: "Impacto Total",
-      value: impactoTotal,
-      icon: Heart,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      change: "Doações processadas",
-      trend: "up" as const,
-      description: "Total de doações",
-      tooltip: "Número total de doações (físicas e financeiras) processadas pela ONG."
+      description: "Atividades voluntárias",
+      tooltip: "Total de atividades voluntárias disponíveis para participação."
     }
   ];
 
