@@ -172,9 +172,6 @@ const AdminScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* KPIs integrados com doações físicas */}
-        <AdminKPICards />
-        
         {/* Notificações */}
         <AdminNotifications />
         
@@ -240,20 +237,21 @@ const AdminScreen: React.FC = () => {
           
           {/* Conteúdo das abas */}
           <TabsContent value="dashboard" className="p-0">
+            {/* KPIs do Dashboard Geral */}
+            <DashboardKPICards />
+            
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
               <div className="text-center">
                 <BarChart3 className="h-20 w-20 mx-auto mb-6 text-viver-yellow" />
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                  Dashboard de Doações Físicas
+                  Dashboard Geral da ONG Viver
                 </h3>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Aqui você encontra uma visão geral completa das doações físicas cadastradas no sistema. 
-                  Os indicadores acima são atualizados automaticamente conforme novas doações são adicionadas.
+                  Aqui você encontra uma visão geral completa do sistema, incluindo estatísticas de voluntários, doadores, eventos e atividades voluntárias.
                 </p>
                 <div className="mt-6 p-4 bg-viver-yellow/10 rounded-lg border border-viver-yellow/20">
                   <p className="text-sm text-gray-700">
-                    💡 <strong>Dica:</strong> As estatísticas são sincronizadas em tempo real com as doações físicas. 
-                    Quando uma nova doação for cadastrada, ela aparecerá automaticamente nos indicadores acima.
+                    💡 <strong>Dica:</strong> Os indicadores acima são atualizados em tempo real conforme novos cadastros são feitos no sistema.
                   </p>
                 </div>
               </div>
@@ -261,6 +259,9 @@ const AdminScreen: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="doacoes" className="p-0">
+            {/* KPIs específicos de Doações Físicas */}
+            <AdminKPICards />
+            
             <DoacoesFisicasAdmin />
           </TabsContent>
           
