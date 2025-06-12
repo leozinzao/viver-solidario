@@ -4,50 +4,35 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Pagination } from '@/components/ui/pagination';
 import { 
   Search, 
   Filter, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Heart,
+  Download, 
+  MoreHorizontal, 
+  Eye, 
+  Check, 
+  X, 
+  Clock,
+  Package,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  User,
+  Calendar,
+  MapPin,
   Phone,
   Mail,
-  MapPin,
-  Calendar,
-  Package,
-  Download,
-  AlertCircle,
   Trash2,
-  Eye,
-  Edit,
-  Check,
-  X
+  RefreshCw
 } from 'lucide-react';
 import { useDoacoesFisicasAdmin } from '@/hooks/useDoacoesFisicasAdmin';
 import DetalheDoacaoDialog from './DetalheDoacaoDialog';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 const DoacoesFisicasAdmin: React.FC = () => {
   const { 
@@ -55,524 +40,392 @@ const DoacoesFisicasAdmin: React.FC = () => {
     categorias, 
     loading, 
     updateStatus, 
-    deleteDonation,
-    isUpdating,
+    deleteDonation, 
+    isUpdating, 
     isDeleting,
     stats 
   } = useDoacoesFisicasAdmin();
-  
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('todas');
-  const [selectedStatus, setSelectedStatus] = useState('todas');
-  const [selectedDoacao, setSelectedDoacao] = useState(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
+  const [selectedDoacao, setSelectedDoacao] = useState<any>(null);
+  const [showDetalhes, setShowDetalhes] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  // Filtrar doações
   const filteredDoacoes = doacoes.filter(doacao => {
-    const matchesSearch = 
-      doacao.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doacao.descricao?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doacao.doadores?.nome?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = !searchTerm || 
+      doacao.doadores?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doacao.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doacao.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = selectedCategory === 'todas' || doacao.categoria_id === selectedCategory;
-    const matchesStatus = selectedStatus === 'todas' || doacao.status === selectedStatus;
+    const matchesStatus = statusFilter === 'all' || doacao.status === statusFilter;
+    const matchesCategory = categoryFilter === 'all' || doacao.categoria_id === categoryFilter;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'cadastrada':
-        return { 
-          label: 'Pendente', 
-          color: 'bg-orange-100 text-orange-800 border-orange-200', 
-          icon: Clock,
-          dotColor: 'bg-orange-500'
-        };
-      case 'aceita':
-        return { 
-          label: 'Aprovada', 
-          color: 'bg-blue-100 text-blue-800 border-blue-200', 
-          icon: Heart,
-          dotColor: 'bg-blue-500'
-        };
-      case 'recebida':
-        return { 
-          label: 'Recebida', 
-          color: 'bg-green-100 text-green-800 border-green-200', 
-          icon: CheckCircle,
-          dotColor: 'bg-green-500'
-        };
-      case 'cancelada':
-        return { 
-          label: 'Cancelada', 
-          color: 'bg-red-100 text-red-800 border-red-200', 
-          icon: XCircle,
-          dotColor: 'bg-red-500'
-        };
-      default:
-        return { 
-          label: status, 
-          color: 'bg-gray-100 text-gray-800 border-gray-200', 
-          icon: Package,
-          dotColor: 'bg-gray-500'
-        };
-    }
+  // Paginação
+  const totalPages = Math.ceil(filteredDoacoes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedDoacoes = filteredDoacoes.slice(startIndex, startIndex + itemsPerPage);
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      cadastrada: { label: 'Pendente', variant: 'secondary' as const, icon: Clock },
+      aceita: { label: 'Aceita', variant: 'default' as const, icon: CheckCircle },
+      recebida: { label: 'Recebida', variant: 'default' as const, icon: Package },
+      cancelada: { label: 'Cancelada', variant: 'destructive' as const, icon: XCircle },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.cadastrada;
+    const Icon = config.icon;
+    
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
   };
 
-  const getCategoryIcon = (categoria: any) => {
-    if (categoria?.icone) {
-      // Mapear ícones baseado no nome/tipo
-      const iconMap: { [key: string]: React.ElementType } = {
-        'package': Package,
-        'heart': Heart,
-        'clothes': Package, // Pode ser substituído por ícone específico
-        'food': Package, // Pode ser substituído por ícone específico
-      };
-      return iconMap[categoria.icone] || Package;
-    }
-    return Package;
-  };
-
-  const handleStatusUpdate = async (doacaoId: string, newStatus: string, observacoes?: string) => {
+  const handleStatusUpdate = async (doacaoId: string, newStatus: string) => {
     try {
-      await updateStatus(doacaoId, newStatus, observacoes);
+      await updateStatus(doacaoId, newStatus);
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
     }
   };
 
-  const handleDeleteDonation = async (doacaoId: string) => {
-    try {
-      await deleteDonation(doacaoId);
-    } catch (error) {
-      console.error('Erro ao deletar doação:', error);
+  const handleDeleteDoacao = async (doacaoId: string) => {
+    if (window.confirm('Tem certeza que deseja deletar esta doação? Esta ação não pode ser desfeita.')) {
+      try {
+        await deleteDonation(doacaoId);
+      } catch (error) {
+        console.error('Erro ao deletar doação:', error);
+      }
     }
   };
 
-  const handleViewDetails = (doacao: any) => {
+  const handleVerDetalhes = (doacao: any) => {
     setSelectedDoacao(doacao);
-    setIsDetailOpen(true);
+    setShowDetalhes(true);
   };
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        {/* Skeleton dos indicadores - agora em grid horizontal para telas médias+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-gray-200 rounded-lg"></div>
-                  <div className="flex-1">
-                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-20"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viver-yellow mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando doações...</p>
         </div>
-        
-        {/* Skeleton da tabela */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="h-10 bg-gray-200 rounded"></div>
-              <div className="h-64 bg-gray-200 rounded"></div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Indicadores - Grid horizontal em telas médias e maiores */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-4 lg:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Pendentes</p>
-                <p className="text-2xl lg:text-3xl font-bold text-orange-600">{stats.cadastrada || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Aguardando aprovação</p>
+      {/* Header com estatísticas em cards circulares */}
+      <div className="flex flex-col gap-3 mb-6 w-full">
+        {/* Card Pendentes */}
+        <Card className="bg-orange-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-orange-50 border-2 border-orange-600 shadow-md flex-shrink-0">
+              <Clock className="h-8 w-8 text-orange-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 mb-1">Pendentes</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-3xl font-bold text-orange-600 leading-none">
+                  {stats.cadastrada || 0}
+                </span>
+                <div className="flex items-center gap-1">
+                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                  <span className="text-xs font-medium text-orange-600">
+                    Aguardando aprovação
+                  </span>
+                </div>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Clock className="h-5 w-5 lg:h-6 lg:w-6 text-orange-600" />
-              </div>
+              <p className="text-sm text-gray-600 leading-tight">
+                Aguardando aprovação
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-4 lg:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Aprovadas</p>
-                <p className="text-2xl lg:text-3xl font-bold text-blue-600">{stats.aceita || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Aceitas pela ONG</p>
+        {/* Card Aprovadas */}
+        <Card className="bg-blue-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-blue-50 border-2 border-blue-600 shadow-md flex-shrink-0">
+              <CheckCircle className="h-8 w-8 text-blue-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 mb-1">Aprovadas</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-3xl font-bold text-blue-600 leading-none">
+                  {stats.aceita || 0}
+                </span>
+                <div className="flex items-center gap-1">
+                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                  <span className="text-xs font-medium text-blue-600">
+                    Aceitas pela ONG
+                  </span>
+                </div>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Heart className="h-5 w-5 lg:h-6 lg:w-6 text-blue-600" />
-              </div>
+              <p className="text-sm text-gray-600 leading-tight">
+                Aceitas pela ONG
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-4 lg:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Recebidas</p>
-                <p className="text-2xl lg:text-3xl font-bold text-green-600">{stats.recebida || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Finalizadas</p>
+        {/* Card Recebidas */}
+        <Card className="bg-green-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-green-50 border-2 border-green-600 shadow-md flex-shrink-0">
+              <Package className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 mb-1">Recebidas</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-3xl font-bold text-green-600 leading-none">
+                  {stats.recebida || 0}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Package className="h-4 w-4 text-green-500" />
+                  <span className="text-xs font-medium text-green-600">
+                    Finalizadas
+                  </span>
+                </div>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 lg:h-6 lg:w-6 text-green-600" />
-              </div>
+              <p className="text-sm text-gray-600 leading-tight">
+                Finalizadas
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
-          <CardContent className="p-4 lg:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total</p>
-                <p className="text-2xl lg:text-3xl font-bold text-purple-600">{stats.total || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">Todas as doações</p>
+        {/* Card Total */}
+        <Card className="bg-purple-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-full bg-purple-50 border-2 border-purple-600 shadow-md flex-shrink-0">
+              <Package className="h-8 w-8 text-purple-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 mb-1">Total</p>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-3xl font-bold text-purple-600 leading-none">
+                  {stats.total || 0}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Package className="h-4 w-4 text-purple-500" />
+                  <span className="text-xs font-medium text-purple-600">
+                    Todas as doações
+                  </span>
+                </div>
               </div>
-              <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <Package className="h-5 w-5 lg:h-6 lg:w-6 text-purple-600" />
-              </div>
+              <p className="text-sm text-gray-600 leading-tight">
+                Todas as doações
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filtros e Busca - Layout horizontal melhorado */}
-      <Card className="border-0 shadow-md">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Filter className="h-5 w-5 text-viver-yellow" />
-              Filtros e Busca
-            </CardTitle>
-            <Button variant="outline" size="sm" className="flex items-center gap-2 w-fit">
-              <Download className="h-4 w-4" />
-              Exportar
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          {/* Container de filtros em linha horizontal */}
-          <div className="flex flex-col lg:flex-row gap-4 items-end">
-            {/* Busca - ocupa mais espaço */}
-            <div className="flex-1 lg:flex-[2]">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Buscar doações
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Buscar por título, descrição ou nome do doador..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            
-            {/* Filtros lado a lado */}
-            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto lg:flex-1">
-              <div className="flex-1 lg:min-w-[160px]">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Categoria
-                </label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todas">Todas as categorias</SelectItem>
-                    {categorias.map((categoria) => (
-                      <SelectItem key={categoria.id} value={categoria.id}>
-                        {categoria.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex-1 lg:min-w-[140px]">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Status
-                </label>
-                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todas">Todos os status</SelectItem>
-                    <SelectItem value="cadastrada">Pendentes</SelectItem>
-                    <SelectItem value="aceita">Aprovadas</SelectItem>
-                    <SelectItem value="recebida">Recebidas</SelectItem>
-                    <SelectItem value="cancelada">Canceladas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Botão Limpar */}
-            <div className="w-full sm:w-auto">
-              <Button 
-                variant="outline" 
-                className="w-full sm:w-auto"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('todas');
-                  setSelectedStatus('todas');
-                }}
-              >
-                Limpar
+      {/* Filtros e busca */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Lista de Doações Físicas</span>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Exportar
+              </Button>
+              <Button variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Atualizar
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Lista de Doações - Título com mais destaque */}
-      <Card className="border-0 shadow-md">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-xl lg:text-2xl mb-2">
-                <Package className="h-6 w-6 text-viver-yellow" />
-                Gerenciar Doações Físicas
-              </CardTitle>
-              <p className="text-gray-600 text-sm">
-                Controle completo das doações físicas recebidas pela ONG
-              </p>
-            </div>
-            <div className="bg-gray-100 px-4 py-2 rounded-full">
-              <span className="text-sm font-medium text-gray-700">
-                {filteredDoacoes.length} doações encontradas
-              </span>
-            </div>
-          </div>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
-          {/* Tabela com scroll horizontal quando necessário */}
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold min-w-[80px]">Tipo</TableHead>
-                  <TableHead className="font-semibold min-w-[200px]">Doação</TableHead>
-                  <TableHead className="font-semibold min-w-[180px]">Doador</TableHead>
-                  <TableHead className="font-semibold min-w-[160px]">Local</TableHead>
-                  <TableHead className="font-semibold min-w-[120px]">Status</TableHead>
-                  <TableHead className="font-semibold min-w-[100px]">Data</TableHead>
-                  <TableHead className="font-semibold min-w-[140px]">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredDoacoes.map((doacao) => {
-                  const statusConfig = getStatusConfig(doacao.status);
-                  const StatusIcon = statusConfig.icon;
-                  const CategoryIcon = getCategoryIcon(doacao.categorias_doacoes);
-                  
-                  return (
-                    <TableRow key={doacao.id} className="hover:bg-gray-50 transition-colors">
-                      <TableCell className="p-3">
-                        <div className="flex items-center justify-center">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            doacao.categorias_doacoes?.cor ? 
-                            `bg-${doacao.categorias_doacoes.cor}-100` : 
-                            'bg-gray-100'
-                          }`}>
-                            <CategoryIcon className={`h-5 w-5 ${
-                              doacao.categorias_doacoes?.cor ? 
-                              `text-${doacao.categorias_doacoes.cor}-600` : 
-                              'text-gray-600'
-                            }`} />
+        <CardContent className="space-y-4">
+          {/* Barra de busca e filtros */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar por nome, título ou descrição..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filtrar por status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os status</SelectItem>
+                <SelectItem value="cadastrada">Pendentes</SelectItem>
+                <SelectItem value="aceita">Aceitas</SelectItem>
+                <SelectItem value="recebida">Recebidas</SelectItem>
+                <SelectItem value="cancelada">Canceladas</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filtrar por categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as categorias</SelectItem>
+                {categorias.map((categoria) => (
+                  <SelectItem key={categoria.id} value={categoria.id}>
+                    {categoria.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Lista de doações */}
+          {filteredDoacoes.length === 0 ? (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all' 
+                  ? 'Nenhuma doação encontrada com os filtros aplicados.'
+                  : 'Nenhuma doação física cadastrada ainda.'
+                }
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="space-y-4">
+              {paginatedDoacoes.map((doacao) => (
+                <Card key={doacao.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-lg">{doacao.titulo}</h3>
+                          {getStatusBadge(doacao.status)}
+                        </div>
+                        
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          {doacao.descricao}
+                        </p>
+                        
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <User className="h-4 w-4" />
+                            <span>{doacao.doadores?.nome || 'Nome não informado'}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{format(new Date(doacao.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{doacao.endereco_coleta || 'Endereço não informado'}</span>
                           </div>
                         </div>
-                      </TableCell>
+                      </div>
                       
-                      <TableCell className="p-3">
-                        <div className="space-y-1">
-                          <p className="font-medium text-gray-900 text-sm">{doacao.titulo}</p>
-                          <div className="flex items-center gap-2 text-xs text-gray-600">
-                            <span className="font-medium">{doacao.quantidade} {doacao.unidade}</span>
-                            {doacao.categorias_doacoes && (
-                              <>
-                                <span>•</span>
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                  {doacao.categorias_doacoes.nome}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      
-                      <TableCell className="p-3">
-                        <div className="space-y-1">
-                          <p className="font-medium text-gray-900 text-sm">
-                            {doacao.doadores?.nome || 'Não informado'}
-                          </p>
-                          {doacao.telefone_doador && (
-                            <div className="flex items-center gap-1 text-xs text-gray-600">
-                              <Phone className="h-3 w-3" />
-                              <span className="truncate">{doacao.telefone_doador}</span>
-                            </div>
-                          )}
-                          {doacao.email_doador && (
-                            <div className="flex items-center gap-1 text-xs text-gray-600">
-                              <Mail className="h-3 w-3" />
-                              <span className="truncate">{doacao.email_doador}</span>
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      
-                      <TableCell className="p-3">
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          <span className="truncate">
-                            {doacao.localizacao || doacao.endereco_coleta || 'Não informado'}
-                          </span>
-                        </div>
-                      </TableCell>
-                      
-                      <TableCell className="p-3">
-                        <Badge 
-                          className={`${statusConfig.color} border flex items-center gap-2 w-fit px-2 py-1 text-xs`}
-                        >
-                          <div className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`}></div>
-                          <StatusIcon className="h-3 w-3" />
-                          {statusConfig.label}
-                        </Badge>
-                      </TableCell>
-                      
-                      <TableCell className="p-3">
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Calendar className="h-3 w-3" />
-                          {format(new Date(doacao.created_at), 'dd/MM/yy', { locale: ptBR })}
-                        </div>
-                      </TableCell>
-                      
-                      <TableCell className="p-3">
-                        <div className="flex items-center gap-1">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
                           <Button
-                            size="sm"
                             variant="outline"
-                            onClick={() => handleViewDetails(doacao)}
-                            className="h-8 w-8 p-0"
+                            size="sm"
+                            onClick={() => handleVerDetalhes(doacao)}
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-4 w-4 mr-1" />
+                            Ver
                           </Button>
                           
                           {doacao.status === 'cadastrada' && (
                             <>
                               <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleStatusUpdate(doacao.id, 'aceita')}
                                 disabled={isUpdating}
-                                className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                                className="text-green-600 border-green-600 hover:bg-green-50"
                               >
-                                <Check className="h-4 w-4" />
+                                <Check className="h-4 w-4 mr-1" />
+                                Aceitar
                               </Button>
                               <Button
-                                size="sm"
                                 variant="outline"
+                                size="sm"
                                 onClick={() => handleStatusUpdate(doacao.id, 'cancelada')}
                                 disabled={isUpdating}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-600 border-red-600 hover:bg-red-50"
                               >
-                                <X className="h-4 w-4" />
+                                <X className="h-4 w-4 mr-1" />
+                                Rejeitar
                               </Button>
                             </>
                           )}
                           
                           {doacao.status === 'aceita' && (
                             <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => handleStatusUpdate(doacao.id, 'recebida')}
                               disabled={isUpdating}
-                              className="h-8 w-8 p-0 bg-blue-600 hover:bg-blue-700 text-white"
+                              className="text-blue-600 border-blue-600 hover:bg-blue-50"
                             >
-                              <CheckCircle className="h-4 w-4" />
+                              <Package className="h-4 w-4 mr-1" />
+                              Marcar como Recebida
                             </Button>
                           )}
                           
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={isDeleting}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tem certeza que deseja excluir permanentemente a doação "{doacao.titulo}"? 
-                                  Esta ação não pode ser desfeita.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteDonation(doacao.id)}
-                                  className="bg-red-600 hover:bg-red-700"
-                                >
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteDoacao(doacao.id)}
+                            disabled={isDeleting}
+                            className="text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Deletar
+                          </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-          
-          {filteredDoacoes.length === 0 && (
-            <div className="text-center py-12 px-6">
-              <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Nenhuma doação encontrada
-              </h3>
-              <p className="text-gray-500 max-w-md mx-auto text-sm">
-                {searchTerm || selectedCategory !== 'todas' || selectedStatus !== 'todas' 
-                  ? 'Tente ajustar os filtros para encontrar mais doações.'
-                  : 'Ainda não há doações físicas cadastradas no sistema.'
-                }
-              </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <Pagination
+                page={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Dialog de Detalhes */}
+      {/* Dialog de detalhes */}
       {selectedDoacao && (
         <DetalheDoacaoDialog
           doacao={selectedDoacao}
-          isOpen={isDetailOpen}
-          onOpenChange={setIsDetailOpen}
-          onStatusUpdate={handleStatusUpdate}
+          open={showDetalhes}
+          onOpenChange={setShowDetalhes}
+          onUpdateStatus={handleStatusUpdate}
+          onDeleteDoacao={handleDeleteDoacao}
           isUpdating={isUpdating}
+          isDeleting={isDeleting}
         />
       )}
     </div>
