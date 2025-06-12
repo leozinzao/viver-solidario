@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -138,7 +137,6 @@ const AdminScreen: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      {/* Container principal com largura máxima aumentada */}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header melhorado */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -237,7 +235,7 @@ const AdminScreen: React.FC = () => {
           
           {/* Conteúdo das abas */}
           <TabsContent value="dashboard" className="p-0">
-            {/* KPIs do Dashboard Geral */}
+            {/* KPIs APENAS do Dashboard Geral */}
             <DashboardKPICards />
             
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
@@ -259,7 +257,7 @@ const AdminScreen: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="doacoes" className="p-0">
-            {/* KPIs específicos de Doações Físicas */}
+            {/* KPIs APENAS de Doações Físicas */}
             <AdminKPICards />
             
             <DoacoesFisicasAdmin />
