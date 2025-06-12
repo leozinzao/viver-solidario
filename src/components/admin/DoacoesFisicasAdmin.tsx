@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -126,113 +127,6 @@ const DoacoesFisicasAdmin: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header com estatísticas em cards circulares */}
-      <div className="flex flex-col gap-3 mb-6 w-full">
-        {/* Card Pendentes */}
-        <Card className="bg-orange-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-orange-50 border-2 border-orange-600 shadow-md flex-shrink-0">
-              <Clock className="h-8 w-8 text-orange-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 mb-1">Pendentes</p>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-3xl font-bold text-orange-600 leading-none">
-                  {stats.cadastrada || 0}
-                </span>
-                <div className="flex items-center gap-1">
-                  <AlertTriangle className="h-4 w-4 text-orange-500" />
-                  <span className="text-xs font-medium text-orange-600">
-                    Aguardando aprovação
-                  </span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-tight">
-                Aguardando aprovação
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card Aprovadas */}
-        <Card className="bg-blue-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-blue-50 border-2 border-blue-600 shadow-md flex-shrink-0">
-              <CheckCircle className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 mb-1">Aprovadas</p>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-3xl font-bold text-blue-600 leading-none">
-                  {stats.aceita || 0}
-                </span>
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="h-4 w-4 text-blue-500" />
-                  <span className="text-xs font-medium text-blue-600">
-                    Aceitas pela ONG
-                  </span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-tight">
-                Aceitas pela ONG
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card Recebidas */}
-        <Card className="bg-green-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-green-50 border-2 border-green-600 shadow-md flex-shrink-0">
-              <Package className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 mb-1">Recebidas</p>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-3xl font-bold text-green-600 leading-none">
-                  {stats.recebida || 0}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Package className="h-4 w-4 text-green-500" />
-                  <span className="text-xs font-medium text-green-600">
-                    Finalizadas
-                  </span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-tight">
-                Finalizadas
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card Total */}
-        <Card className="bg-purple-50 w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="p-3 rounded-full bg-purple-50 border-2 border-purple-600 shadow-md flex-shrink-0">
-              <Package className="h-8 w-8 text-purple-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 mb-1">Total</p>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-3xl font-bold text-purple-600 leading-none">
-                  {stats.total || 0}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Package className="h-4 w-4 text-purple-500" />
-                  <span className="text-xs font-medium text-purple-600">
-                    Todas as doações
-                  </span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 leading-tight">
-                Todas as doações
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Filtros e busca */}
       <Card>
         <CardHeader>
