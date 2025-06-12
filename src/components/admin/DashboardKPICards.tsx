@@ -92,50 +92,51 @@ const KPICard: React.FC<KPICardProps> = ({
 );
 
 const DashboardKPICards: React.FC = () => {
-  // Buscar total de voluntários
-  const { data: totalVoluntarios = 0 } = useQuery({
-    queryKey: ['dashboard-voluntarios'],
+  // Buscar total de usuários no sistema
+  const { data: totalUsuarios = 0 } = useQuery({
+    queryKey: ['dashboard-total-usuarios'],
     queryFn: async () => {
-      const { count } = await supabase
-        .from('voluntarios')
-        .select('id', { count: 'exact', head: true });
-      
-      return count || 0;
+      const { data, error } = await supabase.auth.admin.listUsers();
+      if (error) {
+        console.error('Erro ao buscar usuários:', error);
+        return 0;
+      }
+      return data.users.length;
     },
   });
 
-  // Buscar total de doadores
-  const { data: totalDoadores = 0 } = useQuery({
-    queryKey: ['dashboard-doadores'],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from('doadores')
-        .select('id', { count: 'exact', head: true });
-      
-      return count || 0;
-    },
-  });
-
-  // Buscar eventos ativos/futuros
-  const { data: eventosAtivos = 0 } = useQuery({
-    queryKey: ['dashboard-eventos-ativos'],
+  // Buscar total de eventos
+  const { data: totalEventos = 0 } = useQuery({
+    queryKey: ['dashboard-total-eventos'],
     queryFn: async () => {
       const { count } = await supabase
         .from('eventos')
-        .select('id', { count: 'exact', head: true })
-        .gte('data_inicio', new Date().toISOString().split('T')[0]);
+        .select('id', { count: 'exact', head: true });
       
       return count || 0;
     },
   });
 
-  // Buscar atividades voluntárias cadastradas
-  const { data: atividadesVoluntarias = 0 } = useQuery({
-    queryKey: ['dashboard-atividades'],
+  // Buscar total de depoimentos
+  const { data: totalDepoimentos = 0 } = useQuery({
+    queryKey: ['dashboard-total-depoimentos'],
     queryFn: async () => {
       const { count } = await supabase
-        .from('atividades_voluntarias')
+        .from('testimonials')
         .select('id', { count: 'exact', head: true });
+      
+      return count || 0;
+    },
+  });
+
+  // Buscar impacto total (somar todas as doações)
+  const { data: impactoTotal = 0 } = useQuery({
+    queryKey: ['dashboard-impacto-total'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('doacoes_fisicas_novas')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'recebida');
       
       return count || 0;
     },
@@ -143,48 +144,48 @@ const DashboardKPICards: React.FC = () => {
 
   const dashboardKpis = [
     {
-      title: "Voluntários",
-      value: totalVoluntarios,
+      title: "Usuários Totais",
+      value: totalUsuarios,
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      change: "Ativos no sistema",
+      change: "Cadastrados",
       trend: "up" as const,
-      description: "Voluntários cadastrados",
-      tooltip: "Número total de voluntários cadastrados e ativos no sistema da ONG."
+      description: "Total no sistema",
+      tooltip: "Número total de usuários cadastrados no sistema (voluntários, doadores, administradores)."
     },
     {
-      title: "Doadores",
-      value: totalDoadores,
-      icon: Gift,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      change: "Registrados",
-      trend: "up" as const,
-      description: "Doadores no sistema",
-      tooltip: "Pessoas que já fizeram ou se cadastraram para fazer doações para a ONG."
-    },
-    {
-      title: "Eventos Ativos",
-      value: eventosAtivos,
+      title: "Eventos",
+      value: totalEventos,
       icon: Calendar,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      change: "Programados",
-      trend: "neutral" as const,
-      description: "Eventos futuros",
-      tooltip: "Eventos programados ou em andamento no sistema."
+      change: "Cadastrados",
+      trend: "up" as const,
+      description: "Total de eventos",
+      tooltip: "Número total de eventos cadastrados no sistema da ONG."
     },
     {
-      title: "Atividades",
-      value: atividadesVoluntarias,
-      icon: Activity,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      change: "Disponíveis",
+      title: "Depoimentos",
+      value: totalDepoimentos,
+      icon: MessageSquare,
+      color: "text-green-600",
+      bgColor: "bg-green-50",
+      change: "Publicados",
       trend: "up" as const,
-      description: "Atividades voluntárias",
-      tooltip: "Total de atividades voluntárias disponíveis para participação."
+      description: "Histórias compartilhadas",
+      tooltip: "Depoimentos e histórias compartilhadas pelos beneficiados da ONG."
+    },
+    {
+      title: "Impacto Total",
+      value: impactoTotal,
+      icon: Heart,
+      color: "text-red-600",
+      bgColor: "bg-red-50",
+      change: "Doações finalizadas",
+      trend: "up" as const,
+      description: "Doações recebidas",
+      tooltip: "Total de doações que foram recebidas e efetivamente contribuíram para o impacto social."
     }
   ];
 
