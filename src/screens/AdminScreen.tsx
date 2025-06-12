@@ -8,6 +8,7 @@ import TestimonialManager from '@/components/admin/TestimonialManager';
 import DoacoesFisicasAdmin from '@/components/admin/DoacoesFisicasAdmin';
 import UserManagement from '@/components/admin/UserManagement';
 import AdminKPICards from '@/components/admin/AdminKPICards';
+import DashboardKPICards from '@/components/admin/DashboardKPICards';
 import AdminSearchAndFilters from '@/components/admin/AdminSearchAndFilters';
 import AdminNotifications from '@/components/admin/AdminNotifications';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
