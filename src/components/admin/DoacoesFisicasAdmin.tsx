@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -420,12 +419,10 @@ const DoacoesFisicasAdmin: React.FC = () => {
       {selectedDoacao && (
         <DetalheDoacaoDialog
           doacao={selectedDoacao}
-          open={showDetalhes}
+          isOpen={showDetalhes}
           onOpenChange={setShowDetalhes}
-          onUpdateStatus={handleStatusUpdate}
-          onDeleteDoacao={handleDeleteDoacao}
+          onStatusUpdate={handleStatusUpdate}
           isUpdating={isUpdating}
-          isDeleting={isDeleting}
         />
       )}
     </div>
