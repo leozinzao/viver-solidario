@@ -12,6 +12,8 @@ import {
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
 
 interface KPICardProps {
   title: string;
@@ -88,51 +90,106 @@ const KPICard: React.FC<KPICardProps> = ({
 );
 
 const DashboardKPICards: React.FC = () => {
-  // Dados simulados para o dashboard geral
+  // Buscar usuários ativos (voluntários + doadores)
+  const { data: totalUsuarios = 0 } = useQuery({
+    queryKey: ['dashboard-usuarios'],
+    queryFn: async () => {
+      const [voluntarios, doadores] = await Promise.all([
+        supabase.from('voluntarios').select('id', { count: 'exact', head: true }),
+        supabase.from('doadores').select('id', { count: 'exact', head: true })
+      ]);
+      
+      const countVoluntarios = voluntarios.count || 0;
+      const countDoadores = doadores.count || 0;
+      
+      return countVoluntarios + countDoadores;
+    },
+  });
+
+  // Buscar eventos
+  const { data: totalEventos = 0 } = useQuery({
+    queryKey: ['dashboard-eventos'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('eventos')
+        .select('id', { count: 'exact', head: true });
+      
+      return count || 0;
+    },
+  });
+
+  // Buscar notificações como proxy para depoimentos/mensagens
+  const { data: totalNotificacoes = 0 } = useQuery({
+    queryKey: ['dashboard-notificacoes'],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('notificacoes_doacoes')
+        .select('id', { count: 'exact', head: true });
+      
+      return count || 0;
+    },
+  });
+
+  // Calcular doações totais para impacto
+  const { data: impactoTotal = 0 } = useQuery({
+    queryKey: ['dashboard-impacto'],
+    queryFn: async () => {
+      const [doacoesFisicas, doacoesFinanceiras] = await Promise.all([
+        supabase.from('doacoes_fisicas_novas').select('id', { count: 'exact', head: true }),
+        supabase.from('doacoes').select('id', { count: 'exact', head: true })
+      ]);
+      
+      const countFisicas = doacoesFisicas.count || 0;
+      const countFinanceiras = doacoesFinanceiras.count || 0;
+      
+      return countFisicas + countFinanceiras;
+    },
+  });
+
   const dashboardKpis = [
     {
-      title: "Usuários Ativos",
-      value: 342,
+      title: "Usuários Cadastrados",
+      value: totalUsuarios,
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
-      change: "+12% este mês",
+      change: "Total no sistema",
       trend: "up" as const,
-      description: "Total de usuários ativos",
-      tooltip: "Número de usuários que acessaram o sistema nos últimos 30 dias."
+      description: "Voluntários e doadores",
+      tooltip: "Número total de usuários cadastrados no sistema (voluntários + doadores)."
     },
     {
-      title: "Eventos Realizados",
-      value: 25,
+      title: "Eventos Cadastrados",
+      value: totalEventos,
       icon: Calendar,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      change: "+3 este mês",
+      change: "Eventos ativos",
       trend: "up" as const,
-      description: "Eventos realizados",
-      tooltip: "Total de eventos organizados pela ONG no período atual."
+      description: "Total de eventos",
+      tooltip: "Total de eventos cadastrados no sistema da ONG."
     },
     {
-      title: "Depoimentos",
-      value: 89,
+      title: "Notificações",
+      value: totalNotificacoes,
       icon: MessageSquare,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
-      change: "+7 novos",
+      change: "Sistema ativo",
       trend: "up" as const,
-      description: "Depoimentos coletados",
-      tooltip: "Depoimentos de beneficiários e voluntários sobre o trabalho da ONG."
+      description: "Comunicações do sistema",
+      tooltip: "Notificações enviadas pelo sistema para comunicação com usuários."
     },
     {
-      title: "Impacto Social",
-      value: "98%",
+      title: "Impacto Total",
+      value: impactoTotal,
       icon: Heart,
       color: "text-red-600",
       bgColor: "bg-red-50",
-      change: "Satisfação",
+      change: "Doações processadas",
       trend: "up" as const,
-      description: "Índice de satisfação",
-      tooltip: "Porcentagem de satisfação dos beneficiários com os serviços prestados."
+      description: "Total de doações",
+      tooltip: "Número total de doações (físicas e financeiras) processadas pela ONG."
     }
   ];
 
