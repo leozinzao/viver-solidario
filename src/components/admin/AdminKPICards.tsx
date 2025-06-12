@@ -46,10 +46,10 @@ const KPICard: React.FC<KPICardProps> = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Card className={`${bgColor} w-full border-0 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden`}>
-          <CardContent className="p-4 flex items-center gap-3">
-            {/* Ícone */}
-            <div className={`p-2 rounded-lg ${bgColor} border ${color.replace('text-', 'border-')} shadow-sm flex-shrink-0`}>
-              <Icon className={`h-5 w-5 ${color}`} />
+          <CardContent className="p-4 flex items-center gap-4">
+            {/* Ícone maior e mais destacado */}
+            <div className={`p-3 rounded-full ${bgColor} border-2 ${color.replace('text-', 'border-')} shadow-md flex-shrink-0`}>
+              <Icon className={`h-8 w-8 ${color}`} />
             </div>
             
             {/* Conteúdo principal */}
@@ -59,19 +59,19 @@ const KPICard: React.FC<KPICardProps> = ({
               </p>
               
               <div className="flex items-center gap-2 mb-1">
-                <span className={`text-2xl font-bold ${color} leading-none`}>
+                <span className={`text-3xl font-bold ${color} leading-none`}>
                   {value}
                 </span>
                 {change && (
                   <div className="flex items-center gap-1">
                     {trend === TREND_UP && (
-                      <TrendingUp className="h-3 w-3 text-green-500" />
+                      <TrendingUp className="h-4 w-4 text-green-500" />
                     )}
                     {trend === TREND_DOWN && (
-                      <TrendingDown className="h-3 w-3 text-red-500" />
+                      <TrendingDown className="h-4 w-4 text-red-500" />
                     )}
                     {trend === TREND_NEUTRAL && (
-                      <AlertTriangle className="h-3 w-3 text-orange-500" />
+                      <AlertTriangle className="h-4 w-4 text-orange-500" />
                     )}
                     <span className={`text-xs font-medium ${
                       trend === TREND_UP ? 'text-green-600' : 
@@ -84,7 +84,7 @@ const KPICard: React.FC<KPICardProps> = ({
               </div>
               
               {description && (
-                <p className="text-xs text-gray-500 leading-tight">
+                <p className="text-sm text-gray-600 leading-tight">
                   {description}
                 </p>
               )}
