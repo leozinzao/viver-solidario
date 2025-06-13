@@ -11,7 +11,8 @@ import {
   X,
   Eye,
   EyeOff,
-  ExternalLink
+  ExternalLink,
+  Clock
 } from 'lucide-react';
 
 interface AdminNotification {
@@ -83,13 +84,13 @@ const AdminNotifications: React.FC = () => {
   const getIcon = (type: AdminNotification['type']) => {
     switch (type) {
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+        return <AlertTriangle className="h-5 w-5 text-orange-600" />;
       case 'error':
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Info className="h-5 w-5 text-blue-600" />;
     }
   };
 
@@ -100,141 +101,197 @@ const AdminNotifications: React.FC = () => {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     
     if (minutes < 60) {
-      return `${minutes} minutos atrás`;
+      return `${minutes} min atrás`;
     } else if (hours < 24) {
-      return `${hours} horas atrás`;
+      return `${hours}h atrás`;
     } else {
       const days = Math.floor(hours / 24);
-      return `${days} dias atrás`;
+      return `${days}d atrás`;
     }
   };
 
   const displayedNotifications = showAll ? notifications : notifications.slice(0, 3);
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-4">
+    <Card className="mb-8 shadow-lg border-0 bg-gradient-to-br from-white to-gray-50/30">
+      <CardHeader className="pb-4 bg-gradient-to-r from-viver-yellow/5 to-orange-50/50 rounded-t-lg">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Bell className="h-6 w-6 text-viver-yellow" />
-            <div>
-              <CardTitle className="text-xl">Central de Notificações</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">Acompanhe atividades importantes</p>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-viver-yellow/20 to-viver-yellow/40 flex items-center justify-center">
+                <Bell className="h-6 w-6 text-viver-yellow" />
+              </div>
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">{unreadCount}</span>
+                </div>
+              )}
             </div>
-            {unreadCount > 0 && (
-              <Badge variant="destructive" className="bg-red-500 text-white">
-                {unreadCount} nova{unreadCount !== 1 ? 's' : ''}
-              </Badge>
-            )}
-            {urgentCount > 0 && (
-              <Badge variant="outline" className="border-orange-500 text-orange-700 bg-orange-50">
-                {urgentCount} urgente{urgentCount !== 1 ? 's' : ''}
-              </Badge>
-            )}
+            
+            <div className="flex-1">
+              <CardTitle className="text-2xl font-bold text-gray-900 mb-1">
+                Central de Notificações
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Mantenha-se atualizado com as atividades importantes
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <Badge className="bg-red-100 text-red-800 border-red-200 px-3 py-1">
+                  <span className="text-xs font-semibold">
+                    {unreadCount} nova{unreadCount !== 1 ? 's' : ''}
+                  </span>
+                </Badge>
+              )}
+              {urgentCount > 0 && (
+                <Badge className="bg-orange-100 text-orange-800 border-orange-200 px-3 py-1">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  <span className="text-xs font-semibold">
+                    {urgentCount} urgente{urgentCount !== 1 ? 's' : ''}
+                  </span>
+                </Badge>
+              )}
+            </div>
           </div>
-          
-          <div className="flex gap-2">
-            {unreadCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Marcar todas como lidas
-              </Button>
-            )}
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-2 mt-4">
+          {unreadCount > 0 && (
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => setShowAll(!showAll)}
-              className="text-sm"
+              onClick={markAllAsRead} 
+              className="text-sm hover:bg-white/80 transition-colors"
             >
-              {showAll ? 'Mostrar menos' : `Ver todas (${notifications.length})`}
+              <Eye className="h-4 w-4 mr-2" />
+              Marcar todas como lidas
             </Button>
-          </div>
+          )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowAll(!showAll)}
+            className="text-sm hover:bg-white/80 transition-colors"
+          >
+            {showAll ? 'Mostrar menos' : `Ver todas (${notifications.length})`}
+          </Button>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        {displayedNotifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`p-4 rounded-lg border-l-4 transition-all ${
-              notification.read 
-                ? 'bg-gray-50 border-l-gray-300' 
-                : notification.actionRequired
-                ? 'bg-orange-50 border-l-orange-400'
-                : 'bg-blue-50 border-l-blue-400'
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <div className="mt-1">
-                {getIcon(notification.type)}
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h4 className={`font-semibold ${
-                        notification.read ? 'text-gray-700' : 'text-gray-900'
-                      }`}>
-                        {notification.title}
-                      </h4>
-                      {notification.actionRequired && (
-                        <Badge variant="outline" className="text-xs border-orange-500 text-orange-700 bg-orange-100">
-                          Ação necessária
-                        </Badge>
-                      )}
-                    </div>
-                    <p className={`text-sm mb-2 leading-relaxed ${
-                      notification.read ? 'text-gray-500' : 'text-gray-700'
+      <CardContent className="p-0">
+        {displayedNotifications.length > 0 ? (
+          <div className="divide-y divide-gray-100">
+            {displayedNotifications.map((notification, index) => (
+              <div
+                key={notification.id}
+                className={`p-6 transition-all duration-200 hover:bg-gray-50/50 ${
+                  !notification.read 
+                    ? 'bg-gradient-to-r from-blue-50/30 to-transparent border-l-4 border-l-blue-400' 
+                    : 'hover:bg-gray-50/30'
+                } ${
+                  notification.actionRequired && !notification.read
+                    ? 'bg-gradient-to-r from-orange-50/50 to-transparent border-l-4 border-l-orange-400'
+                    : ''
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 mt-1">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      notification.type === 'warning' ? 'bg-orange-100' :
+                      notification.type === 'error' ? 'bg-red-100' :
+                      notification.type === 'success' ? 'bg-green-100' :
+                      'bg-blue-100'
                     }`}>
-                      {notification.message}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-gray-400">
-                        {getTimeString(notification.timestamp)}
-                      </p>
-                      {notification.link && (
-                        <Button variant="ghost" size="sm" className="text-xs h-6 px-2">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Ver detalhes
-                        </Button>
-                      )}
+                      {getIcon(notification.type)}
                     </div>
                   </div>
                   
-                  <div className="flex gap-1">
-                    {!notification.read && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => markAsRead(notification.id)}
-                        className="h-8 w-8 p-0"
-                        title="Marcar como lida"
-                      >
-                        <EyeOff className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeNotification(notification.id)}
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
-                      title="Remover notificação"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className={`font-bold text-lg leading-tight ${
+                            notification.read ? 'text-gray-600' : 'text-gray-900'
+                          }`}>
+                            {notification.title}
+                          </h4>
+                          {notification.actionRequired && !notification.read && (
+                            <Badge className="bg-orange-100 text-orange-800 border-orange-200 text-xs px-2 py-1">
+                              <AlertTriangle className="h-3 w-3 mr-1" />
+                              Ação necessária
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <p className={`text-sm leading-relaxed mb-3 ${
+                          notification.read ? 'text-gray-500' : 'text-gray-700'
+                        }`}>
+                          {notification.message}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Clock className="h-3 w-3" />
+                            <span>{getTimeString(notification.timestamp)}</span>
+                          </div>
+                          
+                          {notification.link && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-xs h-7 px-3 text-viver-yellow hover:bg-viver-yellow/10 hover:text-viver-yellow"
+                            >
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              Ver detalhes
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-1 flex-shrink-0">
+                        {!notification.read && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => markAsRead(notification.id)}
+                            className="h-8 w-8 p-0 hover:bg-blue-100 text-blue-600"
+                            title="Marcar como lida"
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeNotification(notification.id)}
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 hover:bg-red-50"
+                          title="Remover notificação"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
-        
-        {notifications.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <Bell className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <h3 className="font-medium text-gray-700 mb-1">Nenhuma notificação</h3>
-            <p className="text-sm">Você está em dia com todas as atividades!</p>
+        ) : (
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-full bg-gray-100 mx-auto mb-4 flex items-center justify-center">
+              <Bell className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="font-semibold text-lg text-gray-700 mb-2">
+              Nenhuma notificação
+            </h3>
+            <p className="text-sm text-gray-500 max-w-sm mx-auto">
+              Você está em dia com todas as atividades! 
+              <br />
+              Novas notificações aparecerão aqui.
+            </p>
           </div>
         )}
       </CardContent>
