@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,11 +119,14 @@ const FormularioDoacaoOtimizado: React.FC<FormularioDoacaoOtimizadoProps> = ({
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {categorias.map((categoria) => (
-                  <SelectItem key={categoria.id} value={categoria.id}>
-                    {categoria.nome}
-                  </SelectItem>
-                ))}
+                {categorias
+                  .filter((categoria) => categoria.id && categoria.id.trim() !== '')
+                  .map((categoria) => (
+                    <SelectItem key={categoria.id} value={categoria.id}>
+                      {categoria.nome}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
           </div>

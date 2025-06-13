@@ -176,11 +176,14 @@ const DoacoesFisicasAdmin: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as categorias</SelectItem>
-                {categorias.map((categoria) => (
-                  <SelectItem key={categoria.id} value={categoria.id}>
-                    {categoria.nome}
-                  </SelectItem>
-                ))}
+                {categorias
+                  .filter((categoria) => categoria.id && categoria.id.trim() !== '')
+                  .map((categoria) => (
+                    <SelectItem key={categoria.id} value={categoria.id}>
+                      {categoria.nome}
+                    </SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
           </div>
