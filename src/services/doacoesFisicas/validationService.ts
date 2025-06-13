@@ -1,5 +1,5 @@
 
-import { validateData, doacaoFisicaSchema } from '@/lib/validation';
+import { validateData, doacaoFisicaSchema, enderecoSchema } from '@/lib/validation';
 
 export const validationService = {
   // Validar dados básicos da doação
@@ -57,5 +57,19 @@ export const validationService = {
     }
 
     console.log('Validation: Tipo de entrega válido');
+  },
+
+  // Validar endereço completo usando schema
+  validateEndereco(endereco: any): void {
+    console.log('Validation: Validando endereço completo:', endereco);
+    
+    const validation = validateData(enderecoSchema, endereco);
+    if (!validation.success) {
+      console.error('Validation: Erro de validação de endereço:', validation);
+      const errorMessage = 'error' in validation ? validation.error : 'Endereço inválido';
+      throw new Error(`Endereço inválido: ${errorMessage}`);
+    }
+
+    console.log('Validation: Endereço válido');
   }
 };
