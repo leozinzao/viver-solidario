@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import AdminKPICards from '@/components/admin/AdminKPICards';
 import DashboardKPICards from '@/components/admin/DashboardKPICards';
 import AdminSearchAndFilters from '@/components/admin/AdminSearchAndFilters';
-import AdminNotifications from '@/components/admin/AdminNotifications';
+import AdminNotifications from '@/components/admin/notifications/AdminNotifications';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
   ShieldAlert, 
