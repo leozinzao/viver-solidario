@@ -1,4 +1,4 @@
-import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar, Handshake, GraduationCap, Settings as LucideSettings, Shield as LucideShield, Lock as LucideLock, Save as LucideSave, X as LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database, Users, BarChart3, Package, MessageSquare } from "lucide-react";
+import { LucideProps, Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, Calendar as LucideCalendar, Handshake, GraduationCap, Settings as LucideSettings, Shield as LucideShield, Lock as LucideLock, Save as LucideSave, X as LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database, Users } from "lucide-react";
 
 // Custom icon for volunteer activism
 export const VolunteerActivism = (props: LucideProps) => (
@@ -253,4 +253,4 @@ export const X = (props: LucideProps) => (
   </svg>
 );
 
-export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap, LucideSave, LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database, Users, BarChart3, Package, MessageSquare };
+export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap, LucideSave, LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database, Users };
