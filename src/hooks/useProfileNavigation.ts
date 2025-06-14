@@ -16,7 +16,7 @@ export const useProfileNavigation = () => {
   
   const goToAdmin = () => {
     if (isAuthenticated) {
-      navigateToScreen('admin');
+      navigateToScreen('admin-dashboard');
     } else {
       navigateToScreen('login');
     }

@@ -54,7 +54,7 @@ const ProfileOptions: React.FC<ProfileOptionsProps> = ({
           icon={<Shield className="w-5 h-5" />}
           title="Painel Administrativo"
           description="Acesso às funções administrativas"
-          onClick={() => navigateToScreen('admin')}
+          onClick={() => navigateToScreen('admin-dashboard')}
           highlight
         />
       )}
