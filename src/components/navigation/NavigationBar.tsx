@@ -67,7 +67,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
           <>
             <User className="h-6 w-6 mb-1" />
             <span>Login</span>
-          </}>
+          </>
         )}
       </button>
     </div>
