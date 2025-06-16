@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Home, Calendar, Heart, Handshake, User, Settings } from "@/components/icons";
+import { Home, Calendar, Heart, Handshake, User, BarChart3 } from "@/components/icons";
 import { useAuth } from "@/context/AuthContext";
 
 interface NavigationBarProps {
@@ -38,6 +38,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
       </button>
 
       <button
+        className={`nav-item ${currentScreen === "impact" ? "text-viver-yellow" : "text-muted-foreground"}`}
+        onClick={() => onNavigate("impact")}
+      >
+        <BarChart3 className="h-6 w-6 mb-1" />
+        <span>Impacto</span>
+      </button>
+
+      <button
         className={`nav-item ${currentScreen === "volunteer" ? "text-viver-yellow" : "text-muted-foreground"}`}
         onClick={() => onNavigate("volunteer")}
       >
@@ -59,7 +67,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ currentScreen, onNavigate
           <>
             <User className="h-6 w-6 mb-1" />
             <span>Login</span>
-          </>
+          </}>
         )}
       </button>
     </div>

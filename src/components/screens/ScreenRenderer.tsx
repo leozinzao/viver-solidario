@@ -15,6 +15,7 @@ import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
 import AdminScreen from "@/screens/AdminScreen";
 import HistoricoAcoesScreen from "@/screens/HistoricoAcoesScreen";
 import ConfiguracoesScreen from "@/screens/ConfiguracoesScreen";
+import ImpactoScreen from "@/screens/ImpactoScreen";
 
 type ScreenType =
   | "welcome"
@@ -121,10 +122,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       return <ConfiguracoesScreen />;
 
     case "impact":
-      if (!isAuthenticated) {
-        return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
-      }
-      return <PlaceholderScreen title="Impacto" />;
+      return <ImpactoScreen />;
 
     case "admin":
       if (!isAuthenticated) {
