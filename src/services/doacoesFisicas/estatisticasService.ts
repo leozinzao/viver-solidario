@@ -23,11 +23,12 @@ export const estatisticasService = {
         throw new Error(`Erro ao carregar estatísticas: ${error.message}`);
       }
 
-      // Contar por status
+      // Contar por status usando os novos valores
       const contadores: ContadoresDoacoes = {
         total: data?.length || 0,
-        disponivel: data?.filter(d => d.status === 'disponivel').length || 0,
-        reservada: data?.filter(d => d.status === 'reservada').length || 0,
+        cadastrada: data?.filter(d => d.status === 'cadastrada').length || 0,
+        aceita: data?.filter(d => d.status === 'aceita').length || 0,
+        recebida: data?.filter(d => d.status === 'recebida').length || 0,
         entregue: data?.filter(d => d.status === 'entregue').length || 0,
         cancelada: data?.filter(d => d.status === 'cancelada').length || 0,
       };

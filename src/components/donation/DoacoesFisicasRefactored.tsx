@@ -125,8 +125,9 @@ const DoacoesFisicasRefactored: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos os status</SelectItem>
-                    <SelectItem value="disponivel">Disponível</SelectItem>
-                    <SelectItem value="reservada">Reservada</SelectItem>
+                    <SelectItem value="cadastrada">Cadastrada</SelectItem>
+                    <SelectItem value="aceita">Aceita</SelectItem>
+                    <SelectItem value="recebida">Recebida</SelectItem>
                     <SelectItem value="entregue">Entregue</SelectItem>
                     <SelectItem value="cancelada">Cancelada</SelectItem>
                   </SelectContent>
