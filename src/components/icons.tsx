@@ -246,4 +246,5 @@ export const X = (props: LucideProps) => (
   </svg>
 );
 
+// Export all icons including BarChart3
 export { Home, Heart, User, Plus, UserPlus, LogOut, Edit, History, Moon, LucideCalendar, Handshake, GraduationCap, LucideSave, LucideX, ArrowLeft, Clock, Filter, Search, Bell, Globe, Palette, Database, Users, BarChart3 };
