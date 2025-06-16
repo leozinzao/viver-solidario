@@ -20,23 +20,27 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider delayDuration={300}>
-        <Routes>
-          <Route path="/" element={<ViverSolidarioApp />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/politica" element={<PrivacyPolicy />} />
-          <Route path="/termos" element={<TermsOfService />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-        <Sonner />
-      </TooltipProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log('App component rendering...');
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Routes>
+            <Route path="/" element={<ViverSolidarioApp />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/politica" element={<PrivacyPolicy />} />
+            <Route path="/termos" element={<TermsOfService />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
