@@ -26,7 +26,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <TooltipProvider>
+        <div className="app-container">
           <Routes>
             <Route path="/" element={<ViverSolidarioApp />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -35,9 +35,11 @@ const App = () => {
             <Route path="/termos" element={<TermsOfService />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </div>
       </BrowserRouter>
     </QueryClientProvider>
   );
