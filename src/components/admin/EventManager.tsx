@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useEvents, useDeleteEvent } from '@/hooks/useEventCrud';
+import { useEventos } from '@/hooks/useEventos';
 import { CalendarDays, Plus, Edit, Trash2, ExternalLink, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,11 +12,13 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const EventManager: React.FC = () => {
-  const { data: eventos, isLoading, error, refetch } = useEvents();
-  const deleteEventMutation = useDeleteEvent();
+  const { eventosQuery, excluirEvento, carregandoExcluir } = useEventos();
+  const { data: eventosData, isLoading, error, refetch } = eventosQuery;
   
   const [showEventForm, setShowEventForm] = useState(false);
   const [deletingEvent, setDeletingEvent] = useState<any>(null);
+
+  const eventos = eventosData?.eventos || [];
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null;
@@ -30,18 +32,10 @@ const EventManager: React.FC = () => {
   const handleDeleteEvent = async () => {
     if (deletingEvent) {
       try {
-        await deleteEventMutation.mutateAsync(deletingEvent.id);
-        toast({
-          title: "Sucesso",
-          description: "Evento excluído com sucesso!"
-        });
+        await excluirEvento(deletingEvent.id);
         setDeletingEvent(null);
       } catch (error) {
-        toast({
-          title: "Erro",
-          description: "Erro ao excluir evento. Tente novamente.",
-          variant: "destructive"
-        });
+        console.error('Erro ao excluir evento:', error);
       }
     }
   };
@@ -189,9 +183,9 @@ const EventManager: React.FC = () => {
             <Button 
               variant="destructive" 
               onClick={handleDeleteEvent}
-              disabled={deleteEventMutation.isPending}
+              disabled={carregandoExcluir}
             >
-              {deleteEventMutation.isPending ? 'Excluindo...' : 'Excluir'}
+              {carregandoExcluir ? 'Excluindo...' : 'Excluir'}
             </Button>
           </DialogFooter>
         </DialogContent>

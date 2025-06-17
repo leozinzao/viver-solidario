@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { useAddEvent } from '@/hooks/useEventCrud';
+import { useEventos } from '@/hooks/useEventos';
 import { CalendarDays, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -23,7 +23,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onOpenChange }) => {
     data_fim: ''
   });
 
-  const addEventMutation = useAddEvent();
+  const { criarEvento, carregandoCriar } = useEventos();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,17 +38,12 @@ const EventForm: React.FC<EventFormProps> = ({ open, onOpenChange }) => {
     }
 
     try {
-      await addEventMutation.mutateAsync({
+      await criarEvento({
         titulo: formData.titulo,
         resumo: formData.resumo || null,
         link: formData.link || null,
         data_inicio: formData.data_inicio || null,
         data_fim: formData.data_fim || null
-      });
-
-      toast({
-        title: "Sucesso",
-        description: "Evento criado com sucesso!"
       });
 
       // Reset form
@@ -62,11 +57,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onOpenChange }) => {
 
       onOpenChange(false);
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao criar evento. Tente novamente.",
-        variant: "destructive"
-      });
+      console.error('Erro ao criar evento:', error);
     }
   };
 
@@ -155,10 +146,10 @@ const EventForm: React.FC<EventFormProps> = ({ open, onOpenChange }) => {
             <Button 
               type="submit" 
               className="bg-viver-yellow hover:bg-viver-yellow/90 text-black"
-              disabled={addEventMutation.isPending}
+              disabled={carregandoCriar}
             >
               <CalendarDays className="h-4 w-4 mr-2" />
-              {addEventMutation.isPending ? 'Criando...' : 'Criar Evento'}
+              {carregandoCriar ? 'Criando...' : 'Criar Evento'}
             </Button>
           </DialogFooter>
         </form>
