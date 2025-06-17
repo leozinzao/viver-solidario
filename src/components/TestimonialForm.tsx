@@ -13,29 +13,24 @@ interface TestimonialFormProps {
 
 const TestimonialForm: React.FC<TestimonialFormProps> = ({ onSuccess }) => {
   const { user } = useAuth();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [role, setRole] = useState(user?.role === 'volunteer' ? 'Voluntário' : '');
+  const [nome, setNome] = useState(user?.name || '');
+  const [depoimento, setDepoimento] = useState('');
   
   const createTestimonial = useCreateTestimonial();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!title || !content) return;
+    if (!nome || !depoimento) return;
     
     await createTestimonial.mutateAsync({
-      titulo: title,
-      conteudo: content,
-      autor_nome: user?.name || 'Usuário anônimo',
-      autor_cargo: role,
-      publicado: false // Por padrão, depoimentos precisam de aprovação
+      nome,
+      depoimento
     });
     
     // Limpa o formulário
-    setTitle('');
-    setContent('');
-    setRole(user?.role === 'volunteer' ? 'Voluntário' : '');
+    setNome(user?.name || '');
+    setDepoimento('');
     
     if (onSuccess) {
       onSuccess();
@@ -53,35 +48,25 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onSuccess }) => {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium">Título</label>
+            <label htmlFor="nome" className="text-sm font-medium">Nome</label>
             <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Um título para seu depoimento"
+              id="nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Seu nome"
               required
             />
           </div>
           
           <div className="space-y-2">
-            <label htmlFor="content" className="text-sm font-medium">Seu depoimento</label>
+            <label htmlFor="depoimento" className="text-sm font-medium">Seu depoimento</label>
             <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              id="depoimento"
+              value={depoimento}
+              onChange={(e) => setDepoimento(e.target.value)}
               placeholder="Escreva aqui sua experiência com a ONG Viver..."
               rows={5}
               required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="role" className="text-sm font-medium">Sua relação com a ONG</label>
-            <Input
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              placeholder="Ex: Voluntário, Beneficiado, Doador..."
             />
           </div>
           

@@ -22,24 +22,18 @@ const TestimonialEdit: React.FC<TestimonialEditProps> = ({
   open,
   onOpenChange
 }) => {
-  const [title, setTitle] = useState(testimonial.titulo);
-  const [content, setContent] = useState(testimonial.conteudo);
-  const [author, setAuthor] = useState(testimonial.autor_nome);
-  const [role, setRole] = useState(testimonial.autor_cargo || '');
-  const [published, setPublished] = useState(testimonial.publicado);
+  const [nome, setNome] = useState(testimonial.nome);
+  const [depoimento, setDepoimento] = useState(testimonial.depoimento);
+  const [aprovado, setAprovado] = useState(testimonial.aprovado);
 
   const updateTestimonial = useUpdateTestimonial();
   
   const handleSave = async () => {
     await updateTestimonial.mutateAsync({
       id: testimonial.id,
-      testimonial: {
-        titulo: title,
-        conteudo: content,
-        autor_nome: author,
-        autor_cargo: role,
-        publicado: published
-      }
+      nome,
+      depoimento,
+      aprovado
     });
     
     onOpenChange(false);
@@ -56,48 +50,30 @@ const TestimonialEdit: React.FC<TestimonialEditProps> = ({
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-title">Título</Label>
+            <Label htmlFor="edit-nome">Nome</Label>
             <Input
-              id="edit-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              id="edit-nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="edit-content">Conteúdo</Label>
+            <Label htmlFor="edit-depoimento">Depoimento</Label>
             <Textarea
-              id="edit-content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              id="edit-depoimento"
+              value={depoimento}
+              onChange={(e) => setDepoimento(e.target.value)}
               rows={5}
             />
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="edit-author">Autor</Label>
-            <Input
-              id="edit-author"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="edit-role">Função/Cargo</Label>
-            <Input
-              id="edit-role"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            />
-          </div>
-          
           <div className="flex items-center justify-between">
-            <Label htmlFor="edit-published">Publicado</Label>
+            <Label htmlFor="edit-aprovado">Aprovado</Label>
             <Switch
-              id="edit-published"
-              checked={published}
-              onCheckedChange={setPublished}
+              id="edit-aprovado"
+              checked={aprovado}
+              onCheckedChange={setAprovado}
             />
           </div>
         </div>
