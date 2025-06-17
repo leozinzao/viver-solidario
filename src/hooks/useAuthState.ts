@@ -21,8 +21,6 @@ export const useAuthState = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const createSimpleUserProfile = (authUser: User): UserInfo => {
-    console.log('Criando perfil simples para:', authUser.email);
-    
     return {
       id: authUser.id,
       name: authUser.user_metadata?.full_name || 
@@ -49,34 +47,26 @@ export const useAuthState = () => {
           onConflict: 'id',
           ignoreDuplicates: false 
         });
-      console.log('Perfil salvo no banco com sucesso');
     } catch (error) {
-      console.warn('Erro ao salvar perfil no banco (não crítico):', error);
+      // Silencioso - não bloqueia a UI
     }
   };
 
   useEffect(() => {
-    console.log('AuthState: Inicializando sistema simplificado...');
-    
     let mounted = true;
 
     // Timeout de segurança para evitar loading infinito
     const safetyTimeout = setTimeout(() => {
       if (mounted) {
-        console.warn('AuthState: Timeout de segurança - forçando fim do loading');
         setLoading(false);
       }
-    }, 5000); // Reduzido para 5 segundos
+    }, 3000);
 
     const handleAuthStateChange = (event: string, session: Session | null) => {
       if (!mounted) return;
       
-      console.log('AuthState: Mudança de estado:', event, session?.user?.email || 'sem usuário');
-      
       try {
         if (session?.user) {
-          console.log('AuthState: Processando usuário autenticado...');
-          
           // Criar perfil simples imediatamente
           const userProfile = createSimpleUserProfile(session.user);
           
@@ -85,13 +75,11 @@ export const useAuthState = () => {
             setIsAuthenticated(true);
             setLoading(false);
             clearTimeout(safetyTimeout);
-            console.log('AuthState: Usuário configurado imediatamente:', userProfile.email);
             
             // Salvar no banco de forma assíncrona
             saveUserProfileAsync(userProfile);
           }
         } else {
-          console.log('AuthState: Usuário desconectado');
           if (mounted) {
             setUser(null);
             setIsAuthenticated(false);
@@ -100,8 +88,6 @@ export const useAuthState = () => {
           }
         }
       } catch (error) {
-        console.error('AuthState: Erro no processamento:', error);
-        
         // Em caso de erro, ainda assim configurar usuário básico se existir sessão
         if (session?.user && mounted) {
           const fallbackUser: UserInfo = {
@@ -115,7 +101,6 @@ export const useAuthState = () => {
           setIsAuthenticated(true);
           setLoading(false);
           clearTimeout(safetyTimeout);
-          console.log('AuthState: Usuário configurado via fallback');
         }
       }
     };
@@ -123,11 +108,9 @@ export const useAuthState = () => {
     // Verificar sessão inicial
     const checkInitialSession = async () => {
       try {
-        console.log('AuthState: Verificando sessão inicial...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('AuthState: Erro ao verificar sessão:', error);
           if (mounted) {
             setLoading(false);
             clearTimeout(safetyTimeout);
@@ -135,11 +118,9 @@ export const useAuthState = () => {
           return;
         }
         
-        console.log('AuthState: Sessão inicial encontrada:', !!session);
         handleAuthStateChange('INITIAL_SESSION', session);
         
       } catch (error) {
-        console.error('AuthState: Erro crítico na verificação inicial:', error);
         if (mounted) {
           setLoading(false);
           clearTimeout(safetyTimeout);
@@ -157,7 +138,6 @@ export const useAuthState = () => {
       mounted = false;
       clearTimeout(safetyTimeout);
       subscription.unsubscribe();
-      console.log('AuthState: Cleanup realizado');
     };
   }, []);
 

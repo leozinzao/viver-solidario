@@ -10,35 +10,32 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/components/ui/use-toast';
 import { UserRole } from '@/lib/permissions';
-import { Search, Shield, Users, UserCheck } from 'lucide-react';
+import { Search, Users, UserCheck } from 'lucide-react';
 
 const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
 
-  // Buscar todos os usuários
+  // Buscar usuários da tabela voluntarios
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      console.log('Buscando usuários...');
       const { data, error } = await supabase
         .from('voluntarios')
         .select('*')
         .order('nome');
 
       if (error) {
-        console.error('Erro ao buscar usuários:', error);
         throw error;
       }
       return data;
     },
+    retry: 1
   });
 
   // Atualizar role do usuário
   const updateUserRole = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: UserRole }) => {
-      console.log('Atualizando role do usuário:', { userId, newRole });
-      
       const { data, error } = await supabase
         .from('voluntarios')
         .update({ role: newRole })
@@ -47,7 +44,6 @@ const UserManagement: React.FC = () => {
         .single();
 
       if (error) {
-        console.error('Erro ao atualizar role:', error);
         throw error;
       }
       
@@ -61,7 +57,6 @@ const UserManagement: React.FC = () => {
       });
     },
     onError: (error: Error) => {
-      console.error('Erro na mutação de role:', error);
       toast({
         title: "Erro",
         description: `Não foi possível atualizar o role: ${error.message}`,

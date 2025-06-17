@@ -15,7 +15,6 @@ import { Eye, Edit, Trash2, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import TestimonialEdit from './TestimonialEdit';
-import { Pagination } from '@/components/ui/pagination';
 
 const TestimonialManager: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -72,8 +71,8 @@ const TestimonialManager: React.FC = () => {
         <TableCaption>Lista de depoimentos enviados à ONG</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Autor</TableHead>
+            <TableHead>Nome</TableHead>
+            <TableHead>Depoimento</TableHead>
             <TableHead>Data</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
@@ -89,12 +88,12 @@ const TestimonialManager: React.FC = () => {
           )}
           {testimonials.map((testimonial: any) => (
             <TableRow key={testimonial.id}>
-              <TableCell className="font-medium">{testimonial.titulo}</TableCell>
-              <TableCell>{testimonial.autor_nome}</TableCell>
-              <TableCell>{formatDate(testimonial.criado_em)}</TableCell>
+              <TableCell className="font-medium">{testimonial.nome}</TableCell>
+              <TableCell className="max-w-xs truncate">{testimonial.depoimento}</TableCell>
+              <TableCell>{formatDate(testimonial.created_at)}</TableCell>
               <TableCell>
-                {testimonial.publicado ? (
-                  <Badge className="bg-green-500">Publicado</Badge>
+                {testimonial.aprovado ? (
+                  <Badge className="bg-green-500">Aprovado</Badge>
                 ) : (
                   <Badge variant="outline">Pendente</Badge>
                 )}
@@ -115,7 +114,7 @@ const TestimonialManager: React.FC = () => {
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  {testimonial.publicado ? (
+                  {testimonial.aprovado ? (
                     <Button 
                       variant="outline" 
                       size="icon"
@@ -150,35 +149,22 @@ const TestimonialManager: React.FC = () => {
         </TableBody>
       </Table>
       
-      {pagination && pagination.pages > 1 && (
-        <Pagination
-          className="justify-center"
-          page={page}
-          totalPages={pagination.pages}
-          onPageChange={setPage}
-        />
-      )}
-      
       {/* View Dialog */}
       <Dialog open={!!viewingTestimonial} onOpenChange={(open) => !open && setViewingTestimonial(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{viewingTestimonial?.titulo}</DialogTitle>
-            <DialogDescription>
-              Por {viewingTestimonial?.autor_nome}
-              {viewingTestimonial?.autor_cargo && ` - ${viewingTestimonial.autor_cargo}`}
-            </DialogDescription>
+            <DialogTitle>Depoimento de {viewingTestimonial?.nome}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="whitespace-pre-wrap">{viewingTestimonial?.conteudo}</p>
+            <p className="whitespace-pre-wrap">{viewingTestimonial?.depoimento}</p>
           </div>
           <DialogFooter>
             <div className="flex w-full justify-between">
               <span className="text-xs text-muted-foreground">
-                Enviado em {viewingTestimonial && formatDate(viewingTestimonial.criado_em)}
+                Enviado em {viewingTestimonial && formatDate(viewingTestimonial.created_at)}
               </span>
-              <Badge className={viewingTestimonial?.publicado ? 'bg-green-500' : 'bg-muted'}>
-                {viewingTestimonial?.publicado ? 'Publicado' : 'Não publicado'}
+              <Badge className={viewingTestimonial?.aprovado ? 'bg-green-500' : 'bg-muted'}>
+                {viewingTestimonial?.aprovado ? 'Aprovado' : 'Pendente'}
               </Badge>
             </div>
           </DialogFooter>
@@ -200,7 +186,7 @@ const TestimonialManager: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Confirmar exclusão</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir o depoimento "{deletingTestimonial?.titulo}"?
+              Tem certeza que deseja excluir o depoimento de "{deletingTestimonial?.nome}"?
               Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>

@@ -1,197 +1,175 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 
 interface Testimonial {
   id: string;
-  titulo: string;
-  conteudo: string;
-  autor_nome: string;
-  autor_cargo?: string;
-  publicado: boolean;
-  criado_em: string;
-  atualizado_em?: string;
+  nome: string;
+  depoimento: string;
+  aprovado: boolean;
+  created_at: string;
 }
 
-interface TestimonialInput {
-  titulo: string;
-  conteudo: string;
-  autor_nome: string;
-  autor_cargo?: string;
-  publicado?: boolean;
-}
+type CreateTestimonialData = {
+  nome: string;
+  depoimento: string;
+};
 
-export function useTestimonials(page = 1, pageSize = 10) {
+type UpdateTestimonialData = {
+  id: string;
+  nome?: string;
+  depoimento?: string;
+  aprovado?: boolean;
+};
+
+export const useTestimonials = (page: number = 1, pageSize: number = 10) => {
   return useQuery({
     queryKey: ['testimonials', page, pageSize],
     queryFn: async () => {
-      try {
-        const result = await api(`/api/testimonials?page=${page}&pageSize=${pageSize}`);
-        return result;
-      } catch (error) {
-        console.error('Error fetching testimonials:', error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível carregar os depoimentos.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
-    }
-  });
-}
+      const { data, error, count } = await supabase
+        .from('testimonials')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range((page - 1) * pageSize, page * pageSize - 1);
 
-export function useTestimonial(id: string | undefined) {
-  return useQuery({
-    queryKey: ['testimonial', id],
-    queryFn: async () => {
-      if (!id) return null;
-      try {
-        return await api(`/api/testimonials/${id}`);
-      } catch (error) {
-        console.error(`Error fetching testimonial ${id}:`, error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível carregar o depoimento.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
+      if (error) throw error;
+
+      return {
+        testimonials: data as Testimonial[],
+        pagination: {
+          total: count || 0,
+          page,
+          pageSize,
+          pages: count ? Math.ceil(count / pageSize) : 0
+        }
+      };
     },
-    enabled: !!id
+    retry: 1
   });
-}
+};
 
-export function useCreateTestimonial() {
+export const useCreateTestimonial = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (testimonial: TestimonialInput) => {
-      try {
-        const result = await api('/api/testimonials', {
-          method: 'POST',
-          body: JSON.stringify(testimonial)
-        });
-        
-        toast({
-          title: 'Depoimento enviado',
-          description: 'Seu depoimento foi enviado com sucesso e será analisado pela equipe.',
-        });
-        
-        return result;
-      } catch (error) {
-        console.error('Error creating testimonial:', error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível enviar o depoimento.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
+    mutationFn: async (data: CreateTestimonialData) => {
+      const { data: result, error } = await supabase
+        .from('testimonials')
+        .insert([data])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      toast({
+        title: "Depoimento enviado",
+        description: "Seu depoimento foi enviado para análise!"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao enviar depoimento",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
-}
+};
 
-export function useUpdateTestimonial() {
+export const useUpdateTestimonial = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, testimonial }: { id: string, testimonial: Partial<TestimonialInput> }) => {
-      try {
-        const result = await api(`/api/testimonials/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify(testimonial)
-        });
-        
-        toast({
-          title: 'Depoimento atualizado',
-          description: 'O depoimento foi atualizado com sucesso.',
-        });
-        
-        return result;
-      } catch (error) {
-        console.error(`Error updating testimonial ${id}:`, error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível atualizar o depoimento.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
+    mutationFn: async ({ id, ...data }: UpdateTestimonialData) => {
+      const { data: result, error } = await supabase
+        .from('testimonials')
+        .update(data)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['testimonial', variables.id] });
+      toast({
+        title: "Depoimento atualizado",
+        description: "O depoimento foi atualizado com sucesso!"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao atualizar depoimento",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
-}
+};
 
-export function useDeleteTestimonial() {
+export const useDeleteTestimonial = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async (id: string) => {
-      try {
-        await api(`/api/testimonials/${id}`, {
-          method: 'DELETE'
-        });
-        
-        toast({
-          title: 'Depoimento excluído',
-          description: 'O depoimento foi excluído com sucesso.',
-        });
-      } catch (error) {
-        console.error(`Error deleting testimonial ${id}:`, error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível excluir o depoimento.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
+      const { error } = await supabase
+        .from('testimonials')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
+      toast({
+        title: "Depoimento excluído",
+        description: "O depoimento foi excluído com sucesso!"
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao excluir depoimento",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
-}
+};
 
-export function useToggleTestimonialPublish() {
+export const useToggleTestimonialPublish = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, publicado }: { id: string, publicado: boolean }) => {
-      try {
-        const result = await api(`/api/testimonials/${id}/publish`, {
-          method: 'PATCH',
-          body: JSON.stringify({ publicado })
-        });
-        
-        toast({
-          title: publicado ? 'Depoimento publicado' : 'Depoimento despublicado',
-          description: publicado ? 
-            'O depoimento agora está visível para todos.' : 
-            'O depoimento não está mais visível para os usuários.',
-        });
-        
-        return result;
-      } catch (error) {
-        console.error(`Error toggling testimonial ${id} publish status:`, error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível alterar o status de publicação do depoimento.',
-          variant: 'destructive',
-        });
-        throw error;
-      }
+    mutationFn: async ({ id, publicado }: { id: string; publicado: boolean }) => {
+      const { data: result, error } = await supabase
+        .from('testimonials')
+        .update({ aprovado: publicado })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['testimonials'] });
-      queryClient.invalidateQueries({ queryKey: ['testimonial', variables.id] });
+      toast({
+        title: data.aprovado ? "Depoimento aprovado" : "Depoimento despublicado",
+        description: `O depoimento foi ${data.aprovado ? 'aprovado' : 'despublicado'} com sucesso!`
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
-}
+};

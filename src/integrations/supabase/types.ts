@@ -318,6 +318,30 @@ export type Database = {
           },
         ]
       }
+      testimonials: {
+        Row: {
+          aprovado: boolean | null
+          created_at: string | null
+          depoimento: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          aprovado?: boolean | null
+          created_at?: string | null
+          depoimento: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          aprovado?: boolean | null
+          created_at?: string | null
+          depoimento?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       voluntarios: {
         Row: {
           ativo: boolean | null
