@@ -1,0 +1,115 @@
+
+// DER - Sistema Viver Solidário
+// Para usar em dbdiagram.io
+
+Table voluntarios {
+  id uuid [pk, default: `gen_random_uuid()`]
+  nome text
+  email text
+  telefone text
+  role text [default: 'donor']
+  ativo boolean [default: true]
+  senha_hash text
+  nascimento date
+  theme text [default: 'light']
+  created_at timestamp [default: `now()`]
+}
+
+Table doadores {
+  id uuid [pk, default: `gen_random_uuid()`]
+  nome text [not null]
+  email text
+  telefone text
+  documento text
+  endereco text
+  created_at timestamp [default: `now()`]
+}
+
+Table categorias_doacoes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  nome text [not null]
+  descricao text
+  cor text
+  icone text
+  created_at timestamp [default: `now()`]
+}
+
+Table doacoes_fisicas_novas {
+  id uuid [pk, default: `gen_random_uuid()`]
+  doador_id uuid [ref: > doadores.id]
+  beneficiario_id uuid [ref: > doadores.id]
+  categoria_id uuid [ref: > categorias_doacoes.id]
+  titulo text [not null]
+  descricao text
+  quantidade numeric [not null, default: 1]
+  unidade text [default: 'unidade']
+  status text [default: 'disponivel']
+  tipo_entrega text [default: 'retirada']
+  endereco_coleta text
+  endereco_entrega text
+  localizacao text
+  observacoes text
+  observacoes_entrega text
+  data_disponivel timestamp [default: `now()`]
+  data_reserva timestamp
+  data_entrega timestamp
+  avaliacao_doador integer
+  avaliacao_beneficiario integer
+  comentario_avaliacao text
+  fotos text[]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table eventos {
+  id uuid [pk, default: `gen_random_uuid()`]
+  titulo text [not null]
+  resumo text
+  link text
+  data_inicio date
+  data_fim date
+  created_at timestamp [default: `now()`]
+}
+
+Table mensagens_doacoes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  remetente_id uuid [ref: > voluntarios.id]
+  destinatario_id uuid [ref: > voluntarios.id]
+  doacao_id uuid [ref: > doacoes_fisicas_novas.id]
+  mensagem text [not null]
+  lida boolean [default: false]
+  created_at timestamp [default: `now()`]
+}
+
+Table notificacoes_doacoes {
+  id uuid [pk, default: `gen_random_uuid()`]
+  usuario_id uuid [ref: > voluntarios.id]
+  doacao_id uuid [ref: > doacoes_fisicas_novas.id]
+  tipo text [not null]
+  titulo text [not null]
+  mensagem text [not null]
+  lida boolean [default: false]
+  created_at timestamp [default: `now()`]
+}
+
+Table admin_actions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  admin_id uuid [ref: > voluntarios.id]
+  action_type text [not null]
+  target_type text [not null]
+  target_id uuid
+  description text
+  metadata jsonb
+  created_at timestamp [default: `now()`]
+}
+
+// Relacionamentos principais
+// doacoes_fisicas_novas.doador_id > doadores.id
+// doacoes_fisicas_novas.beneficiario_id > doadores.id
+// doacoes_fisicas_novas.categoria_id > categorias_doacoes.id
+// mensagens_doacoes.remetente_id > voluntarios.id
+// mensagens_doacoes.destinatario_id > voluntarios.id
+// mensagens_doacoes.doacao_id > doacoes_fisicas_novas.id
+// notificacoes_doacoes.usuario_id > voluntarios.id
+// notificacoes_doacoes.doacao_id > doacoes_fisicas_novas.id
+// admin_actions.admin_id > voluntarios.id
