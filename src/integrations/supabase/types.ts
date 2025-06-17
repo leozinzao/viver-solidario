@@ -769,10 +769,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_estatisticas_impacto: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
       has_admin_access: {
         Args: { user_id: string }
         Returns: boolean

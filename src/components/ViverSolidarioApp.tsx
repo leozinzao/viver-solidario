@@ -9,6 +9,7 @@ import PermissionDialog from "@/components/permissions/PermissionDialog";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import OfflineIndicator from "@/components/pwa/OfflineIndicator";
 import { usePWA } from "@/hooks/usePWA";
+import { hasPermission, Permission } from "@/lib/permissions";
 
 const AppContent: React.FC = () => {
   const { 
@@ -23,7 +24,7 @@ const AppContent: React.FC = () => {
     setShowPermissionDenied 
   } = useNavigation();
   
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { isInstallable, isInstalled } = usePWA();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   
@@ -31,11 +32,19 @@ const AppContent: React.FC = () => {
   
   // Efeito para redirecionar usuário autenticado automaticamente
   useEffect(() => {
-    if (isAuthenticated && (currentScreen === 'welcome' || currentScreen === 'login' || currentScreen === 'signup')) {
-      console.log('ViverSolidarioApp: Usuário autenticado detectado, redirecionando para home');
-      navigateToScreen('home');
+    if (isAuthenticated && user && (currentScreen === 'welcome' || currentScreen === 'login' || currentScreen === 'signup')) {
+      console.log('ViverSolidarioApp: Usuário autenticado detectado');
+      
+      // Se o usuário tem permissões administrativas, redirecionar para admin dashboard
+      if (hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
+        console.log('ViverSolidarioApp: Redirecionando admin para dashboard administrativo');
+        navigateToScreen('admin-dashboard');
+      } else {
+        console.log('ViverSolidarioApp: Redirecionando usuário para home');
+        navigateToScreen('home');
+      }
     }
-  }, [isAuthenticated, currentScreen, navigateToScreen]);
+  }, [isAuthenticated, user, currentScreen, navigateToScreen]);
 
   // Mostrar prompt de instalação após um tempo
   useEffect(() => {
@@ -53,6 +62,9 @@ const AppContent: React.FC = () => {
   
   // Telas de autenticação que não mostram navegação
   const authScreens = ["welcome", "login", "signup"];
+  
+  // Telas administrativas
+  const adminScreens = ["admin-dashboard", "admin-doacoes", "admin-usuarios", "admin-depoimentos", "admin-configuracoes"];
   
   // Determinar se deve mostrar navegação
   const shouldShowNavigation = 

@@ -15,7 +15,15 @@ import DoacoesFisicasScreen from "@/screens/DoacoesFisicasScreen";
 import AdminScreen from "@/screens/AdminScreen";
 import HistoricoAcoesScreen from "@/screens/HistoricoAcoesScreen";
 import ConfiguracoesScreen from "@/screens/ConfiguracoesScreen";
-import ImpactoScreen from "@/screens/ImpactoScreen";
+
+// Import new admin screens
+import AdminDashboardScreen from "@/screens/AdminDashboardScreen";
+import AdminDoacoesScreen from "@/screens/AdminDoacoesScreen";
+import AdminUsuariosScreen from "@/screens/AdminUsuariosScreen";
+import AdminDepoimentosScreen from "@/screens/AdminDepoimentosScreen";
+import AdminConfiguracoesScreen from "@/screens/AdminConfiguracoesScreen";
+
+import { hasPermission, Permission } from "@/lib/permissions";
 
 type ScreenType =
   | "welcome"
@@ -29,6 +37,13 @@ type ScreenType =
   | "events"
   | "impact"
   | "admin"
+  | "admin-dashboard"
+  | "admin-doacoes"
+  | "admin-usuarios"
+  | "admin-depoimentos"
+  | "admin-eventos"
+  | "admin-configuracoes"
+  | "admin-notificacoes"
   | "historico-acoes"
   | "configuracoes";
 
@@ -59,7 +74,7 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
   onBackToWelcome,
   onLoginSuccess,
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   // Render screens based on current screen
   switch (currentScreen) {
@@ -109,6 +124,44 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       }
       return <ProfileScreen />;
 
+    // Admin screens - new dedicated screens
+    case "admin-dashboard":
+      if (!isAuthenticated || !user || !hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
+        return <PlaceholderScreen title="Acesso Restrito - Permissões Administrativas Necessárias" />;
+      }
+      return <AdminDashboardScreen />;
+
+    case "admin-doacoes":
+      if (!isAuthenticated || !user || !hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
+        return <PlaceholderScreen title="Acesso Restrito - Permissões Administrativas Necessárias" />;
+      }
+      return <AdminDoacoesScreen />;
+
+    case "admin-usuarios":
+      if (!isAuthenticated || !user || !hasPermission(user.role, Permission.MANAGE_USERS)) {
+        return <PlaceholderScreen title="Acesso Restrito - Permissões de Gestão de Usuários Necessárias" />;
+      }
+      return <AdminUsuariosScreen />;
+
+    case "admin-depoimentos":
+      if (!isAuthenticated || !user || !hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
+        return <PlaceholderScreen title="Acesso Restrito - Permissões Administrativas Necessárias" />;
+      }
+      return <AdminDepoimentosScreen />;
+
+    case "admin-configuracoes":
+      if (!isAuthenticated || !user || !hasPermission(user.role, Permission.ACCESS_ADMIN_PANEL)) {
+        return <PlaceholderScreen title="Acesso Restrito - Permissões Administrativas Necessárias" />;
+      }
+      return <AdminConfiguracoesScreen />;
+
+    // Legacy admin screen (mantido por compatibilidade)
+    case "admin":
+      if (!isAuthenticated) {
+        return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
+      }
+      return <AdminScreen />;
+
     case "historico-acoes":
       if (!isAuthenticated) {
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
@@ -122,13 +175,10 @@ const ScreenRenderer: React.FC<ScreenRendererProps> = ({
       return <ConfiguracoesScreen />;
 
     case "impact":
-      return <ImpactoScreen />;
-
-    case "admin":
       if (!isAuthenticated) {
         return <PlaceholderScreen title="Acesso Restrito - Faça Login" />;
       }
-      return <AdminScreen />;
+      return <PlaceholderScreen title="Impacto" />;
 
     default:
       return <PlaceholderScreen title="Página não encontrada" />;

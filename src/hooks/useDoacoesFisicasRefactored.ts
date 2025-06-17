@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { doacoesFisicasService, DoacaoFisica, Categoria } from '@/services/doacoesFisicasService';
 import { useToast } from '@/hooks/use-toast';
@@ -25,9 +26,8 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
   });
   const [estatisticas, setEstatisticas] = useState({
     total: 0,
-    cadastrada: 0,
-    aceita: 0,
-    recebida: 0,
+    disponivel: 0,
+    reservada: 0,
     entregue: 0,
     cancelada: 0
   });
@@ -179,8 +179,8 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     }
   }, [user, toast, carregarDoacoes, carregarEstatisticas]);
 
-  // Aceitar doação (novo status)
-  const aceitarDoacao = useCallback(async (doacaoId: string) => {
+  // Reservar doação
+  const reservarDoacao = useCallback(async (doacaoId: string) => {
     if (!user) {
       toast({
         title: "Erro",
@@ -193,27 +193,27 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     setLoading(true);
 
     try {
-      await doacoesFisicasService.atualizarStatus(doacaoId, 'aceita', user.id);
+      await doacoesFisicasService.atualizarStatus(doacaoId, 'reservada', user.id);
       
       toast({
         title: "Sucesso",
-        description: "Doação aceita com sucesso!",
+        description: "Doação reservada com sucesso!",
         variant: "default"
       });
       
       // Atualizar lista local
       setDoacoes(prev => prev.map(doacao => 
         doacao.id === doacaoId 
-          ? { ...doacao, status: 'aceita' as const, beneficiario_id: user.id }
+          ? { ...doacao, status: 'reservada' as const, beneficiario_id: user.id }
           : doacao
       ));
       
       return true;
     } catch (err: any) {
-      console.error('Erro ao aceitar doação:', err);
+      console.error('Erro ao reservar doação:', err);
       toast({
         title: "Erro",
-        description: err?.message || "Erro ao aceitar doação",
+        description: err?.message || "Erro ao reservar doação",
         variant: "destructive"
       });
       return false;
@@ -293,7 +293,7 @@ export const useDoacoesFisicasRefactored = (props?: UseDoacoesFisicasProps) => {
     carregarCategorias,
     carregarEstatisticas,
     criarDoacao,
-    aceitarDoacao,
+    reservarDoacao,
     confirmarEntrega
   };
 };

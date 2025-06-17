@@ -6,9 +6,8 @@ import { useAuth } from '@/context/AuthContext';
 export const useEstatisticasDoacoes = () => {
   const [estatisticas, setEstatisticas] = useState({
     total: 0,
-    cadastrada: 0,
-    aceita: 0,
-    recebida: 0,
+    disponivel: 0,
+    reservada: 0,
     entregue: 0,
     cancelada: 0
   });

@@ -55,13 +55,12 @@ export function useDoacoesFisicasAdmin() {
     },
   });
 
-  // Calcular estatísticas com novos status
+  // Calcular estatísticas
   const stats = {
     total: doacoes.length,
     cadastrada: doacoes.filter(d => d.status === 'cadastrada').length,
     aceita: doacoes.filter(d => d.status === 'aceita').length,
     recebida: doacoes.filter(d => d.status === 'recebida').length,
-    entregue: doacoes.filter(d => d.status === 'entregue').length,
     cancelada: doacoes.filter(d => d.status === 'cancelada').length,
   };
 
@@ -70,20 +69,13 @@ export function useDoacoesFisicasAdmin() {
     mutationFn: async ({ 
       doacaoId, 
       newStatus, 
-      observacoes,
-      dadosImpacto
+      observacoes 
     }: { 
       doacaoId: string; 
       newStatus: string; 
       observacoes?: string;
-      dadosImpacto?: {
-        tipo_beneficiario?: string;
-        pessoas_impactadas?: number;
-        localidade_entrega?: string;
-        observacoes_impacto?: string;
-      };
     }) => {
-      console.log('Atualizando status da doação:', { doacaoId, newStatus, observacoes, dadosImpacto });
+      console.log('Atualizando status da doação:', { doacaoId, newStatus, observacoes });
       
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
@@ -97,16 +89,8 @@ export function useDoacoesFisicasAdmin() {
       if (newStatus === 'aceita') {
         updateData.data_aceita = new Date().toISOString();
         updateData.responsavel_ong_id = user.id;
-      } else if (newStatus === 'entregue') {
+      } else if (newStatus === 'recebida') {
         updateData.data_entrega = new Date().toISOString();
-        
-        // Adicionar dados de impacto se fornecidos
-        if (dadosImpacto) {
-          updateData.tipo_beneficiario = dadosImpacto.tipo_beneficiario;
-          updateData.pessoas_impactadas = dadosImpacto.pessoas_impactadas || 1;
-          updateData.localidade_entrega = dadosImpacto.localidade_entrega;
-          updateData.observacoes_impacto = dadosImpacto.observacoes_impacto;
-        }
       }
 
       // Adicionar observações se fornecidas
@@ -135,7 +119,7 @@ export function useDoacoesFisicasAdmin() {
         'doacao_fisica',
         `Status da doação alterado para: ${newStatus}`,
         doacaoId,
-        { oldStatus: data.status, newStatus, observacoes, dadosImpacto }
+        { oldStatus: data.status, newStatus, observacoes }
       );
       
       return data;
@@ -145,8 +129,7 @@ export function useDoacoesFisicasAdmin() {
       
       const statusLabels = {
         aceita: 'aceita',
-        recebida: 'recebida',  
-        entregue: 'entregue',
+        recebida: 'recebida',
         cancelada: 'cancelada'
       };
       
@@ -211,32 +194,15 @@ export function useDoacoesFisicasAdmin() {
     },
   });
 
-  // Buscar estatísticas de impacto
-  const { data: estatisticasImpacto } = useQuery({
-    queryKey: ['estatisticas-impacto'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc('get_estatisticas_impacto');
-
-      if (error) {
-        console.error('Erro ao buscar estatísticas de impacto:', error);
-        throw error;
-      }
-      
-      return data;
-    },
-  });
-
   return {
     doacoes,
     categorias,
     loading: loading || isLoadingDoacoes,
-    updateStatus: (doacaoId: string, newStatus: string, observacoes?: string, dadosImpacto?: any) =>
-      updateStatus.mutate({ doacaoId, newStatus, observacoes, dadosImpacto }),
+    updateStatus: (doacaoId: string, newStatus: string, observacoes?: string) =>
+      updateStatus.mutate({ doacaoId, newStatus, observacoes }),
     deleteDonation: (doacaoId: string) => deleteDonation.mutate(doacaoId),
     isUpdating: updateStatus.isPending,
     isDeleting: deleteDonation.isPending,
     stats,
-    estatisticasImpacto,
   };
 }

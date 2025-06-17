@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { StrictMode } from "react";
 import ViverSolidarioApp from "./components/ViverSolidarioApp";
 import AuthPage from "./pages/Auth";
 import SignUp from "./pages/SignUp";
@@ -20,13 +21,11 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => {
-  console.log('App component rendering...');
-  
-  return (
+const App = () => (
+  <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <div className="app-container">
+        <TooltipProvider delayDuration={300}>
           <Routes>
             <Route path="/" element={<ViverSolidarioApp />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -35,14 +34,12 @@ const App = () => {
             <Route path="/termos" element={<TermsOfService />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </div>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  );
-};
+  </StrictMode>
+);
 
 export default App;

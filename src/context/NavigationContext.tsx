@@ -12,7 +12,13 @@ type ScreenType =
   | "volunteer"
   | "events"
   | "impact"
-  | "admin"
+  | "admin-dashboard"
+  | "admin-doacoes"
+  | "admin-usuarios"
+  | "admin-depoimentos"
+  | "admin-eventos"
+  | "admin-configuracoes"
+  | "admin-notificacoes"
   | "historico-acoes"
   | "configuracoes";
 
