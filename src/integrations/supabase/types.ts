@@ -42,65 +42,6 @@ export type Database = {
         }
         Relationships: []
       }
-      atividades_voluntarias: {
-        Row: {
-          data: string | null
-          descricao: string | null
-          horas_prev: number | null
-          id: string
-          nome: string | null
-        }
-        Insert: {
-          data?: string | null
-          descricao?: string | null
-          horas_prev?: number | null
-          id?: string
-          nome?: string | null
-        }
-        Update: {
-          data?: string | null
-          descricao?: string | null
-          horas_prev?: number | null
-          id?: string
-          nome?: string | null
-        }
-        Relationships: []
-      }
-      brecho_do_bem: {
-        Row: {
-          data: string | null
-          doador_id: string | null
-          id: string
-          item: string | null
-          status: string | null
-          valor_estimado: number | null
-        }
-        Insert: {
-          data?: string | null
-          doador_id?: string | null
-          id?: string
-          item?: string | null
-          status?: string | null
-          valor_estimado?: number | null
-        }
-        Update: {
-          data?: string | null
-          doador_id?: string | null
-          id?: string
-          item?: string | null
-          status?: string | null
-          valor_estimado?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "brecho_do_bem_doador_id_fkey"
-            columns: ["doador_id"]
-            isOneToOne: false
-            referencedRelation: "doadores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       categorias_doacoes: {
         Row: {
           cor: string | null
@@ -127,160 +68,6 @@ export type Database = {
           nome?: string
         }
         Relationships: []
-      }
-      cofrinhos: {
-        Row: {
-          data_coleta: string | null
-          id: string
-          ponto_id: string | null
-          status: string | null
-          valor: number | null
-        }
-        Insert: {
-          data_coleta?: string | null
-          id?: string
-          ponto_id?: string | null
-          status?: string | null
-          valor?: number | null
-        }
-        Update: {
-          data_coleta?: string | null
-          id?: string
-          ponto_id?: string | null
-          status?: string | null
-          valor?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cofrinhos_ponto_id_fkey"
-            columns: ["ponto_id"]
-            isOneToOne: false
-            referencedRelation: "pontos_de_coleta"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cupons_fiscais: {
-        Row: {
-          data: string | null
-          doador_id: string | null
-          id: string
-          numero: string | null
-          valor: number | null
-        }
-        Insert: {
-          data?: string | null
-          doador_id?: string | null
-          id?: string
-          numero?: string | null
-          valor?: number | null
-        }
-        Update: {
-          data?: string | null
-          doador_id?: string | null
-          id?: string
-          numero?: string | null
-          valor?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cupons_fiscais_doador_id_fkey"
-            columns: ["doador_id"]
-            isOneToOne: false
-            referencedRelation: "doadores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doacoes: {
-        Row: {
-          data: string | null
-          descricao: string | null
-          doador_id: string | null
-          forma_id: number | null
-          id: string
-          valor: number | null
-        }
-        Insert: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          forma_id?: number | null
-          id?: string
-          valor?: number | null
-        }
-        Update: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          forma_id?: number | null
-          id?: string
-          valor?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doacoes_doador_id_fkey"
-            columns: ["doador_id"]
-            isOneToOne: false
-            referencedRelation: "doadores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "doacoes_forma_id_fkey"
-            columns: ["forma_id"]
-            isOneToOne: false
-            referencedRelation: "formas_de_doacao"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doacoes_fisicas: {
-        Row: {
-          data: string | null
-          descricao: string | null
-          doador_id: string | null
-          estado: string | null
-          id: string
-          ponto_id: string | null
-          quantidade: number | null
-          tipo_item: string | null
-        }
-        Insert: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          estado?: string | null
-          id?: string
-          ponto_id?: string | null
-          quantidade?: number | null
-          tipo_item?: string | null
-        }
-        Update: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          estado?: string | null
-          id?: string
-          ponto_id?: string | null
-          quantidade?: number | null
-          tipo_item?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doacoes_fisicas_doador_id_fkey"
-            columns: ["doador_id"]
-            isOneToOne: false
-            referencedRelation: "doadores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "doacoes_fisicas_ponto_id_fkey"
-            columns: ["ponto_id"]
-            isOneToOne: false
-            referencedRelation: "pontos_de_coleta"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       doacoes_fisicas_novas: {
         Row: {
@@ -392,35 +179,6 @@ export type Database = {
           },
         ]
       }
-      doacoes_produtos_servicos: {
-        Row: {
-          data: string | null
-          descricao: string | null
-          doador_id: string | null
-          id: string
-        }
-        Insert: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          id?: string
-        }
-        Update: {
-          data?: string | null
-          descricao?: string | null
-          doador_id?: string | null
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doacoes_produtos_servicos_doador_id_fkey"
-            columns: ["doador_id"]
-            isOneToOne: false
-            referencedRelation: "doadores"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       doadores: {
         Row: {
           created_at: string | null
@@ -478,48 +236,6 @@ export type Database = {
           link?: string | null
           resumo?: string | null
           titulo?: string
-        }
-        Relationships: []
-      }
-      eventos_voluntarios: {
-        Row: {
-          data: string | null
-          descricao: string | null
-          id: string
-          local: string | null
-          nome: string | null
-        }
-        Insert: {
-          data?: string | null
-          descricao?: string | null
-          id?: string
-          local?: string | null
-          nome?: string | null
-        }
-        Update: {
-          data?: string | null
-          descricao?: string | null
-          id?: string
-          local?: string | null
-          nome?: string | null
-        }
-        Relationships: []
-      }
-      formas_de_doacao: {
-        Row: {
-          descricao: string | null
-          id: number
-          nome: string
-        }
-        Insert: {
-          descricao?: string | null
-          id?: number
-          nome: string
-        }
-        Update: {
-          descricao?: string | null
-          id?: number
-          nome?: string
         }
         Relationships: []
       }
@@ -602,63 +318,6 @@ export type Database = {
           },
         ]
       }
-      pontos_de_coleta: {
-        Row: {
-          created_at: string | null
-          endereco: string | null
-          id: string
-          nome: string
-          telefone: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          endereco?: string | null
-          id?: string
-          nome: string
-          telefone?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          endereco?: string | null
-          id?: string
-          nome?: string
-          telefone?: string | null
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          aprovado: boolean
-          atualizado_em: string
-          criado_em: string
-          email: string
-          id: number
-          nome: string
-          perfil: string
-          senha: string
-        }
-        Insert: {
-          aprovado?: boolean
-          atualizado_em?: string
-          criado_em?: string
-          email: string
-          id?: number
-          nome: string
-          perfil?: string
-          senha: string
-        }
-        Update: {
-          aprovado?: boolean
-          atualizado_em?: string
-          criado_em?: string
-          email?: string
-          id?: number
-          nome?: string
-          perfil?: string
-          senha?: string
-        }
-        Relationships: []
-      }
       voluntarios: {
         Row: {
           ativo: boolean | null
@@ -695,80 +354,15 @@ export type Database = {
         }
         Relationships: []
       }
-      voluntarios_atividades: {
-        Row: {
-          atividade_id: string
-          data_part: string | null
-          horas: number | null
-          voluntario_id: string
-        }
-        Insert: {
-          atividade_id: string
-          data_part?: string | null
-          horas?: number | null
-          voluntario_id: string
-        }
-        Update: {
-          atividade_id?: string
-          data_part?: string | null
-          horas?: number | null
-          voluntario_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "voluntarios_atividades_atividade_id_fkey"
-            columns: ["atividade_id"]
-            isOneToOne: false
-            referencedRelation: "atividades_voluntarias"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "voluntarios_atividades_voluntario_id_fkey"
-            columns: ["voluntario_id"]
-            isOneToOne: false
-            referencedRelation: "voluntarios"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      voluntarios_eventos: {
-        Row: {
-          evento_id: string
-          horas: number | null
-          voluntario_id: string
-        }
-        Insert: {
-          evento_id: string
-          horas?: number | null
-          voluntario_id: string
-        }
-        Update: {
-          evento_id?: string
-          horas?: number | null
-          voluntario_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "voluntarios_eventos_evento_id_fkey"
-            columns: ["evento_id"]
-            isOneToOne: false
-            referencedRelation: "eventos_voluntarios"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "voluntarios_eventos_voluntario_id_fkey"
-            columns: ["voluntario_id"]
-            isOneToOne: false
-            referencedRelation: "voluntarios"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_estatisticas_impacto: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       has_admin_access: {
         Args: { user_id: string }
         Returns: boolean
