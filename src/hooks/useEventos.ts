@@ -10,14 +10,14 @@ export interface Evento {
   link?: string | null;
   data_inicio?: string | null;
   data_fim?: string | null;
-  criado_em?: string;
+  created_at?: string;
   local?: string | null;
   participantes_max?: number | null;
   inscritos?: number | null;
   imagem_url?: string | null;
 }
 
-type NovoEvento = Omit<Evento, 'id' | 'criado_em'>;
+type NovoEvento = Omit<Evento, 'id' | 'created_at'>;
 
 export const useEventos = (options?: { 
   enabled?: boolean;
@@ -43,19 +43,13 @@ export const useEventos = (options?: {
     queryKey: ['eventos', { page, limit, orderBy, orderDirection }],
     queryFn: async () => {
       try {
-        console.log('Iniciando busca de eventos...');
+        console.log('Buscando eventos...');
         
-        const query = supabase
+        const { data, error, count } = await supabase
           .from('eventos')
           .select('*', { count: 'exact' })
           .order(orderBy, { ascending: orderDirection === 'asc' })
           .range(offset, offset + limit - 1);
-        
-        console.log('Query configurada:', query);
-        
-        const { data, error, count } = await query;
-        
-        console.log('Resposta da query:', { data, error, count });
         
         if (error) {
           console.error('Erro na consulta Supabase:', error);
@@ -69,7 +63,7 @@ export const useEventos = (options?: {
           currentPage: page
         };
         
-        console.log('Resultado processado:', resultado);
+        console.log('Eventos carregados:', resultado.eventos.length);
         
         return resultado;
       } catch (error) {
@@ -78,7 +72,7 @@ export const useEventos = (options?: {
       }
     },
     enabled,
-    retry: 3,
+    retry: 2,
     retryDelay: 1000
   });
   

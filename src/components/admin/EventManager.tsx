@@ -2,13 +2,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useEventos } from '@/hooks/useEventos';
-import { CalendarDays, Plus, Edit, Trash2, ExternalLink, RefreshCw } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, ExternalLink, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import EventForm from './EventForm';
-import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -66,8 +65,6 @@ const EventManager: React.FC = () => {
   }
 
   if (error) {
-    console.error('Erro detalhado ao carregar eventos:', error);
-    
     return (
       <div className="space-y-4">
         <Alert variant="destructive">
@@ -75,10 +72,6 @@ const EventManager: React.FC = () => {
             <strong>Erro ao carregar eventos:</strong>
             <br />
             {error instanceof Error ? error.message : 'Erro desconhecido'}
-            <br />
-            <small className="text-muted-foreground mt-2 block">
-              Verifique o console do navegador para mais detalhes.
-            </small>
           </AlertDescription>
         </Alert>
         
