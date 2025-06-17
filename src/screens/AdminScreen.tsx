@@ -11,6 +11,7 @@ import AdminKPICards from '@/components/admin/AdminKPICards';
 import DashboardKPICards from '@/components/admin/DashboardKPICards';
 import AdminSearchAndFilters from '@/components/admin/AdminSearchAndFilters';
 import AdminNotifications from '@/components/admin/notifications/AdminNotifications';
+import EventManager from '@/components/admin/EventManager';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { 
   ShieldAlert, 
@@ -272,27 +273,7 @@ const AdminScreen: React.FC = () => {
           
           <TabsContent value="events" className="p-0">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex flex-col gap-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Gestão de Eventos</h2>
-                    <p className="text-gray-600">Organize e gerencie todos os eventos da ONG Viver</p>
-                  </div>
-                  <Button className="bg-viver-yellow hover:bg-viver-yellow/90 text-black font-medium">
-                    <CalendarDays className="h-4 w-4 mr-2" />
-                    Criar Novo Evento
-                  </Button>
-                </div>
-                <div className="text-center p-12 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-                  <CalendarDays className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-medium text-gray-700 mb-2">
-                    Módulo de Eventos em Desenvolvimento
-                  </h3>
-                  <p className="text-gray-500 max-w-md mx-auto">
-                    Em breve você poderá criar, editar e gerenciar todos os eventos da organização através desta interface.
-                  </p>
-                </div>
-              </div>
+              <EventManager />
             </div>
           </TabsContent>
           
