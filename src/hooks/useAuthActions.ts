@@ -12,8 +12,6 @@ export const useAuthActions = (
     if (!user) return;
     
     try {
-      console.log('Atualizando role do usuário:', user.email);
-      
       const { data, error } = await supabase
         .from('voluntarios')
         .select('role')
@@ -22,7 +20,6 @@ export const useAuthActions = (
 
       if (!error && data?.role && data.role !== user.role) {
         setUser({ ...user, role: data.role });
-        console.log('Role atualizado para:', data.role);
       }
     } catch (error) {
       console.error('Erro ao atualizar role:', error);
@@ -50,34 +47,25 @@ export const useAuthActions = (
 
   const login = async (email: string, password: string) => {
     try {
-      console.log('AuthActions: Tentando login:', email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        console.error('AuthActions: Erro no login:', error);
         throw new Error('Email ou senha incorretos');
       }
       
-      console.log('AuthActions: Login bem-sucedido:', data.user?.email);
-      
     } catch (error: any) {
-      console.error('AuthActions: Falha no login:', error);
       throw error;
     }
   };
 
   const logout = async () => {
     try {
-      console.log('AuthActions: Fazendo logout...');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      console.log('AuthActions: Logout realizado com sucesso');
     } catch (error) {
-      console.error('AuthActions: Erro ao fazer logout:', error);
       toast({
         title: "Erro ao desconectar",
         description: "Houve um problema ao fazer logout.",
@@ -97,10 +85,8 @@ export const useAuthActions = (
         theme: data.theme || user.theme
       };
       
-      // Atualizar estado imediatamente
       setUser(updatedUser);
       
-      // Tentar atualizar no banco
       try {
         await supabase
           .from('voluntarios')
@@ -119,7 +105,6 @@ export const useAuthActions = (
         description: "Suas informações foram atualizadas com sucesso!"
       });
     } catch (error) {
-      console.error('AuthActions: Falha ao atualizar perfil:', error);
       throw error;
     }
   };
@@ -139,7 +124,6 @@ export const useAuthActions = (
         description: "Sua senha foi atualizada com sucesso!"
       });
     } catch (error) {
-      console.error('AuthActions: Falha ao atualizar senha:', error);
       throw error;
     }
   };

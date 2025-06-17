@@ -33,7 +33,6 @@ export const useAuthState = () => {
   };
 
   const saveUserProfileAsync = async (userProfile: UserInfo) => {
-    // Salvar no banco de forma assíncrona sem bloquear a UI
     try {
       await supabase
         .from('voluntarios')
@@ -55,7 +54,6 @@ export const useAuthState = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Timeout de segurança para evitar loading infinito
     const safetyTimeout = setTimeout(() => {
       if (mounted) {
         setLoading(false);
@@ -67,7 +65,6 @@ export const useAuthState = () => {
       
       try {
         if (session?.user) {
-          // Criar perfil simples imediatamente
           const userProfile = createSimpleUserProfile(session.user);
           
           if (mounted) {
@@ -76,7 +73,6 @@ export const useAuthState = () => {
             setLoading(false);
             clearTimeout(safetyTimeout);
             
-            // Salvar no banco de forma assíncrona
             saveUserProfileAsync(userProfile);
           }
         } else {
@@ -88,7 +84,6 @@ export const useAuthState = () => {
           }
         }
       } catch (error) {
-        // Em caso de erro, ainda assim configurar usuário básico se existir sessão
         if (session?.user && mounted) {
           const fallbackUser: UserInfo = {
             id: session.user.id,
@@ -105,7 +100,6 @@ export const useAuthState = () => {
       }
     };
 
-    // Verificar sessão inicial
     const checkInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -128,10 +122,8 @@ export const useAuthState = () => {
       }
     };
 
-    // Configurar listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    // Verificar sessão inicial
     checkInitialSession();
 
     return () => {

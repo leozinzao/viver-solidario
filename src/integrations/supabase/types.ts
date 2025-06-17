@@ -388,11 +388,15 @@ export type Database = {
         Returns: Json
       }
       has_admin_access: {
-        Args: { user_id: string }
+        Args: { user_id?: string }
         Returns: boolean
       }
       is_admin: {
-        Args: { user_id: string }
+        Args: { user_id?: string }
+        Returns: boolean
+      }
+      is_own_profile: {
+        Args: { user_id?: string }
         Returns: boolean
       }
     }

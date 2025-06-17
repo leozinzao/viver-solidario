@@ -12,15 +12,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const authActions = useAuthActions(user, setUser);
   const { hasPermission } = useAuthPermissions(user);
 
-  console.log('AuthContext: Renderizando - loading:', loading, 'isAuthenticated:', isAuthenticated, 'user:', user?.email);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viver-yellow mx-auto mb-2"></div>
           <p className="text-gray-600">Carregando aplicação...</p>
-          <p className="text-xs text-gray-400 mt-1">Verificando autenticação</p>
         </div>
       </div>
     );
