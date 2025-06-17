@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 export interface Evento {
   id: string;
@@ -31,7 +31,7 @@ export const useEventos = (options?: {
   // Configurações padrão
   const limit = options?.limit || 10;
   const page = options?.page || 1;
-  const orderBy = options?.orderBy || 'data_inicio';
+  const orderBy = options?.orderBy || 'created_at';
   const orderDirection = options?.orderDirection || 'desc';
   const enabled = options?.enabled !== false;
   
@@ -43,41 +43,62 @@ export const useEventos = (options?: {
     queryKey: ['eventos', { page, limit, orderBy, orderDirection }],
     queryFn: async () => {
       try {
+        console.log('Iniciando busca de eventos...');
+        
         const query = supabase
           .from('eventos')
           .select('*', { count: 'exact' })
           .order(orderBy, { ascending: orderDirection === 'asc' })
           .range(offset, offset + limit - 1);
         
+        console.log('Query configurada:', query);
+        
         const { data, error, count } = await query;
         
-        if (error) throw error;
+        console.log('Resposta da query:', { data, error, count });
         
-        return {
+        if (error) {
+          console.error('Erro na consulta Supabase:', error);
+          throw error;
+        }
+        
+        const resultado = {
           eventos: data as Evento[],
           total: count || 0,
           pageCount: count ? Math.ceil(count / limit) : 0,
           currentPage: page
         };
+        
+        console.log('Resultado processado:', resultado);
+        
+        return resultado;
       } catch (error) {
         console.error('Erro ao buscar eventos:', error);
         throw error;
       }
     },
-    enabled
+    enabled,
+    retry: 3,
+    retryDelay: 1000
   });
   
   // Mutation para criar evento
   const criarEventoMutation = useMutation({
     mutationFn: async (novoEvento: NovoEvento) => {
+      console.log('Criando novo evento:', novoEvento);
+      
       const { data, error } = await supabase
         .from('eventos')
         .insert([novoEvento])
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao criar evento:', error);
+        throw error;
+      }
       
+      console.log('Evento criado com sucesso:', data);
       return data as Evento;
     },
     onSuccess: () => {
@@ -100,6 +121,8 @@ export const useEventos = (options?: {
   // Mutation para atualizar evento
   const atualizarEventoMutation = useMutation({
     mutationFn: async ({ id, ...dadosEvento }: { id: string } & Partial<Evento>) => {
+      console.log('Atualizando evento:', { id, dadosEvento });
+      
       const { data, error } = await supabase
         .from('eventos')
         .update(dadosEvento)
@@ -107,8 +130,12 @@ export const useEventos = (options?: {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar evento:', error);
+        throw error;
+      }
       
+      console.log('Evento atualizado com sucesso:', data);
       return data as Evento;
     },
     onSuccess: (_, variables) => {
@@ -132,13 +159,19 @@ export const useEventos = (options?: {
   // Mutation para excluir evento
   const excluirEventoMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log('Excluindo evento:', id);
+      
       const { error } = await supabase
         .from('eventos')
         .delete()
         .eq('id', id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao excluir evento:', error);
+        throw error;
+      }
       
+      console.log('Evento excluído com sucesso:', id);
       return id;
     },
     onSuccess: (id) => {
@@ -166,14 +199,20 @@ export const useEventos = (options?: {
       queryFn: async () => {
         if (!id) return null;
         
+        console.log('Buscando evento específico:', id);
+        
         const { data, error } = await supabase
           .from('eventos')
           .select('*')
           .eq('id', id)
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao buscar evento específico:', error);
+          throw error;
+        }
         
+        console.log('Evento específico encontrado:', data);
         return data as Evento;
       },
       enabled: !!id

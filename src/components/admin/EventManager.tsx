@@ -6,6 +6,7 @@ import { CalendarDays, Plus, Edit, Trash2, ExternalLink, RefreshCw } from 'lucid
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import EventForm from './EventForm';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -20,11 +21,19 @@ const EventManager: React.FC = () => {
 
   const eventos = eventosData?.eventos || [];
 
+  console.log('EventManager - Estado atual:', {
+    eventosData,
+    isLoading,
+    error: error?.message,
+    eventos: eventos.length
+  });
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null;
     try {
       return format(new Date(dateString), 'dd/MM/yyyy', { locale: ptBR });
     } catch (e) {
+      console.error('Erro ao formatar data:', e);
       return 'Data inválida';
     }
   };
@@ -57,13 +66,28 @@ const EventManager: React.FC = () => {
   }
 
   if (error) {
+    console.error('Erro detalhado ao carregar eventos:', error);
+    
     return (
-      <div className="text-center py-12">
-        <p className="text-destructive mb-4">Erro ao carregar eventos</p>
-        <Button onClick={() => refetch()} variant="outline">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Tentar novamente
-        </Button>
+      <div className="space-y-4">
+        <Alert variant="destructive">
+          <AlertDescription>
+            <strong>Erro ao carregar eventos:</strong>
+            <br />
+            {error instanceof Error ? error.message : 'Erro desconhecido'}
+            <br />
+            <small className="text-muted-foreground mt-2 block">
+              Verifique o console do navegador para mais detalhes.
+            </small>
+          </AlertDescription>
+        </Alert>
+        
+        <div className="text-center">
+          <Button onClick={() => refetch()} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar novamente
+          </Button>
+        </div>
       </div>
     );
   }
@@ -74,6 +98,11 @@ const EventManager: React.FC = () => {
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Gestão de Eventos</h2>
           <p className="text-gray-600">Organize e gerencie todos os eventos da ONG Viver</p>
+          {eventos.length > 0 && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Total de eventos: {eventosData?.total || eventos.length}
+            </p>
+          )}
         </div>
         <Button 
           onClick={() => setShowEventForm(true)}
